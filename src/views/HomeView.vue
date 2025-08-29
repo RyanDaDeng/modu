@@ -14,8 +14,8 @@
       <!-- Welcome Dialog -->
       <WelcomeDialog />
       <div class="container mx-auto px-4 -mb-12 py-6">
-        <!-- New User Guide Banner -->
-        <div v-show="!announcementHidden" class="mb-4 sm:mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-lg sm:rounded-xl p-[2px]">
+        <!-- New User Guide Banner - Desktop Only -->
+        <div v-show="!announcementHidden" class="hidden sm:block mb-4 sm:mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-lg sm:rounded-xl p-[2px]">
           <div class="bg-gray-900/90 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-6">
             <div class="flex items-start space-x-3 sm:space-x-4">
               <!-- Icon (hidden on mobile) -->
@@ -89,6 +89,35 @@
           >
             搜索
           </button>
+        </div>
+        
+        <!-- Mobile New User Guide Banner - Below Search -->
+        <div v-show="!announcementHidden" class="sm:hidden mt-3 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-lg p-[1px]">
+          <div class="bg-gray-900/90 backdrop-blur-sm rounded-lg p-3">
+            <div class="flex items-start space-x-2">
+              <!-- Content -->
+              <div class="flex-1">
+                <h2 class="text-sm font-bold text-white mb-1.5 flex items-center gap-1">
+                  <span>💡 新手指引</span>
+                  <span class="px-1.5 py-0.5 text-[10px] bg-blue-500 text-white rounded-full">小贴士</span>
+                </h2>
+
+                <div class="text-gray-300 text-xs space-y-1.5">
+                  <p class="leading-relaxed">
+                    图片加载慢？点击右上角齿轮图标切换服务器！
+                  </p>
+                </div>
+              </div>
+
+              <!-- Close button -->
+              <button
+                  @click="hideAnnouncement"
+                  class="flex-shrink-0 text-gray-400 hover:text-gray-200 text-xs transition-colors cursor-pointer p-1"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
