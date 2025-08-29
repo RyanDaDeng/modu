@@ -55,6 +55,7 @@ async function getProxyData(url) {
 }
 
 const api = axios.create({
+  baseURL: BACKEND_PROXY,
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json'

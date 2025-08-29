@@ -9,12 +9,12 @@ const API_URL = import.meta.env.PROD
 // 简单配置
 const api = axios.create({
   baseURL: API_URL,
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'X-Requested-With': 'XMLHttpRequest'
+    'Accept': 'application/json'
   },
-  withCredentials: false  // No longer using cookies
+  withCredentials: false  // No CSRF needed
 })
 
 // Request interceptor to add auth token
