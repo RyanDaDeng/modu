@@ -85,19 +85,19 @@ api.interceptors.response.use(
 
 // 注册
 export const register = async (data) => {
-  const response = await api.post('/api/register', data)
+  const response = await api.post('/api/auth/register', data)
   return response
 }
 
 // 登录
 export const login = async (credentials) => {
-  const response = await api.post('/api/login', credentials)
+  const response = await api.post('/api/auth/login', credentials)
   return response
 }
 
 // 退出登录
 export const logout = async () => {
-  await api.post('/api/logout')
+  await api.post('/api/auth/logout')
 }
 
 // 获取当前用户信息（从服务器）
