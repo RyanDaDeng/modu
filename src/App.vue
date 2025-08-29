@@ -1,7 +1,6 @@
 <template>
   <div id="app" class="min-h-screen flex flex-col">
-    <AppHeader v-if="!isChapterView" />
-    <main class="flex-grow pb-14 sm:pb-0">
+    <main class="flex-grow">
       <router-view v-slot="{ Component, route }">
         <keep-alive :include="cachedViews">
           <component :is="Component" :key="route.path" />
@@ -9,7 +8,6 @@
       </router-view>
     </main>
     <AppFooter v-if="!isChapterView" />
-    <MobileBottomNav v-if="!isChapterView" />
     <BackToTop />
     <AgeWarning />
     <ToastNotification />
@@ -21,9 +19,7 @@ import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { useAuthStore } from '@/stores/auth'
-import AppHeader from '@/components/AppHeader.vue'
 import AppFooter from '@/components/AppFooter.vue'
-import MobileBottomNav from '@/components/MobileBottomNav.vue'
 import BackToTop from '@/components/BackToTop.vue'
 import AgeWarning from '@/components/AgeWarning.vue'
 import ToastNotification from '@/components/ToastNotification.vue'

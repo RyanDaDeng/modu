@@ -48,7 +48,7 @@
               <!-- Content -->
               <div class="text-gray-300 space-y-4">
                 <p class="text-sm sm:text-base leading-relaxed">
-                  感谢来到 <span class="text-pink-400 font-semibold">禁漫社 纯净版</span>
+                  感谢来到 <span class="text-pink-400 font-semibold">魔都 纯净版</span>
                 </p>
                 
                 <p class="text-sm sm:text-base leading-relaxed">

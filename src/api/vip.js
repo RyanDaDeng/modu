@@ -12,8 +12,23 @@ const api = axios.create({
     'Accept': 'application/json',
     'X-Requested-With': 'XMLHttpRequest'
   },
-  withCredentials: true
+  withCredentials: false // No longer using cookies
 })
+
+// Request interceptor to add auth token
+api.interceptors.request.use(
+  config => {
+    const token = localStorage.getItem('auth_token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  error => {
+    return Promise.reject(error)
+  }
+)
+
 
 // Get VIP plans
 export const getVipPlans = async () => {
@@ -26,6 +41,14 @@ export const createVipOrder = async (planKey, paymentMethod) => {
   const response = await api.post('/api/vip/create-order', {
     plan_key: planKey,
     payment_method: paymentMethod
+  })
+  return response.data
+}
+
+// Get recharge history
+export const getRechargeHistory = async (page = 1, perPage = 10) => {
+  const response = await api.get('/api/recharge-history', {
+    params: { page, per_page: perPage }
   })
   return response.data
 }

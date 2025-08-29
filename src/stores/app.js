@@ -13,7 +13,8 @@ export const useAppStore = defineStore('app', {
     searchHistory: [],
     collectedComics: [], // This will be synced with backend
     user: null, // 只在内存中保存，不使用localStorage
-    authToken: null // Sanctum不需要token
+    authToken: null, // Sanctum不需要token
+    navCategories: [] // Navigation categories from API
   }),
 
   getters: {
@@ -157,6 +158,10 @@ export const useAppStore = defineStore('app', {
         this.clearUser()
         throw error // 继续抛出错误，让调用者决定如何处理
       }
+    },
+
+    setNavCategories(categories) {
+      this.navCategories = categories
     }
   }
 })

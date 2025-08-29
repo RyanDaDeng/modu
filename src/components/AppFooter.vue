@@ -1,8 +1,18 @@
 <template>
-  <footer class="bg-gray-900 border-t border-gray-800">
-    <div class="container mx-auto px-4 py-8">
+  <footer class="relative border-t border-gray-800">
+    <!-- Background Image -->
+    <div 
+      class="absolute inset-0 bg-cover bg-center bg-fixed"
+      style="background-image: url('/img_7.png')"
+    >
+      <!-- Dark overlay for readability -->
+      <div class="absolute inset-0 bg-black/85"></div>
+    </div>
+    
+    <!-- Content -->
+    <div class="relative z-10 container mx-auto px-4 py-8">
       <!-- Age Warning -->
-      <div class="bg-red-900/20 border border-red-800 rounded-lg p-4 mb-6">
+      <div class="bg-red-900/30 backdrop-blur-sm border border-red-800/50 rounded-lg p-4 mb-6">
         <div class="flex items-center gap-3 mb-2">
           <svg class="w-6 h-6 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
@@ -15,7 +25,7 @@
       </div>
       
       <!-- Disclaimer -->
-      <div class="bg-gray-800 rounded-lg p-4 mb-6">
+      <div class="bg-gray-800/40 backdrop-blur-sm rounded-lg p-4 mb-6 border border-gray-700/50">
         <h3 class="text-lg font-bold text-white mb-3">免责声明</h3>
         <div class="space-y-2 text-sm text-gray-400 leading-relaxed">
           <p>
@@ -33,18 +43,25 @@
         </div>
       </div>
       
-      <!-- Copyright -->
+      <!-- Links and Copyright -->
       <div class="text-center pt-4 border-t border-gray-800">
-        <div class="flex items-center justify-center space-x-2 mb-2">
-          <img 
-            src="/logo.png" 
-            alt="禁漫社" 
-            class="w-6 h-6 object-contain"
-          />
-          <span class="text-sm text-gray-500 font-semibold">禁漫社</span>
+        <!-- Policy Links -->
+        <div class="flex items-center justify-center gap-4 mb-4">
+          <router-link to="/terms" class="text-sm text-gray-400 hover:text-pink-500 transition-colors">
+            服务条款
+          </router-link>
+          <span class="text-gray-600">|</span>
+          <router-link to="/privacy" class="text-sm text-gray-400 hover:text-pink-500 transition-colors">
+            隐私政策
+          </router-link>
+        </div>
+        
+        <!-- Logo and Copyright -->
+        <div class="flex justify-center mb-2">
+          <SiteLogo :size="'small'" />
         </div>
         <p class="text-sm text-gray-500">
-          © {{ currentYear }} 禁漫社 - 仅供学习交流使用
+          © {{ currentYear }} 魔都 - 仅供学习交流使用
         </p>
         <p class="text-xs text-gray-600 mt-2">
           本站不存储任何资源内容，所有内容均来自第三方网站
@@ -56,6 +73,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import SiteLogo from '@/components/SiteLogo.vue'
 
 const currentYear = computed(() => new Date().getFullYear())
 </script>

@@ -5,6 +5,7 @@ import { useAppStore } from './app'
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
+    token: null,
     isAuthenticated: false,
     isLoading: false,
     authInitialized: false,
@@ -21,17 +22,29 @@ export const useAuthStore = defineStore('auth', {
     async initAuth() {
       if (this.authInitialized) return
       
-      // 检查 localStorage 中的登录标记
-      const hasLoggedIn = localStorage.getItem('has_logged_in') === 'true'
+      // 检查 localStorage 中的 token
+      const token = localStorage.getItem('auth_token')
+      const expiresAt = localStorage.getItem('token_expires_at')
       
-      if (!hasLoggedIn) {
-        // 从未登录过，直接显示登录按钮
+      if (!token) {
+        // 没有 token，直接显示登录按钮
         this.authInitialized = true
         this.clearAuth()
         return
       }
       
-      // 之前登录过，尝试获取用户信息
+      // 检查 token 是否已过期
+      if (expiresAt && new Date(expiresAt) < new Date()) {
+        console.log('Token has expired')
+        this.authInitialized = true
+        this.clearAuth()
+        localStorage.removeItem('auth_token')
+        localStorage.removeItem('token_expires_at')
+        return
+      }
+      
+      // 有 token 且未过期，设置并尝试获取用户信息
+      this.token = token
       this.isLoading = true
       
       try {
@@ -47,20 +60,19 @@ export const useAuthStore = defineStore('auth', {
           // 同步到 app store
           const appStore = useAppStore()
           appStore.setUser(user)
-          
-          // 保持登录标记
-          localStorage.setItem('has_logged_in', 'true')
         } else {
-          // session 已过期，清除登录标记
+          // token 无效
           this.clearAuth()
-          localStorage.removeItem('has_logged_in')
+          localStorage.removeItem('auth_token')
+          localStorage.removeItem('token_expires_at')
         }
       } catch (error) {
         console.error('Auth initialization error:', error)
         this.authInitialized = true
         this.clearAuth()
-        // 401 错误，清除登录标记
-        localStorage.removeItem('has_logged_in')
+        // 401 错误，清除 token
+        localStorage.removeItem('auth_token')
+        localStorage.removeItem('token_expires_at')
       } finally {
         this.isLoading = false
       }
@@ -74,12 +86,16 @@ export const useAuthStore = defineStore('auth', {
           remember: this.rememberMe
         })
         
-        if (response.user) {
+        if (response.user && response.token) {
           this.user = response.user
+          this.token = response.token
           this.isAuthenticated = true
           
-          // 设置登录标记
-          localStorage.setItem('has_logged_in', 'true')
+          // 保存 token 到 localStorage
+          localStorage.setItem('auth_token', response.token)
+          if (response.expires_at) {
+            localStorage.setItem('token_expires_at', response.expires_at)
+          }
           
           // 同步到 app store
           const appStore = useAppStore()
@@ -108,12 +124,16 @@ export const useAuthStore = defineStore('auth', {
       try {
         const response = await apiRegister(userData)
         
-        if (response.user) {
+        if (response.user && response.token) {
           this.user = response.user
+          this.token = response.token
           this.isAuthenticated = true
           
-          // 设置登录标记
-          localStorage.setItem('has_logged_in', 'true')
+          // 保存 token 到 localStorage
+          localStorage.setItem('auth_token', response.token)
+          if (response.expires_at) {
+            localStorage.setItem('token_expires_at', response.expires_at)
+          }
           
           // 同步到 app store
           const appStore = useAppStore()
@@ -155,8 +175,9 @@ export const useAuthStore = defineStore('auth', {
       } finally {
         this.clearAuth()
         
-        // 清除登录标记
-        localStorage.removeItem('has_logged_in')
+        // 清除所有认证相关的 localStorage
+        localStorage.removeItem('auth_token')
+        localStorage.removeItem('token_expires_at')
         
         // 清除 app store 的用户信息
         const appStore = useAppStore()
@@ -172,21 +193,20 @@ export const useAuthStore = defineStore('auth', {
           this.user = user
           this.isAuthenticated = true
           
-          // 更新登录标记
-          localStorage.setItem('has_logged_in', 'true')
-          
           // 同步到 app store
           const appStore = useAppStore()
           appStore.setUser(user)
           
           return user
         } else {
-          // 没有用户，清除登录标记
-          localStorage.removeItem('has_logged_in')
+          // 没有用户，清除 token
+          localStorage.removeItem('auth_token')
+          localStorage.removeItem('token_expires_at')
         }
       } catch (error) {
-        // 获取失败，清除登录标记
-        localStorage.removeItem('has_logged_in')
+        // 获取失败，清除 token
+        localStorage.removeItem('auth_token')
+        localStorage.removeItem('token_expires_at')
         this.clearAuth()
         throw error
       }
@@ -194,6 +214,7 @@ export const useAuthStore = defineStore('auth', {
 
     clearAuth() {
       this.user = null
+      this.token = null
       this.isAuthenticated = false
       this.rememberMe = false
     },

@@ -72,6 +72,16 @@ const router = createRouter({
       name: 'recharge-history',
       component: () => import('../views/RechargeHistoryView.vue'),
       meta: { requiresAuth: true }
+    },
+    {
+      path: '/terms',
+      name: 'terms',
+      component: () => import('../views/TermsView.vue')
+    },
+    {
+      path: '/privacy',
+      name: 'privacy',
+      component: () => import('../views/PrivacyView.vue')
     }
   ],
   scrollBehavior(to, from, savedPosition) {

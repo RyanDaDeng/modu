@@ -213,12 +213,7 @@
 import { ref, watch, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { getImageServer, saveImageServer } from '@/utils/imageServer'
-import axios from 'axios'
-
-const api = axios.create({
-  baseURL: '/api',
-  withCredentials: true
-})
+import { getImageServers } from '@/api/request'
 
 const props = defineProps({
   modelValue: {
@@ -262,8 +257,8 @@ const fetchServers = async () => {
   error.value = ''
   
   try {
-    const response = await api.get('/image-servers')
-    servers.value = response.data.servers
+    const response = await getImageServers()
+    servers.value = response.servers
     
     // Use the utility function to get current server
     selectedServer.value = getImageServer()
@@ -324,7 +319,7 @@ const saveSelection = async () => {
   
   try {
     // Use utility function to save
-    await saveImageServer(selectedServer.value, api)
+    await saveImageServer(selectedServer.value)
     
     close()
     

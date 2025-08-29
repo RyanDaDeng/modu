@@ -30,23 +30,28 @@ export function getImageServer() {
  * Saves to localStorage for all users
  * If logged in, also saves to backend
  */
-export async function saveImageServer(serverUrl, api) {
+export async function saveImageServer(serverUrl) {
   const authStore = useAuthStore()
   
   // Always save to localStorage
   localStorage.setItem('img_server', serverUrl)
   
-  // If logged in, save to backend
-  if (authStore.isLoggedIn && api) {
+  // Only try to save to backend if user is actually logged in
+  // Check both isLoggedIn and that we have a user object
+  if (authStore.isLoggedIn && authStore.user) {
     try {
-      await api.put('/user/image-server', {
-        img_server: serverUrl
-      })
+      const { updateUserImageServer } = await import('@/api/request')
+      await updateUserImageServer(serverUrl)
       
       // Update user data in auth store
-      authStore.user.img_server = serverUrl
+      if (authStore.user) {
+        authStore.user.img_server = serverUrl
+      }
     } catch (err) {
-      console.error('Failed to save server to backend:', err)
+      // Only log error if it's not a 401 (which is expected when not logged in)
+      if (err.response?.status !== 401) {
+        console.error('Failed to save server to backend:', err)
+      }
       // localStorage save was successful, so don't throw
     }
   }

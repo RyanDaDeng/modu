@@ -1,7 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-900 pb-20 sm:pb-8">
-    <!-- Page Header -->
-    <PageHeader title="充值记录" />
+  <AppLayout title="充值记录">
     
     <!-- Order List -->
     <div class="container mx-auto px-4 py-6 max-w-4xl">
@@ -106,15 +104,15 @@
         <LoadingSpinner size="small" />
       </div>
     </div>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import axios from 'axios'
-import PageHeader from '@/components/PageHeader.vue'
+import { getRechargeHistory } from '@/api/vip'
+import AppLayout from '@/components/AppLayout.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const router = useRouter()
@@ -126,17 +124,6 @@ const pagination = ref(null)
 const loading = ref(false)
 const loadingMore = ref(false)
 
-// API setup
-const api = axios.create({
-  baseURL: import.meta.env.PROD ? import.meta.env.VITE_BACKEND_API_URL : '',
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'X-Requested-With': 'XMLHttpRequest'
-  },
-  withCredentials: true
-})
-
 // Load orders
 const loadOrders = async (page = 1, append = false) => {
   if (append) {
@@ -146,20 +133,25 @@ const loadOrders = async (page = 1, append = false) => {
   }
   
   try {
-    const response = await api.get('/api/recharge-history', {
-      params: { page, per_page: 10 }
-    })
+    const response = await getRechargeHistory(page, 10)
     
-    if (response.data.success) {
+    if (response.success) {
       if (append) {
-        orders.value = [...orders.value, ...response.data.data]
+        orders.value = [...orders.value, ...response.data]
       } else {
-        orders.value = response.data.data
+        orders.value = response.data
       }
-      pagination.value = response.data.pagination
+      pagination.value = response.pagination
     }
   } catch (error) {
     console.error('Failed to load recharge history:', error)
+    // If 401, redirect to login
+    if (error.response?.status === 401) {
+      router.push({
+        path: '/login',
+        query: { redirect: '/recharge-history' }
+      })
+    }
   } finally {
     loading.value = false
     loadingMore.value = false

@@ -1,5 +1,5 @@
 <template>
-  <div class="relative group">
+  <div class="relative">
     <!-- Left Button -->
     <button
       v-if="showLeftButton"

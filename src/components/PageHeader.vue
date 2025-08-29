@@ -1,5 +1,5 @@
 <template>
-  <div class="sticky top-0 sm:top-14 z-50 sm:z-30 bg-gray-800 shadow-lg">
+  <div class="lg:hidden sticky top-0 sm:top-14 z-50 sm:z-30 bg-gray-800 shadow-lg">
     <div class="container mx-auto px-4">
       <div class="flex items-center justify-between h-14">
         <!-- Back Button -->

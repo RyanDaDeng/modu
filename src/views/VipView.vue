@@ -1,6 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-900 pb-20 sm:pb-8">
-    <PageHeader title="VIP会员" />
+  <AppLayout title="VIP会员">
 
     <!-- Main Content -->
     <div class="container mx-auto px-4 py-6">
@@ -192,7 +191,7 @@
         <p class="text-gray-400 mt-2 text-sm">请稍候，请勿关闭页面...</p>
       </div>
     </div>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup>
@@ -203,7 +202,7 @@ import { getVipPlans, createVipOrder } from '@/api/vip'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import ModalDialog from '@/components/ModalDialog.vue'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
-import PageHeader from '@/components/PageHeader.vue'
+import AppLayout from '@/components/AppLayout.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()

@@ -1,6 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-900">
-    <PageHeader title="更新" />
+  <AppLayout title="更新">
     <div class="container mx-auto px-4 py-6">
       
       <!-- Tab Navigation -->
@@ -70,7 +69,7 @@
       </div>
       
     </div>
-  </div>
+  </AppLayout>
 </template>
 
 <script>
@@ -84,7 +83,7 @@ import { ref, onMounted, computed } from 'vue'
 import { getSerialization } from '@/api/request'
 import ComicCard from '@/components/ComicCard.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
-import PageHeader from '@/components/PageHeader.vue'
+import AppLayout from '@/components/AppLayout.vue'
 
 // Type tabs
 const typeTabs = [

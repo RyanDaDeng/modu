@@ -59,11 +59,18 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json'
   },
-  withCredentials: true // 需要带cookie
+  withCredentials: false // No longer using cookies
 })
 
 api.interceptors.request.use(config => {
   const appStore = useAppStore()
+  
+  // Add auth token if available
+  const token = localStorage.getItem('auth_token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  
   // 发送currentKey给后端，让后端使用相同的key生成token
   if (appStore.currentKey) {
     config.headers['X-Client-Key'] = appStore.currentKey
@@ -240,6 +247,18 @@ export async function getCategories() {
   // Use timestamp from header if available (for cached responses)
   const timestamp = response.headers['x-timestamp'] || appStore.currentKey
   return decryptData(timestamp, response.data.data)
+}
+
+export async function getImageServers() {
+  const response = await api.get('/api/image-servers')
+  return response.data
+}
+
+export async function updateUserImageServer(imgServer) {
+  const response = await api.put('/api/user/image-server', {
+    img_server: imgServer
+  })
+  return response.data
 }
 
 export async function getCategoriesFilter(page = 1, order = '', category = '') {

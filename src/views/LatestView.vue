@@ -1,6 +1,5 @@
 <template>
-  <div class="bg-gray-900 min-h-screen">
-    <PageHeader title="最新更新" />
+  <AppLayout title="最新更新">
     <div class="container mx-auto px-4 py-6">
       
       <div v-if="!comics.length && !loading" class="text-center py-12">
@@ -38,7 +37,7 @@
         <LoadingSpinner />
       </div>
     </div>
-  </div>
+  </AppLayout>
 </template>
 
 <script>
@@ -52,7 +51,7 @@ import { ref, onMounted } from 'vue'
 import { getLatestContent } from '@/api/request'
 import ComicCard from '@/components/ComicCard.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
-import PageHeader from '@/components/PageHeader.vue'
+import AppLayout from '@/components/AppLayout.vue'
 
 const comics = ref([])
 const loading = ref(false)

@@ -1,5 +1,9 @@
 <template>
-  <div class="min-h-screen bg-gray-900">
+  <AppLayout 
+    :title="comicInfo.name || '加载中...'" 
+    :show-bottom-nav="false"
+    :hide-breadcrumbs="true"
+  >
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center min-h-screen">
       <div class="flex flex-col items-center">
@@ -9,20 +13,6 @@
 
     <!-- Main Content (always visible) -->
     <div v-else-if="!isReading">
-      <!-- Page Header -->
-      <PageHeader :title="comicInfo.name || '加载中...'">
-        <template #action>
-          <button
-            @click="toggleCollect"
-            class="p-2 rounded-lg hover:bg-gray-700 transition-colors"
-            :class="isCollected ? 'text-pink-500' : 'text-gray-400'"
-          >
-            <svg class="w-5 h-5 sm:w-6 sm:h-6" :fill="isCollected ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
-          </button>
-        </template>
-      </PageHeader>
 
       <!-- Comic Info Section -->
       <div class="relative">
@@ -140,15 +130,23 @@
                 @click="handleChapterClick(item.id, index)"
                 class="relative px-4 py-3 rounded-lg transition-all text-center cursor-pointer transform hover:scale-105 group border"
                 :class="[
-                  isChapterLocked(index) 
-                    ? 'bg-gray-800 hover:bg-gray-700 hover:shadow-lg border-gray-700 hover:border-yellow-500' 
-                    : 'bg-gray-700 hover:bg-gray-600 hover:shadow-lg border-gray-700 hover:border-green-500'
+                  index === lastReadChapterIndex
+                    ? 'bg-pink-900/30 border-pink-500 hover:bg-pink-800/40 hover:border-pink-400'
+                    : isChapterLocked(index) 
+                      ? 'bg-gray-800 hover:bg-gray-700 hover:shadow-lg border-gray-700 hover:border-yellow-500' 
+                      : 'bg-gray-700 hover:bg-gray-600 hover:shadow-lg border-gray-700 hover:border-green-500'
                 ]"
               >
-                <!-- Chapter Label (Free/Locked) -->
+                <!-- Chapter Label (Free/Locked/Last Read) -->
                 <div class="absolute -top-2 -right-2 z-10 pointer-events-none">
                   <span 
-                    v-if="!appStore.isLoggedIn && index < 3"
+                    v-if="index === lastReadChapterIndex"
+                    class="inline-flex items-center px-2 py-0.5 text-xs font-bold bg-pink-500 text-white rounded-full"
+                  >
+                    上次阅读
+                  </span>
+                  <span 
+                    v-else-if="!appStore.isLoggedIn && index < 3"
                     class="inline-flex items-center px-2 py-0.5 text-xs font-bold bg-green-500 text-white rounded-full"
                   >
                     免费
@@ -167,8 +165,9 @@
                 <div 
                   class="font-semibold transition-colors"
                   :class="{ 
-                    'text-gray-400 group-hover:text-yellow-400': isChapterLocked(index),
-                    'text-white group-hover:text-green-400': !isChapterLocked(index)
+                    'text-pink-300 group-hover:text-pink-200': index === lastReadChapterIndex,
+                    'text-gray-400 group-hover:text-yellow-400': index !== lastReadChapterIndex && isChapterLocked(index),
+                    'text-white group-hover:text-green-400': index !== lastReadChapterIndex && !isChapterLocked(index)
                   }"
                 >
                   第{{ index + 1 }}章
@@ -315,7 +314,7 @@
     </div>
 
     <!-- Reading Mode (Fullscreen) -->
-    <div v-if="isReading" ref="readingContainer" class="fixed inset-0 z-50 bg-black overflow-auto" @scroll="handleReadingScroll">
+    <div v-if="isReading" ref="readingContainer" class="fixed inset-0 z-50 bg-black overflow-y-auto" @scroll="handleReadingScroll">
       <!-- Reading Header -->
       <div 
         class="fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800 transition-transform duration-300"
@@ -755,7 +754,7 @@
       @confirm="handleVipUpgrade"
       @cancel="showVipPrompt = false"
     />
-  </div>
+  </AppLayout>
 </template>
 
 <script setup>
@@ -767,9 +766,10 @@ import { cutImage, getImageUrl, getMaxRequestCount } from '@/utils/image'
 import { getImageServer } from '@/utils/imageServer'
 import { formatNumber } from '@/utils/format'
 import { checkCollection, toggleCollection } from '@/api/collection'
+import readingHistoryService from '@/services/readingHistory'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import ModalDialog from '@/components/ModalDialog.vue'
-import PageHeader from '@/components/PageHeader.vue'
+import AppLayout from '@/components/AppLayout.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -816,6 +816,7 @@ const loadingAllImages = ref(false)
 
 // Reading history
 const readingHistory = ref({}) // { comicId: chapterIndex }
+const lastReadChapterIndex = ref(-1) // Track last read chapter for visual indicator
 
 // Refs for DOM elements
 const imageRefs = ref([])
@@ -983,6 +984,9 @@ const loadComicInfo = async () => {
     if (activeTab.value === 'comments' && !comments.value.length) {
       loadComments()
     }
+    
+    // Load reading history after comic info is loaded
+    await loadReadingHistory()
   } catch (err) {
     console.error('Failed to load comic info:', err)
     error.value = '加载失败，请稍后重试'
@@ -992,39 +996,47 @@ const loadComicInfo = async () => {
 }
 
 // Load reading history from localStorage
-const loadReadingHistory = () => {
-  const history = localStorage.getItem('chapterReadingHistory')
-  if (history) {
-    readingHistory.value = JSON.parse(history)
+const loadReadingHistory = async () => {
+  // Load last read chapter for this comic using the new service
+  const historyItem = await readingHistoryService.getByComicId(comicId.value)
+  if (historyItem) {
+    lastReadChapterIndex.value = historyItem.chapterIndex
   }
 }
 
 // Save reading history to localStorage
-const saveReadingHistory = (chapterId) => {
-  let history = { ...readingHistory.value }
+const saveReadingHistory = async (chapterId) => {
   const currentComicId = comicId.value
   
-  // Find the chapter index - save only the latest clicked chapter
+  // Find the chapter details
+  let chapterTitle = ''
+  let chapterIndex = -1
+  
   if (comicInfo.value.series?.length) {
-    const chapterIndex = comicInfo.value.series.findIndex(s => s.id == chapterId)
+    chapterIndex = comicInfo.value.series.findIndex(s => s.id == chapterId)
     if (chapterIndex >= 0) {
-      history[currentComicId] = chapterIndex
+      chapterTitle = `第${chapterIndex + 1}章`
     }
   } else {
     // Single chapter comic
-    history[currentComicId] = 0
+    chapterIndex = 0
+    chapterTitle = '单章节'
   }
   
-  // Keep only last 10 comics (remove oldest if exceeds limit)
-  const entries = Object.entries(history)
-  if (entries.length > 10) {
-    // Get the keys array and remove the first (oldest) entry
-    const keys = Object.keys(history)
-    delete history[keys[0]]
+  // Save to new history service
+  if (chapterIndex >= 0) {
+    await readingHistoryService.add({
+      comicId: currentComicId,
+      comicTitle: comicInfo.value.name || '',
+      chapterId: chapterId,
+      chapterTitle: chapterTitle,
+      chapterIndex: chapterIndex,
+      coverImage: getAlbumCover(currentComicId)
+    })
   }
   
-  readingHistory.value = history
-  localStorage.setItem('chapterReadingHistory', JSON.stringify(history))
+  // Update local state for visual indicators
+  lastReadChapterIndex.value = chapterIndex
 }
 
 
@@ -1113,9 +1125,6 @@ const startReading = async (seriesId, isSingleChapter = false) => {
   
   // Save to reading history
   saveReadingHistory(seriesId)
-  
-  // Prevent body scroll when in reading mode
-  document.body.style.overflow = 'hidden'
   
   currentReadingId.value = seriesId
   isReading.value = true
@@ -1254,9 +1263,6 @@ const exitReading = () => {
     observer.disconnect()
     observer = null
   }
-  
-  // Restore body scroll
-  document.body.style.overflow = ''
   
   // Restore scroll position after DOM update
   nextTick(() => {

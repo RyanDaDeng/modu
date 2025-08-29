@@ -21,7 +21,7 @@
       
       <!-- Brand text with animation -->
       <div class="brand-text-container">
-        <span class="brand-text">禁漫社</span>
+        <span class="brand-text">魔都</span>
         <span class="brand-heart">♥</span>
       </div>
       
@@ -50,17 +50,28 @@
 /* Logo container with animations */
 .logo-container {
   position: relative;
-  width: 64px;
-  height: 64px;
+  width: 42px;
+  height: 48px;
   animation: breathe 3s ease-in-out infinite;
 }
 
 .logo-main {
   width: 100%;
   height: 100%;
+  object-fit: contain;
+  /* 添加白色光晕，让黑色部分更明显 */
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.4)) 
+          drop-shadow(0 0 6px rgba(255, 255, 255, 0.2));
+}
+
+/* 添加背景光圈效果 */
+.logo-container::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
   border-radius: 50%;
-  border: 3px solid rgba(236, 72, 153, 0.3);
-  box-shadow: 0 0 20px rgba(236, 72, 153, 0.4);
+  z-index: -1;
 }
 
 /* Eye blink effect */
@@ -82,17 +93,19 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   pointer-events: none;
 }
 
 .heart {
   position: absolute;
   color: #ec4899;
-  font-size: 12px;
+  font-size: 10px;
   opacity: 0;
   animation: float-heart 3s ease-out infinite;
+  /* 添加心形光晕 */
+  filter: drop-shadow(0 0 2px rgba(236, 72, 153, 0.6));
 }
 
 .heart-1 {
@@ -122,7 +135,7 @@
 
 .brand-text {
   font-family: 'Pacifico', 'Dancing Script', 'Satisfy', 'Kaushan Script', 'Permanent Marker', fantasy;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 900;
   color: #ec4899;
   text-shadow: 
@@ -162,7 +175,7 @@
 }
 
 .dot:nth-child(3) {
-  animation-delay: 0;
+  animation-delay: 0s;
 }
 
 /* Animations */
@@ -195,20 +208,7 @@
   }
 }
 
-@keyframes float-heart {
-  0% {
-    transform: translate(0, 0) scale(0);
-    opacity: 1;
-  }
-  50% {
-    opacity: 1;
-    transform: translate(random(-30, 30) * 1px, -30px) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(random(-50, 50) * 1px, -60px) scale(0.5);
-  }
-}
+/* Removed invalid float-heart animation - using individual animations below */
 
 @keyframes glow-text {
   0%, 100% {

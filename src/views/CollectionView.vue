@@ -1,6 +1,5 @@
 <template>
-  <div class="bg-gray-900 min-h-screen">
-    <PageHeader title="我的收藏" />
+  <AppLayout title="我的收藏">
     <div class="container mx-auto px-4 py-6">
       <div class="mb-6">
         <p class="text-gray-400 mt-1">共 {{ totalCollections }} 部作品</p>
@@ -58,7 +57,19 @@
       </div>
 
     </div>
-  </div>
+    
+    <!-- Confirmation Dialog -->
+    <ConfirmationDialog
+      :show="showRemoveConfirm"
+      :title="'移除收藏'"
+      :message="`确定要移除《${comicToRemove?.name || ''}》吗？`"
+      confirm-text="移除"
+      cancel-text="取消"
+      confirm-button-class="bg-red-600 hover:bg-red-700 text-white"
+      @confirm="confirmRemove"
+      @cancel="cancelRemove"
+    />
+  </AppLayout>
 </template>
 
 <script setup>
@@ -66,10 +77,11 @@ import { ref, onMounted, onActivated } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { getCollections, removeFromCollection } from '@/api/collection'
+import AppLayout from '@/components/AppLayout.vue'
 import ComicCard from '@/components/ComicCard.vue'
 import Pagination from '@/components/Pagination.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
-import PageHeader from '@/components/PageHeader.vue'
+import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 
 const router = useRouter()
 const appStore = useAppStore()
@@ -81,6 +93,10 @@ const currentPage = ref(1)
 const totalPages = ref(1)
 const totalCollections = ref(0)
 const perPage = 24
+
+// Confirmation dialog
+const showRemoveConfirm = ref(false)
+const comicToRemove = ref(null)
 
 // Methods
 const loadCollections = async (page = 1) => {
@@ -108,28 +124,43 @@ const loadCollections = async (page = 1) => {
   }
 }
 
-const removeFromCollectionHandler = async (comic) => {
-  if (!confirm(`确定要移除《${comic.name}》吗？`)) return
+const removeFromCollectionHandler = (comic) => {
+  comicToRemove.value = comic
+  showRemoveConfirm.value = true
+}
+
+const confirmRemove = async () => {
+  if (!comicToRemove.value) return
   
   try {
-    await removeFromCollection(comic.comic_id || comic.id)
+    await removeFromCollection(comicToRemove.value.comic_id || comicToRemove.value.id)
     
     // Remove from local list
-    const index = collections.value.findIndex(c => (c.comic_id || c.id) === (comic.comic_id || comic.id))
+    const index = collections.value.findIndex(c => (c.comic_id || c.id) === (comicToRemove.value.comic_id || comicToRemove.value.id))
     if (index > -1) {
       collections.value.splice(index, 1)
       totalCollections.value--
     }
     
     // Update app store
-    const storeIndex = appStore.collectedComics.findIndex(c => (c.comic_id || c.id) === (comic.comic_id || comic.id))
+    const storeIndex = appStore.collectedComics.findIndex(c => (c.comic_id || c.id) === (comicToRemove.value.comic_id || comicToRemove.value.id))
     if (storeIndex > -1) {
       appStore.collectedComics.splice(storeIndex, 1)
     }
+    
+    showRemoveConfirm.value = false
+    comicToRemove.value = null
   } catch (error) {
     console.error('Failed to remove collection:', error)
-    alert('取消收藏失败，请重试')
+    // You might want to show a toast notification here instead of alert
+    showRemoveConfirm.value = false
+    comicToRemove.value = null
   }
+}
+
+const cancelRemove = () => {
+  showRemoveConfirm.value = false
+  comicToRemove.value = null
 }
 
 const handlePageChange = (page) => {

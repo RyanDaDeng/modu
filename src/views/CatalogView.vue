@@ -1,6 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-900">
-    <PageHeader title="分类浏览" />
+  <AppLayout title="分类浏览">
     <!-- Filter Bar Container -->
     <div class="container mx-auto px-4 py-6">
 
@@ -165,7 +164,7 @@
         />
       </div>
     </div>
-  </div>
+  </AppLayout>
 </template>
 
 <script>
@@ -175,16 +174,17 @@ export default {
 </script>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { getCategoriesFilter, getCategories } from '@/api/request'
+import AppLayout from '@/components/AppLayout.vue'
 import ComicCard from '@/components/ComicCard.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import Pagination from '@/components/Pagination.vue'
 import { formatNumber } from '@/utils/format'
-import PageHeader from '@/components/PageHeader.vue'
 
 const router = useRouter()
+const route = useRoute()
 
 // Categories data
 const categories = ref([])
@@ -219,6 +219,86 @@ const itemsPerPage = ref(0)
 const totalPages = ref(1)
 const displayPage = ref(1) // For pagination display
 
+// Parse query parameters
+const parseQueryParams = () => {
+  const query = route.query
+  
+  // Parse page parameter - reset to 1 if not provided
+  if (query.page) {
+    const page = parseInt(query.page)
+    if (!isNaN(page) && page > 0) {
+      currentPage.value = page
+      displayPage.value = page
+    }
+  } else {
+    // Reset to page 1 when no page parameter
+    currentPage.value = 1
+    displayPage.value = 1
+  }
+  
+  // Parse sort parameter (o parameter)
+  if (query.o) {
+    const sortValue = query.o
+    const sortOption = sortOptions.find(opt => opt.value === sortValue)
+    if (sortOption) {
+      selectedSort.value = sortValue
+    }
+  }
+  
+  // Parse category parameter (c parameter)
+  if (query.c && categories.value.length > 0) {
+    // Check if it contains underscore for subcategory
+    if (query.c.includes('_')) {
+      const [mainSlug, subSlug] = query.c.split('_')
+      const mainCategory = categories.value.find(cat => cat.slug === mainSlug)
+      if (mainCategory) {
+        selectedCategory.value = mainCategory
+        if (mainCategory.sub_categories) {
+          const subCategory = mainCategory.sub_categories.find(sub => sub.slug === subSlug)
+          if (subCategory) {
+            selectedSubCategory.value = subCategory
+          }
+        }
+      }
+    } else {
+      // Just main category
+      const mainCategory = categories.value.find(cat => cat.slug === query.c)
+      if (mainCategory) {
+        selectedCategory.value = mainCategory
+      }
+    }
+  }
+}
+
+// Update URL with current filters
+const updateURL = () => {
+  const query = {}
+  
+  // Add page if not 1
+  if (displayPage.value > 1) {
+    query.page = displayPage.value
+  }
+  
+  // Add sort if not default
+  if (selectedSort.value && selectedSort.value !== 'mv') {
+    query.o = selectedSort.value
+  }
+  
+  // Add category
+  if (selectedCategory.value) {
+    let categoryParam = selectedCategory.value.slug
+    if (selectedSubCategory.value) {
+      categoryParam = `${categoryParam}_${selectedSubCategory.value.slug}`
+    }
+    if (categoryParam) {
+      query.c = categoryParam
+    }
+  }
+  
+  // Update URL without triggering navigation
+  router.replace({ query })
+}
+
 // Load categories
 const loadCategories = async () => {
   loadingCategories.value = true
@@ -229,10 +309,17 @@ const loadCategories = async () => {
       categories.value = data.categories || []
       themeBlocks.value = data.blocks || []
 
-      // Select first category (最新A漫) by default and load
-      if (categories.value.length > 0) {
+      // Parse query params after categories are loaded
+      parseQueryParams()
+      
+      // If no category selected from query, select first category by default
+      if (!selectedCategory.value && categories.value.length > 0) {
         selectedCategory.value = categories.value[0]
-        applyFilter() // Load with default settings
+      }
+      
+      // Load comics with current settings
+      if (selectedCategory.value) {
+        applyFilter()
       }
     }
   } catch (error) {
@@ -315,15 +402,18 @@ const loadComics = async (reset = false) => {
 }
 
 // Apply filter immediately
-const applyFilter = () => {
+const applyFilter = (resetPage = true) => {
   comics.value = []
-  currentPage.value = 1
-  displayPage.value = 1
+  if (resetPage) {
+    currentPage.value = 1
+    displayPage.value = 1
+  }
   hasMore.value = true
   hasSearched.value = true
   totalItems.value = 0
   itemsPerPage.value = 0
   totalPages.value = 1
+  updateURL()
   loadComics(true)
 }
 
@@ -339,19 +429,19 @@ const searchTag = (tag) => {
 const selectCategory = (category) => {
   selectedCategory.value = category
   selectedSubCategory.value = null
-  applyFilter()
+  applyFilter(true) // Reset page when changing category
 }
 
 // Select sort
 const selectSort = (sort) => {
   selectedSort.value = sort
-  applyFilter()
+  applyFilter(true) // Reset page when changing sort
 }
 
 // Select sub category
 const selectSubCategory = (subCategory) => {
   selectedSubCategory.value = subCategory
-  applyFilter()
+  applyFilter(true) // Reset page when changing sub category
 }
 
 // Handle pagination
@@ -361,10 +451,22 @@ const handlePageChange = (page) => {
   currentPage.value = page
   displayPage.value = page
   hasMore.value = true
+  updateURL()
   loadComics(true)
   // Scroll to top
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
+
+// Watch for route query changes
+watch(() => route.query, (newQuery, oldQuery) => {
+  // Only react to changes if categories are loaded
+  if (categories.value.length > 0) {
+    parseQueryParams()
+    // Reset page if sort or category changed
+    const shouldResetPage = (newQuery.o !== oldQuery?.o) || (newQuery.c !== oldQuery?.c)
+    applyFilter(shouldResetPage)
+  }
+}, { deep: true })
 
 onMounted(() => {
   loadCategories()

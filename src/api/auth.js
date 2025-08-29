@@ -14,8 +14,22 @@ const api = axios.create({
     'Accept': 'application/json',
     'X-Requested-With': 'XMLHttpRequest'
   },
-  withCredentials: true
+  withCredentials: false  // No longer using cookies
 })
+
+// Request interceptor to add auth token
+api.interceptors.request.use(
+  config => {
+    const token = localStorage.getItem('auth_token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  error => {
+    return Promise.reject(error)
+  }
+)
 
 // 响应拦截器 - 处理401未认证和其他错误
 api.interceptors.response.use(
@@ -71,15 +85,13 @@ api.interceptors.response.use(
 
 // 注册
 export const register = async (data) => {
-  await api.get('/sanctum/csrf-cookie')
-  const response = await api.post('/api/register', data)  // 使用 /api/register
+  const response = await api.post('/api/register', data)
   return response
 }
 
 // 登录
 export const login = async (credentials) => {
-  await api.get('/sanctum/csrf-cookie')
-  const response = await api.post('/api/login', credentials)  // 使用 /api/login
+  const response = await api.post('/api/login', credentials)
   return response
 }
 
@@ -103,18 +115,15 @@ export const getUser = async () => {
   }
 }
 
-// 检查是否有session cookie
-export const hasSessionCookie = () => {
-  // 只检查 laravel-session (注意是连字符不是下划线)
-  // 不检查XSRF-TOKEN，因为它在未登录时也存在
-  const cookies = document.cookie
-  return cookies.includes('laravel-session')
+// 检查是否有 token
+export const hasAuthToken = () => {
+  return !!localStorage.getItem('auth_token')
 }
 
 // 检查是否已登录（通过API调用）
 export const checkAuth = async () => {
-  // 先检查cookie，没有cookie就不用调用API
-  if (!hasSessionCookie()) {
+  // 先检查 token，没有 token 就不用调用API
+  if (!hasAuthToken()) {
     return false
   }
   

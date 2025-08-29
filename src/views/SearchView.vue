@@ -1,6 +1,5 @@
 <template>
-  <div class="bg-gray-900 min-h-screen">
-    <PageHeader :title="searchQuery ? `搜索结果: ${searchQuery}` : '搜索'" />
+  <AppLayout :title="searchQuery ? `搜索结果: ${searchQuery}` : '搜索'">
     <div class="container mx-auto px-4 py-6">
 
       <div v-if="!searchQuery" class="text-center py-12">
@@ -41,7 +40,7 @@
         <div ref="loadMoreTrigger" class="h-20"></div>
       </div>
     </div>
-  </div>
+  </AppLayout>
 </template>
 
 <script>
@@ -55,9 +54,9 @@ import { ref, watch, onMounted, onUnmounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { getSearchResults } from '@/api/request'
+import AppLayout from '@/components/AppLayout.vue'
 import ComicCard from '@/components/ComicCard.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
-import PageHeader from '@/components/PageHeader.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -193,6 +192,7 @@ const saveScrollPosition = () => {
 }
 
 watch(() => route.query.wd || route.query.q, (newQuery) => {
+  console.log('Search query changed:', newQuery, 'Current:', searchQuery.value)
   if (newQuery !== searchQuery.value) {
     searchQuery.value = newQuery || ''
     if (searchQuery.value) {

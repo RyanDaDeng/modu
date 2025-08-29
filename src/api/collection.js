@@ -12,8 +12,23 @@ const api = axios.create({
     'Accept': 'application/json',
     'X-Requested-With': 'XMLHttpRequest'
   },
-  withCredentials: true
+  withCredentials: false // No longer using cookies
 })
+
+// Request interceptor to add auth token
+api.interceptors.request.use(
+  config => {
+    const token = localStorage.getItem('auth_token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  error => {
+    return Promise.reject(error)
+  }
+)
+
 
 // Get all user's collections
 export const getCollections = async (page = 1, perPage = 20) => {

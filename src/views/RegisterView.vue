@@ -1,18 +1,17 @@
 <template>
-  <div class="min-h-screen bg-gray-900">
-    <PageHeader title="注册" />
-    <div class="flex items-center justify-center px-4 py-6">
-    <div class="max-w-md w-full space-y-8">
+  <AppLayout title="注册">
+    <div class="flex items-center justify-center px-4 py-12">
+    <div class="max-w-md w-full space-y-8 bg-gray-800/50 backdrop-blur-sm rounded-xl p-8">
       <!-- Logo and Title -->
-      <div class="text-center">
-        <h1 class="text-3xl font-bold text-pink-500 mb-2"
-            style="font-family: 'Pacifico', 'Dancing Script', fantasy;">
-          禁漫社
-        </h1>
-        <h2 class="text-2xl font-bold text-white">创建账户</h2>
-        <p class="mt-2 text-gray-400">
+      <div class="text-center space-y-4">
+        <!-- Use SiteLogo component -->
+        <div class="flex justify-center mb-6">
+          <SiteLogo />
+        </div>
+        <h2 class="text-2xl font-bold text-white">创建新账户</h2>
+        <p class="text-gray-400">
           已有账户？
-          <router-link to="/login" class="text-pink-500 hover:text-pink-400">
+          <router-link to="/login" class="text-pink-500 hover:text-pink-400 transition-colors">
             立即登录
           </router-link>
         </p>
@@ -30,8 +29,9 @@
               id="name"
               v-model="form.name"
               type="text"
+              autocomplete="username"
               required
-              class="mt-1 block w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+              class="mt-1 block w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
               placeholder="您的用户名"
             >
             <p v-if="errors.name" class="mt-1 text-sm text-red-400">{{ errors.name[0] }}</p>
@@ -46,8 +46,9 @@
               id="email"
               v-model="form.email"
               type="email"
+              autocomplete="email"
               required
-              class="mt-1 block w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+              class="mt-1 block w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
               placeholder="your@email.com"
             >
             <p v-if="errors.email" class="mt-1 text-sm text-red-400">{{ errors.email[0] }}</p>
@@ -62,8 +63,9 @@
               id="password"
               v-model="form.password"
               type="password"
+              autocomplete="new-password"
               required
-              class="mt-1 block w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+              class="mt-1 block w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
               placeholder="至少8个字符"
             >
             <p v-if="errors.password" class="mt-1 text-sm text-red-400">{{ errors.password[0] }}</p>
@@ -78,8 +80,9 @@
               id="password_confirmation"
               v-model="form.password_confirmation"
               type="password"
+              autocomplete="new-password"
               required
-              class="mt-1 block w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+              class="mt-1 block w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
               placeholder="再次输入密码"
             >
           </div>
@@ -92,13 +95,13 @@
             v-model="form.terms"
             type="checkbox"
             required
-            class="h-4 w-4 mt-1 text-pink-500 focus:ring-pink-500 bg-gray-800 border-gray-700 rounded"
+            class="h-4 w-4 mt-1 text-pink-500 focus:ring-pink-500 bg-gray-900/50 border-gray-700 rounded cursor-pointer"
           >
           <label for="terms" class="ml-2 block text-sm text-gray-400">
             我已阅读并同意
-            <a href="#" class="text-pink-500 hover:text-pink-400">服务条款</a>
+            <router-link to="/terms" target="_blank" class="text-pink-500 hover:text-pink-400">服务条款</router-link>
             和
-            <a href="#" class="text-pink-500 hover:text-pink-400">隐私政策</a>
+            <router-link to="/privacy" target="_blank" class="text-pink-500 hover:text-pink-400">隐私政策</router-link>
           </label>
         </div>
 
@@ -111,7 +114,7 @@
         <button
           type="submit"
           :disabled="loading || !form.terms"
-          class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-[1.02]"
         >
           <span v-if="loading" class="flex items-center gap-2">
             <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
@@ -126,30 +129,34 @@
         <!-- Or Divider -->
         <div class="relative mt-6">
           <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-gray-700"></div>
+            <div class="w-full border-t border-gray-700/50"></div>
           </div>
           <div class="relative flex justify-center text-sm">
-            <span class="px-2 bg-gray-900 text-gray-400">或者</span>
+            <span class="px-2 bg-gray-800/50 text-gray-400">或者</span>
           </div>
         </div>
 
         <!-- Back to Home -->
         <div class="text-center">
-          <router-link to="/" class="text-gray-400 hover:text-white text-sm">
+          <router-link to="/" class="inline-flex items-center gap-2 text-gray-400 hover:text-pink-500 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
             返回首页
           </router-link>
         </div>
       </form>
     </div>
     </div>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup>
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import PageHeader from '@/components/PageHeader.vue'
+import AppLayout from '@/components/AppLayout.vue'
+import SiteLogo from '@/components/SiteLogo.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
