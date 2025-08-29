@@ -1,7 +1,7 @@
 <template>
   <AppLayout 
     :title="comicInfo.name || '加载中...'" 
-    :show-bottom-nav="false"
+    :show-bottom-nav="true"
     :hide-breadcrumbs="true"
   >
     <!-- Loading State -->

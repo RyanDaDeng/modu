@@ -310,3 +310,6 @@ export async function getWeeklyUpdates(type = 'all') {
   return decryptData(timestamp, response.data.data)
 }
 
+// Export the api instance for direct use
+export { api as request }
+

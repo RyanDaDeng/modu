@@ -479,7 +479,7 @@ import HeroSlider from '@/components/HeroSlider.vue'
 import FullscreenSearch from '@/components/FullscreenSearch.vue'
 import { formatNumber } from '@/utils/format'
 import { getImageServer } from '@/utils/imageServer'
-import axios from 'axios'
+import { request } from '@/api/request'
 
 const router = useRouter()
 const appStore = useAppStore()
@@ -596,7 +596,7 @@ const handleImageError = (e) => {
 const fetchRandomComics = async () => {
   try {
     loadingHero.value = true
-    const response = await axios.get('/api/random-comics')
+    const response = await request.get('/api/random-comics')
     
     if (response.data.success && response.data.comics) {
       heroComics.value = response.data.comics.map(item => {
