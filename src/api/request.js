@@ -3,9 +3,11 @@ import { decryptData, deobfuscateResponse } from './crypto'
 import { useAppStore } from '@/stores/app'
 
 // 使用后端代理服务器
+// 开发环境：优先使用 VITE_DEV_API_URL，如果没有则使用代理（空字符串）
+// 生产环境：使用 VITE_BACKEND_API_URL
 const BACKEND_PROXY = import.meta.env.PROD 
   ? (import.meta.env.VITE_BACKEND_API_URL || '') 
-  : ''
+  : (import.meta.env.VITE_DEV_API_URL || '')
 
 /**
  * Process response with google_recaptcha field

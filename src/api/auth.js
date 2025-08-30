@@ -1,12 +1,13 @@
 import axios from 'axios'
 import { useNotificationStore } from '@/stores/notification'
 
-// 开发环境用代理(相对路径)，生产环境用完整URL
+// 开发环境：优先使用 VITE_DEV_API_URL，如果没有则使用代理
+// 生产环境：使用 VITE_BACKEND_API_URL
 const API_URL = import.meta.env.PROD 
   ? import.meta.env.VITE_BACKEND_API_URL 
-  : ''
+  : (import.meta.env.VITE_DEV_API_URL || '')
 
-// 简单配置
+// 简单配置 - 不使用 CSRF
 const api = axios.create({
   baseURL: API_URL,
   timeout: 30000,
@@ -14,10 +15,10 @@ const api = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json'
   },
-  withCredentials: false  // No CSRF needed
+  withCredentials: false  // 不使用 cookies
 })
 
-// Request interceptor to add auth token
+// Request interceptor - 只添加 Bearer token
 api.interceptors.request.use(
   config => {
     const token = localStorage.getItem('auth_token')
@@ -83,15 +84,32 @@ api.interceptors.response.use(
   }
 )
 
-// 注册
+// 生成请求签名（简单的时间戳验证）
+const generateRequestSignature = () => {
+  const timestamp = Date.now()
+  const signature = btoa(timestamp + ':modu18') // 简单签名
+  return { timestamp, signature }
+}
+
+// 注册 - 带安全验证
 export const register = async (data) => {
-  const response = await api.post('/api/auth/register', data)
+  const { timestamp, signature } = generateRequestSignature()
+  const response = await api.post('/api/auth/register', {
+    ...data,
+    _timestamp: timestamp,
+    _signature: signature
+  })
   return response
 }
 
-// 登录
+// 登录 - 带安全验证
 export const login = async (credentials) => {
-  const response = await api.post('/api/auth/login', credentials)
+  const { timestamp, signature } = generateRequestSignature()
+  const response = await api.post('/api/auth/login', {
+    ...credentials,
+    _timestamp: timestamp,
+    _signature: signature
+  })
   return response
 }
 

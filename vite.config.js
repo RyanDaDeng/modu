@@ -18,10 +18,12 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      // 代理所有API请求到Laravel后端
-      '/api': 'http://127.0.0.1:8001',
-      '/sanctum': 'http://127.0.0.1:8001',
-      // 所有认证端点现在都在 /api 前缀下
+      // 简单的 API 代理配置（可选）
+      // 如果设置了 VITE_DEV_API_URL 则不会使用代理
+      '/api': {
+        target: 'http://modu.local',
+        changeOrigin: true
+      }
     }
   }
 })

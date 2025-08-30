@@ -71,6 +71,16 @@
             <p v-if="errors.password" class="mt-1 text-sm text-red-400">{{ errors.password[0] }}</p>
           </div>
 
+          <!-- Honeypot field (hidden from users, traps bots) -->
+          <input 
+            type="text" 
+            v-model="form.website" 
+            name="website" 
+            style="position: absolute; left: -9999px;" 
+            tabindex="-1" 
+            autocomplete="off"
+          />
+
           <!-- Password Confirmation -->
           <div>
             <label for="password_confirmation" class="block text-sm font-medium text-gray-300">
@@ -166,7 +176,8 @@ const form = reactive({
   email: '',
   password: '',
   password_confirmation: '',
-  terms: false
+  terms: false,
+  website: '' // Honeypot field
 })
 
 const errors = ref({})
@@ -174,6 +185,13 @@ const errorMessage = ref('')
 const loading = ref(false)
 
 const handleRegister = async () => {
+  // 检查蜜罐字段（如果被填充说明是机器人）
+  if (form.website) {
+    // 静默失败，不给机器人任何提示
+    console.log('Bot detected')
+    return
+  }
+  
   // 验证密码确认
   if (form.password !== form.password_confirmation) {
     errorMessage.value = '两次输入的密码不一致'
