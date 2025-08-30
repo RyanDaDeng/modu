@@ -211,6 +211,30 @@
                             我的收藏
                           </div>
                         </router-link>
+                        <router-link
+                          to="/reading-history"
+                          @click="showUserMenu = false"
+                          class="block px-4 py-2 text-gray-200 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+                        >
+                          <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.669 0-3.218.51-4.5 1.385V4.804z" />
+                            </svg>
+                            阅读历史
+                          </div>
+                        </router-link>
+                        <router-link
+                          to="/recharge-history"
+                          @click="showUserMenu = false"
+                          class="block px-4 py-2 text-gray-200 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+                        >
+                          <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                            </svg>
+                            充值记录
+                          </div>
+                        </router-link>
                         <div class="my-2 border-t border-white/10"></div>
                         <button
                           @click="handleLogout"

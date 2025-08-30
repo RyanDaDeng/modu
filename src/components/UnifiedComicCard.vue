@@ -1,19 +1,19 @@
 <template>
   <router-link
     :to="`/chapter/${comic.id}`"
-    class="block relative group h-full"
+    class="block relative group"
   >
     <!-- Gradient border effect on hover -->
     <div class="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-lg opacity-0 group-hover:opacity-50 blur-sm transition-all duration-300"></div>
     
     <!-- Main card with glassmorphism -->
-    <div class="relative h-full bg-gray-900/60 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden group-hover:border-pink-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-pink-500/20 flex flex-col">
+    <div class="relative bg-gray-900/60 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden group-hover:border-pink-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-pink-500/20 flex flex-col">
       <!-- Cover Image Container -->
-      <div class="relative aspect-[3/4] bg-gray-800/50 overflow-hidden">
+      <div class="relative aspect-[3/4] bg-gray-800/50 overflow-hidden flex-shrink-0">
         <img
           :src="getComicImage()"
           :alt="comic.name || comic.title"
-          class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+          class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
           :loading="lazyLoad ? 'lazy' : 'eager'"
           @error="handleImageError"
         />
@@ -63,7 +63,7 @@
       </div>
       
       <!-- Comic Info -->
-      <div class="p-1.5 sm:p-2 md:p-3 flex flex-col h-full">
+      <div class="p-1.5 sm:p-2 md:p-3 flex flex-col">
         <!-- Title - always takes 2 lines space -->
         <h3 class="text-xs sm:text-sm font-semibold text-white line-clamp-1 group-hover:text-pink-400 transition-colors truncate">
           {{ comic.name || comic.title || 'Unknown' }}

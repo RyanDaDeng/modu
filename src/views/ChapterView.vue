@@ -300,14 +300,18 @@
           </h2>
           
           <!-- Related Comics Grid - 3 columns on mobile, 6 on desktop -->
-          <div class="grid grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             <UnifiedComicCard
               v-for="related in comicInfo.related_list.slice(0, 12)"
               :key="related.id"
-              :comic="related"
+              :comic="formatRelatedComic(related)"
               :show-category="false"
               :show-stats="false"
               :show-tags="false"
+              :show-author="false"
+              :show-description="false"
+              :show-collection-date="false"
+              :show-episode="false"
             />
           </div>
         </div>
@@ -473,7 +477,7 @@
       <div v-if="images.length" class="pt-10 pb-8 bg-black">
         <div class="max-w-3xl sm:max-w-4xl lg:max-w-5xl mx-auto">
           <div
-            v-for="(image, index) in images"
+            v-for="(image, index) in images.slice(0, displayedImageCount)"
             :key="index"
             :ref="el => imageRefs[index] = el"
             class="comic-image-container relative flex items-center justify-center"
@@ -511,10 +515,33 @@
             <!-- Regular image -->
             <img
               v-if="!image.needProcess && image.loaded"
-              :src="image.displaySrc || image.src"
+              :src="image.src"
               :alt="`Page ${index + 1}`"
               class="w-full h-auto block"
+              @load="onImageLoad(index)"
+              @error="onImageError(index)"
             />
+          </div>
+          
+          <!-- Load More Button -->
+          <div v-if="hasMoreImages && !isPreviewMode" class="mt-8 text-center">
+            <button
+              @click="loadMoreImages"
+              :disabled="loadingMoreImages"
+              class="px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white rounded-xl font-medium transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer inline-flex items-center gap-2"
+            >
+              <svg v-if="!loadingMoreImages" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+              </svg>
+              <svg v-else class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span>{{ loadingMoreImages ? '加载中...' : `加载更多 (剩余 ${images.length - displayedImageCount} 张)` }}</span>
+            </button>
+            <p class="text-gray-400 text-sm mt-2">
+              已显示 {{ displayedImageCount }} / {{ images.length }} 张图片
+            </p>
           </div>
           
           <!-- VIP Required Notice for Preview Mode -->
@@ -909,6 +936,10 @@ const images = ref([])
 const loadingImages = ref(false)
 const readingError = ref('')
 const loadedCount = ref(0)
+const BATCH_SIZE = 50 // Load 50 images at a time
+const displayedImageCount = ref(0) // How many images are currently displayed
+const hasMoreImages = ref(false) // Whether there are more images to load
+const loadingMoreImages = ref(false) // Loading state for load more button
 const currentImageIndex = ref(0)
 const lastScrollPosition = ref(0)
 const isPreviewMode = ref(false)
@@ -1030,6 +1061,18 @@ const isNextChapterLocked = computed(() => {
 const getAlbumCover = (id) => {
   const server = getImageServer()
   return `${server}/media/albums/${id}_3x4.jpg`
+}
+
+// Format related comic data for UnifiedComicCard
+const formatRelatedComic = (related) => {
+  return {
+    id: related.id,
+    name: related.name || related.title,
+    title: related.name || related.title,
+    // UnifiedComicCard will construct the image URL from the ID if no image is provided
+    // If the related object has an image field, we can use it
+    image: related.image || null
+  }
 }
 
 const getCommentAvatar = (photo) => {
@@ -1271,6 +1314,9 @@ const startReading = async (seriesId, isSingleChapter = false) => {
   images.value = []
   loadedCount.value = 0
   currentImageIndex.value = 0
+  displayedImageCount.value = 0
+  hasMoreImages.value = false
+  loadingMoreImages.value = false
   
   // If auto-scroll is globally enabled, ensure it starts paused for new chapter
   if (autoScrollEnabled.value) {
@@ -1304,6 +1350,7 @@ const startReading = async (seriesId, isSingleChapter = false) => {
       
       // Initialize image objects
       const allImages = chapterData.images
+      // Don't limit images here anymore, we'll use batch loading instead
       const imagesToShow = shouldLimitImages ? allImages.slice(0, maxPreviewImages) : allImages
       
       images.value = imagesToShow.map((imageName, index) => ({
@@ -1320,6 +1367,17 @@ const startReading = async (seriesId, isSingleChapter = false) => {
       isPreviewMode.value = shouldLimitImages
       totalImages.value = allImages.length
       
+      // Initialize batch loading
+      if (!shouldLimitImages) {
+        // For non-preview mode, show first batch of images
+        displayedImageCount.value = Math.min(BATCH_SIZE, images.value.length)
+        hasMoreImages.value = images.value.length > BATCH_SIZE
+      } else {
+        // For preview mode, show all limited images
+        displayedImageCount.value = images.value.length
+        hasMoreImages.value = false
+      }
+      
       // Start lazy loading after DOM update
       await nextTick()
       setupLazyLoading()
@@ -1333,6 +1391,31 @@ const startReading = async (seriesId, isSingleChapter = false) => {
     readingError.value = '加载失败，请稍后重试'
   } finally {
     loadingImages.value = false
+  }
+}
+
+// Load more images when user clicks the button
+const loadMoreImages = async () => {
+  if (loadingMoreImages.value || !hasMoreImages.value) return
+  
+  loadingMoreImages.value = true
+  
+  try {
+    // Calculate next batch
+    const currentCount = displayedImageCount.value
+    const nextCount = Math.min(currentCount + BATCH_SIZE, images.value.length)
+    
+    // Show next batch of images
+    displayedImageCount.value = nextCount
+    
+    // Check if there are more images after this batch
+    hasMoreImages.value = nextCount < images.value.length
+    
+    // Wait for DOM update and setup lazy loading for new images
+    await nextTick()
+    setupLazyLoading()
+  } finally {
+    loadingMoreImages.value = false
   }
 }
 
@@ -1394,6 +1477,9 @@ const exitReading = () => {
   currentReadingId.value = null
   images.value = []
   loadedCount.value = 0
+  displayedImageCount.value = 0
+  hasMoreImages.value = false
+  loadingMoreImages.value = false
   currentImageIndex.value = 0
   showHeader.value = true // Reset header visibility
   lastScrollY.value = 0
@@ -1559,13 +1645,13 @@ const loadImage = async (index) => {
     activeRequests++
     
     try {
-      const img = new Image()
-      img.crossOrigin = 'anonymous'
-      
-      await new Promise((resolve, reject) => {
-        img.onload = async () => {
-          // Process image if needed
-          if (imageData.needProcess) {
+      // Only use new Image() for images that need processing
+      if (imageData.needProcess) {
+        const img = new Image()
+        img.crossOrigin = 'anonymous'
+        
+        await new Promise((resolve, reject) => {
+          img.onload = async () => {
             const pageName = imageData.name.substring(0, 5)
             console.log(`Processing image ${index} with page ${pageName}`)
             await nextTick()
@@ -1577,23 +1663,29 @@ const loadImage = async (index) => {
               const ctx = canvas.getContext('2d')
               ctx.drawImage(processedCanvas, 0, 0)
             }
-          } else {
-            imageData.displaySrc = img.src
+            
+            imageData.loaded = true
+            imageData.error = false
+            loadedCount.value++
+            resolve()
           }
           
-          imageData.loaded = true
-          imageData.error = false
-          loadedCount.value++
-          resolve()
-        }
+          img.onerror = () => {
+            imageData.error = true
+            reject(new Error('Failed to load image'))
+          }
+          
+          img.src = imageData.src
+        })
+      } else {
+        // For regular images, just mark as loaded and let the img tag handle loading
+        imageData.loaded = true
+        imageData.error = false
+        loadedCount.value++
         
-        img.onerror = () => {
-          imageData.error = true
-          reject(new Error('Failed to load image'))
-        }
-        
-        img.src = imageData.src
-      })
+        // Add a small delay to avoid too many simultaneous requests
+        await new Promise(resolve => setTimeout(resolve, 50))
+      }
     } catch (err) {
       console.error(`Failed to load image ${index}:`, err)
       imageData.error = true
@@ -1610,6 +1702,25 @@ const loadImage = async (index) => {
       resolveMain() // Resolve the main promise
     }
   })
+}
+
+// Handle image load event for regular images
+const onImageLoad = (index) => {
+  const imageData = images.value[index]
+  if (imageData) {
+    imageData.actuallyLoaded = true
+    console.log(`Image ${index} actually loaded in DOM`)
+  }
+}
+
+// Handle image error event for regular images
+const onImageError = (index) => {
+  const imageData = images.value[index]
+  if (imageData) {
+    imageData.error = true
+    imageData.loaded = false
+    console.error(`Image ${index} failed to load in DOM`)
+  }
 }
 
 // Retry single image
@@ -1900,6 +2011,13 @@ const loadAllImages = async () => {
   if (!images.value.length || loadingAllImages.value) return
   
   loadingAllImages.value = true
+  
+  // First, show all images in DOM
+  if (displayedImageCount.value < images.value.length) {
+    displayedImageCount.value = images.value.length
+    hasMoreImages.value = false
+    await nextTick()
+  }
   
   try {
     // Clear the lazy loading observer temporarily

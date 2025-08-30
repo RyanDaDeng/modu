@@ -74,7 +74,7 @@
     
     <!-- Confirmation Dialog -->
     <ConfirmationDialog
-      :show="showRemoveConfirm"
+      v-model="showRemoveConfirm"
       :title="'移除收藏'"
       :message="`确定要移除《${comicToRemove?.name || ''}》吗？`"
       confirm-text="移除"
@@ -90,7 +90,7 @@
 import { ref, onMounted, onActivated } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
-import { getCollections, removeFromCollection } from '@/api/collection'
+import { getCollections, toggleCollection } from '@/api/collection'
 import { useNotification } from '@/composables/useNotification'
 import AppLayout from '@/components/AppLayout.vue'
 import UnifiedComicCard from '@/components/UnifiedComicCard.vue'
@@ -166,38 +166,48 @@ const removeFromCollectionHandler = (comic) => {
 const confirmRemove = async () => {
   if (!comicToRemove.value) return
   
-  const comicId = comicToRemove.value.comic_id || comicToRemove.value.id
-  console.log('Removing comic with ID:', comicId)
+  const comic = comicToRemove.value
+  const comicId = comic.comic_id || comic.id
+  console.log('Toggling collection for comic:', comic)
   
   try {
-    const response = await removeFromCollection(comicId)
-    console.log('Remove response:', response)
+    // Use toggle API - passing the full comic object
+    const response = await toggleCollection({
+      id: comicId,
+      name: comic.name || comic.title,
+      author: comic.author || '',
+      cover: comic.cover || null
+    })
+    console.log('Toggle response:', response)
     
-    // Remove from local list
-    const index = collections.value.findIndex(c => (c.comic_id || c.id) === comicId)
-    if (index > -1) {
-      collections.value.splice(index, 1)
-      totalCollections.value--
+    // Check if it was actually removed (is_collected should be false)
+    if (response.is_collected === false) {
+      // Remove from local list
+      const index = collections.value.findIndex(c => (c.comic_id || c.id) === comicId)
+      if (index > -1) {
+        collections.value.splice(index, 1)
+        totalCollections.value--
+      }
+      
+      // Update app store
+      const storeIndex = appStore.collectedComics.findIndex(c => (c.comic_id || c.id) === comicId)
+      if (storeIndex > -1) {
+        appStore.collectedComics.splice(storeIndex, 1)
+      }
+      
+      // Show success notification
+      notification.success('已移除收藏')
+      
+      // If no more items and not on first page, go to previous page
+      if (collections.value.length === 0 && currentPage.value > 1) {
+        handlePageChange(currentPage.value - 1)
+      }
     }
-    
-    // Update app store
-    const storeIndex = appStore.collectedComics.findIndex(c => (c.comic_id || c.id) === comicId)
-    if (storeIndex > -1) {
-      appStore.collectedComics.splice(storeIndex, 1)
-    }
-    
-    // Show success notification
-    notification.success('已移除收藏')
     
     showRemoveConfirm.value = false
     comicToRemove.value = null
-    
-    // If no more items and not on first page, go to previous page
-    if (collections.value.length === 0 && currentPage.value > 1) {
-      handlePageChange(currentPage.value - 1)
-    }
   } catch (error) {
-    console.error('Failed to remove collection:', error)
+    console.error('Failed to toggle collection:', error)
     console.error('Error details:', error.response?.data)
     notification.error(error.response?.data?.message || '移除失败，请稍后重试')
     showRemoveConfirm.value = false

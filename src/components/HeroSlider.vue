@@ -187,10 +187,10 @@
         />
       </div>
       
-      <!-- Arrow Navigation -->
+      <!-- Arrow Navigation - Hidden on mobile -->
       <button
         @click="prevSlide"
-        class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm border border-white/10 hover:bg-gray-800/80 hover:border-white/20 text-white rounded-full transition-all group cursor-pointer"
+        class="hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 items-center justify-center bg-gray-900/60 backdrop-blur-sm border border-white/10 hover:bg-gray-800/80 hover:border-white/20 text-white rounded-full transition-all group cursor-pointer"
       >
         <svg class="w-6 h-6 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -198,7 +198,7 @@
       </button>
       <button
         @click="nextSlide"
-        class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm border border-white/10 hover:bg-gray-800/80 hover:border-white/20 text-white rounded-full transition-all group cursor-pointer"
+        class="hidden sm:flex absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 items-center justify-center bg-gray-900/60 backdrop-blur-sm border border-white/10 hover:bg-gray-800/80 hover:border-white/20 text-white rounded-full transition-all group cursor-pointer"
       >
         <svg class="w-6 h-6 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
