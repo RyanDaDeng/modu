@@ -2,7 +2,32 @@
   <AppLayout :title="searchQuery ? `搜索结果: ${searchQuery}` : '搜索'">
     <div class="container mx-auto px-4 py-6">
 
-      <div v-if="!searchQuery" class="text-center py-12">
+      <!-- Login prompt for non-logged users -->
+      <div v-if="!authStore.isLoggedIn" class="text-center py-12">
+        <div class="max-w-md mx-auto">
+          <svg class="w-24 h-24 text-gray-600 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+          </svg>
+          <h2 class="text-xl font-bold text-white mb-2">需要登录才能使用搜索</h2>
+          <p class="text-gray-400 mb-6">登录后即可搜索海量漫画资源</p>
+          <div class="space-y-3">
+            <button
+              @click="router.push('/login')"
+              class="w-full px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl font-medium hover:from-pink-600 hover:to-purple-700 transition-all transform hover:scale-105 cursor-pointer"
+            >
+              立即登录
+            </button>
+            <button
+              @click="router.push('/register')"
+              class="w-full px-6 py-3 bg-gray-800/50 backdrop-blur-sm border border-gray-700 text-gray-300 rounded-xl font-medium hover:bg-gray-700/50 transition-all cursor-pointer"
+            >
+              注册新账号
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div v-else-if="!searchQuery" class="text-center py-12">
         <svg class="w-24 h-24 text-gray-600 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
           <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
         </svg>
@@ -53,6 +78,7 @@ export default {
 import { ref, watch, onMounted, onUnmounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
+import { useAuthStore } from '@/stores/auth'
 import { getSearchResults } from '@/api/request'
 import AppLayout from '@/components/AppLayout.vue'
 import ComicCard from '@/components/ComicCard.vue'
@@ -61,6 +87,7 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue'
 const route = useRoute()
 const router = useRouter()
 const appStore = useAppStore()
+const authStore = useAuthStore()
 
 const searchQuery = ref('')
 const comics = ref([])
@@ -117,6 +144,12 @@ const restoreSearchState = () => {
 }
 
 const searchComics = async (reset = false) => {
+  // Check if user is logged in first
+  if (!authStore.isLoggedIn) {
+    console.log('User not logged in, skipping search')
+    return
+  }
+  
   if (!searchQuery.value || (loading.value && !reset)) return
   
   if (reset) {
@@ -174,7 +207,7 @@ const setupInfiniteScroll = () => {
   
   observer = new IntersectionObserver(
     (entries) => {
-      if (entries[0].isIntersecting && !loading.value && hasMore.value && searchQuery.value) {
+      if (entries[0].isIntersecting && !loading.value && hasMore.value && searchQuery.value && authStore.isLoggedIn) {
         searchComics()
       }
     },
@@ -195,7 +228,8 @@ watch(() => route.query.wd || route.query.q, (newQuery) => {
   console.log('Search query changed:', newQuery, 'Current:', searchQuery.value)
   if (newQuery !== searchQuery.value) {
     searchQuery.value = newQuery || ''
-    if (searchQuery.value) {
+    if (searchQuery.value && authStore.isLoggedIn) {
+      // Only search if user is logged in
       // Try to restore previous state first
       const restored = restoreSearchState()
       if (!restored) {

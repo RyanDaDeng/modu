@@ -4,15 +4,22 @@
     <div class="container mx-auto px-4 py-6">
 
       <!-- Loading Categories -->
-      <div v-if="loadingCategories" class="bg-gray-800 rounded-lg p-4">
-        <div class="flex flex-col items-center">
-          <LoadingSpinner />
-          <span class="mt-3 text-gray-400 text-sm">加载分类中...</span>
+      <div v-if="loadingCategories" class="relative">
+        <!-- Gradient border effect -->
+        <div class="absolute inset-0 bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-blue-500/20 rounded-lg blur-xl"></div>
+        <div class="relative bg-gray-900/80 backdrop-blur-xl border border-white/10 rounded-lg p-4">
+          <div class="flex flex-col items-center">
+            <LoadingSpinner />
+            <span class="mt-3 text-gray-400 text-sm">加载分类中...</span>
+          </div>
         </div>
       </div>
 
       <!-- Filter Bar -->
-      <div v-if="categories.length > 0" class="bg-gray-800 rounded-lg p-2 sm:p-4 space-y-2 sm:space-y-4">
+      <div v-if="categories.length > 0" class="relative">
+        <!-- Gradient border effect -->
+        <div class="absolute inset-0 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-blue-500/10 rounded-lg blur-xl"></div>
+        <div class="relative bg-gray-900/60 backdrop-blur-xl border border-white/10 rounded-lg p-2 sm:p-4 space-y-2 sm:space-y-4">
         <!-- Category Selection -->
         <div>
           <label class="text-xs sm:text-sm text-gray-400 mb-1 sm:mb-2 block">分类</label>
@@ -22,10 +29,10 @@
               :key="category.id"
               @click="selectCategory(category)"
               :class="[
-                'flex-shrink-0 px-2 sm:px-4 py-1 sm:py-2 rounded-md sm:rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap',
+                'flex-shrink-0 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap cursor-pointer',
                 selectedCategory?.id === category.id
-                  ? 'bg-pink-500 text-white'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  ? 'bg-pink-500/20 text-pink-400 border border-pink-500/50'
+                  : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white border border-gray-700'
               ]"
             >
               {{ category.name }}
@@ -45,10 +52,10 @@
                 :key="sort.value"
                 @click="selectSort(sort.value)"
                 :class="[
-                  'flex-shrink-0 px-2 sm:px-4 py-1 sm:py-2 rounded-md sm:rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap',
+                  'flex-shrink-0 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap cursor-pointer',
                   selectedSort === sort.value
-                    ? 'bg-pink-500 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    ? 'bg-pink-500/20 text-pink-400 border border-pink-500/50'
+                    : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white border border-gray-700'
                 ]"
               >
                 {{ sort.label }}
@@ -63,10 +70,10 @@
               <button
                 @click="selectSubCategory(null)"
                 :class="[
-                  'flex-shrink-0 px-2 sm:px-4 py-1 sm:py-2 rounded-md sm:rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap',
+                  'flex-shrink-0 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap cursor-pointer',
                   !selectedSubCategory
-                    ? 'bg-pink-500 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    ? 'bg-pink-500/20 text-pink-400 border border-pink-500/50'
+                    : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white border border-gray-700'
                 ]"
               >
                 全部
@@ -76,16 +83,17 @@
                 :key="sub.CID"
                 @click="selectSubCategory(sub)"
                 :class="[
-                  'flex-shrink-0 px-2 sm:px-4 py-1 sm:py-2 rounded-md sm:rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap',
+                  'flex-shrink-0 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap cursor-pointer',
                   selectedSubCategory?.CID === sub.CID
-                    ? 'bg-pink-500 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    ? 'bg-pink-500/20 text-pink-400 border border-pink-500/50'
+                    : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white border border-gray-700'
                 ]"
               >
                 {{ sub.name }}
               </button>
             </div>
           </div>
+        </div>
       </div>
 
       <!-- Top Pagination -->
@@ -98,7 +106,10 @@
       </div>
 
       <!-- Theme Tags Section (only show when no category selected or showing default) -->
-      <div v-if="!hasSearched" class="bg-gray-800 rounded-lg p-3 sm:p-4 mt-2 sm:mt-4 mb-4 sm:mb-6">
+      <div v-if="!hasSearched" class="relative mt-2 sm:mt-4 mb-4 sm:mb-6">
+        <!-- Gradient border effect -->
+        <div class="absolute inset-0 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-blue-500/10 rounded-lg blur-xl"></div>
+        <div class="relative bg-gray-900/60 backdrop-blur-xl border border-white/10 rounded-lg p-3 sm:p-4">
         <div
           v-for="block in themeBlocks"
           :key="block.title"
@@ -110,11 +121,12 @@
               v-for="tag in block.content"
               :key="tag"
               @click="searchTag(tag)"
-              class="px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-700 hover:bg-pink-500 text-gray-300 hover:text-white rounded-full text-xs sm:text-sm transition-all"
+              class="px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-800/50 hover:bg-pink-500/20 text-gray-300 hover:text-pink-400 border border-gray-700 hover:border-pink-500/50 rounded-full text-xs sm:text-sm transition-colors cursor-pointer"
             >
               {{ tag }}
             </button>
           </div>
+        </div>
         </div>
       </div>
 

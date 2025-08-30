@@ -27,7 +27,7 @@
         >
           <div
             v-if="visible"
-            class="relative bg-gray-900 rounded-xl p-3 sm:p-4 w-full max-w-xl"
+            class="relative bg-gray-900/90 backdrop-blur-xl rounded-xl p-3 sm:p-4 w-full max-w-xl border border-white/10"
           >
             <!-- Header -->
             <div class="flex items-center justify-between mb-3">
@@ -78,7 +78,7 @@
                 <p class="text-gray-400">{{ error }}</p>
                 <button
                   @click="fetchServers"
-                  class="mt-4 px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-lg transition-colors"
+                  class="mt-4 px-4 py-2 bg-pink-500/20 backdrop-blur-sm border border-pink-500/50 text-pink-400 hover:bg-pink-500/30 hover:border-pink-400 rounded-lg transition-all cursor-pointer"
                 >
                   重试
                 </button>
@@ -87,7 +87,7 @@
               <!-- Main Content -->
               <div v-else>
                 <!-- Test Image Section -->
-                <div class="bg-gray-800 rounded-lg p-2.5 mb-2.5">
+                <div class="bg-gray-800/50 backdrop-blur-sm border border-white/10 rounded-lg p-2.5 mb-2.5">
                   <div class="flex items-center gap-3">
                     <!-- Test Image -->
                     <div class="relative w-16 h-20 sm:w-20 sm:h-24 bg-gray-700 rounded overflow-hidden flex-shrink-0">
@@ -145,8 +145,8 @@
                     v-for="server in servers"
                     :key="server.id"
                     @click="selectServer(server)"
-                    class="bg-gray-800 hover:bg-gray-750 rounded-lg p-2 cursor-pointer transition-all border-2 relative"
-                    :class="selectedServer === server.url ? 'border-pink-500 bg-gray-750' : 'border-transparent'"
+                    class="bg-gray-800/50 backdrop-blur-sm hover:bg-gray-700/50 rounded-lg p-2 cursor-pointer transition-all border relative"
+                    :class="selectedServer === server.url ? 'border-pink-500/50 bg-gray-700/50' : 'border-white/10 hover:border-white/20'"
                   >
                     <div class="flex items-center justify-between">
                       <div class="flex-1 min-w-0">
@@ -190,14 +190,14 @@
             <div class="mt-3 flex gap-2">
               <button
                 @click="close"
-                class="flex-1 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm rounded-lg transition-colors font-medium cursor-pointer"
+                class="flex-1 px-3 py-1.5 bg-gray-800/50 backdrop-blur-sm border border-white/10 hover:bg-gray-700/50 hover:border-white/20 text-gray-300 text-sm rounded-lg transition-all font-medium cursor-pointer"
               >
                 取消
               </button>
               <button
                 @click="saveSelection"
                 :disabled="!selectedServer || saving"
-                class="flex-1 px-3 py-1.5 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white text-sm font-bold rounded-lg transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                class="flex-1 px-3 py-1.5 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white text-sm font-bold rounded-lg transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
               >
                 {{ saving ? '保存中...' : '保存选择' }}
               </button>
@@ -320,6 +320,9 @@ const saveSelection = async () => {
   try {
     // Use utility function to save
     await saveImageServer(selectedServer.value)
+    
+    // Mark that user has selected a server
+    localStorage.setItem('imageServerSelected', 'true')
     
     close()
     

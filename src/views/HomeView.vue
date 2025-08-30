@@ -13,7 +13,10 @@
     <!-- Content Layer -->
     <div class="relative">
       <!-- Welcome Dialog -->
-      <WelcomeDialog />
+      <WelcomeDialog @close="handleWelcomeClose" />
+      
+      <!-- Image Server Selection Modal -->
+      <ImageServerModal v-model="showImageServerModal" />
       <div class="container mx-auto px-4 -mb-12 py-6">
         <!-- New User Guide Banner - Desktop Only -->
         <div v-show="!announcementHidden" class="hidden sm:block mb-4 sm:mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-lg sm:rounded-xl p-[2px]">
@@ -32,7 +35,7 @@
               <div class="flex-1">
                 <h2 class="text-base sm:text-xl font-bold text-white mb-2 flex flex-wrap items-center gap-1 sm:gap-2">
                   <span>💡 新手指引</span>
-                  <span class="px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs bg-blue-500 text-white rounded-full">小贴士</span>
+                  <span class="px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs bg-blue-500/30 backdrop-blur-sm border border-blue-400/50 text-blue-300 rounded-full">小贴士</span>
                 </h2>
 
                 <div class="text-gray-300 text-xs sm:text-base space-y-2">
@@ -40,7 +43,7 @@
                     如果图片加载过慢，可以尝试更换图片服务器哦！
                   </p>
 
-                  <div class="flex items-start sm:items-center gap-2 bg-gray-800 rounded-lg p-2.5">
+                  <div class="flex items-start sm:items-center gap-2 bg-gray-900/60 backdrop-blur-sm border border-white/10 rounded-lg p-2.5">
                     <svg class="w-5 h-5 text-pink-400 flex-shrink-0 mt-0.5 sm:mt-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -60,7 +63,7 @@
               <!-- Close button -->
               <button
                   @click="hideAnnouncement"
-                  class="flex-shrink-0 text-gray-400 hover:text-gray-200 text-sm transition-colors cursor-pointer px-2 py-1 hover:bg-gray-800 rounded"
+                  class="flex-shrink-0 text-gray-400 hover:text-white text-sm transition-colors cursor-pointer px-2 py-1 hover:bg-white/10 rounded"
               >
                 关闭
               </button>
@@ -70,23 +73,29 @@
 
       </div>
       <!-- Mobile Search Bar -->
-      <div class="sm:hidden sticky top-0 z-30 bg-gradient-to-b from-gray-900/95 to-gray-900/80 backdrop-blur-sm px-4 py-3">
-        <div class="relative">
+      <div class="sm:hidden sticky top-0 z-30 bg-gradient-to-b from-gray-900/95 to-gray-900/80 backdrop-blur-xl px-4 py-3">
+        <div class="relative group">
+          <!-- Gradient border glow effect -->
+          <div class="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-full blur opacity-0 group-hover:opacity-30 transition-opacity"></div>
+          
+          <!-- Search input with glassmorphism -->
           <input
             v-model="searchQuery"
-            @click="showFullscreenSearch = true"
-            @focus="showFullscreenSearch = true"
+            @click="handleSearchClick"
+            @focus="handleSearchClick"
             type="text"
             placeholder="搜索漫画、作者..."
-            class="w-full px-4 py-2.5 pl-10 bg-white/90 backdrop-blur-sm rounded-full text-gray-800 placeholder-gray-500 focus:outline-none focus:bg-white focus:ring-2 focus:ring-pink-400 transition-all cursor-pointer text-sm"
+            class="relative w-full px-4 py-2.5 pl-10 bg-gray-900/70 backdrop-blur-xl border border-white/20 rounded-full text-gray-200 placeholder-gray-400 focus:outline-none focus:border-pink-500/50 focus:bg-gray-900/80 transition-all cursor-pointer text-sm"
             readonly
           />
-          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
+          
+          <!-- Search button with glassmorphism -->
           <button
-            @click="showFullscreenSearch = true"
-            class="absolute right-1 top-1/2 -translate-y-1/2 px-4 py-1.5 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white text-xs font-medium rounded-full transition-colors cursor-pointer"
+            @click="handleSearchClick"
+            class="absolute right-1 top-1/2 -translate-y-1/2 px-4 py-1.5 bg-gradient-to-r from-pink-500/30 to-purple-500/30 backdrop-blur-sm border border-pink-400/50 hover:from-pink-500/40 hover:to-purple-500/40 hover:border-pink-400/70 text-pink-200 hover:text-white text-xs font-medium rounded-full transition-all cursor-pointer"
           >
             搜索
           </button>
@@ -100,7 +109,7 @@
               <div class="flex-1">
                 <h2 class="text-sm font-bold text-white mb-1.5 flex items-center gap-1">
                   <span>💡 新手指引</span>
-                  <span class="px-1.5 py-0.5 text-[10px] bg-blue-500 text-white rounded-full">小贴士</span>
+                  <span class="px-1.5 py-0.5 text-[10px] bg-blue-500/30 backdrop-blur-sm border border-blue-400/50 text-blue-300 rounded-full">小贴士</span>
                 </h2>
 
                 <div class="text-gray-300 text-xs space-y-1.5">
@@ -113,7 +122,7 @@
               <!-- Close button -->
               <button
                   @click="hideAnnouncement"
-                  class="flex-shrink-0 text-gray-300 hover:text-white text-sm font-medium transition-colors cursor-pointer px-2 py-1 hover:bg-gray-800/50 rounded"
+                  class="flex-shrink-0 text-gray-300 hover:text-white text-sm font-medium transition-colors cursor-pointer px-2 py-1 hover:bg-white/10 rounded"
               >
                 关闭
               </button>
@@ -138,7 +147,7 @@
       <div class="container mx-auto px-4 py-4 sm:py-6">
         <!-- Mobile: Full width slider -->
         <div class="sm:hidden">
-          <HeroSlider :items="heroComics" />
+          <HeroSlider :items="heroComics" :auto-play="true" :interval="5000" />
         </div>
         
         <!-- Desktop: Split Layout -->
@@ -146,17 +155,17 @@
           <!-- Left: Slider (2/5 width) -->
           <div class="w-2/5 flex flex-col gap-3">
             <!-- Main Slider -->
-            <HeroSlider :items="heroComics" />
+            <HeroSlider :items="heroComics" :auto-play="true" :interval="5000" />
             
-            <!-- Quick Access Section Below Slider -->
-            <div class="bg-gradient-to-br from-gray-800/50 to-gray-900/60 backdrop-blur-sm rounded-xl p-3">
+            <!-- Quick Access & Tag Cloud Section Below Slider -->
+            <div class="bg-gray-900/60 backdrop-blur-sm border border-white/10 rounded-xl p-3">
               <!-- Quick Rankings -->
               <div class="grid grid-cols-4 gap-2 mb-3">
                 <button 
                   v-for="ranking in quickRankings" 
                   :key="ranking.name"
                   @click="$router.push(ranking.path)"
-                  class="group relative overflow-hidden rounded-lg bg-gradient-to-br from-gray-700 to-gray-800 p-3 hover:from-gray-600 hover:to-gray-700 transition-all duration-200 cursor-pointer"
+                  class="group relative overflow-hidden rounded-lg bg-gray-800/50 backdrop-blur-sm border border-white/10 p-3 hover:bg-gray-700/50 hover:border-white/20 transition-all duration-200 cursor-pointer"
                 >
                   <div class="relative z-10">
                     <div class="text-2xl mb-1">{{ ranking.icon }}</div>
@@ -165,22 +174,21 @@
                 </button>
               </div>
               
-              <!-- Trending Tags -->
-              <div class="border-t border-gray-700 pt-2">
-                <div class="flex items-center justify-between mb-2">
-                  <span class="text-xs text-gray-400">热门标签</span>
-                  <svg class="w-3 h-3 text-pink-500 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd"/>
-                  </svg>
-                </div>
-                <div class="flex flex-wrap gap-1.5">
+              <!-- Word Cloud -->
+              <div class="border-t border-white/10 pt-3">
+                <div class="word-cloud-container">
                   <span 
-                    v-for="tag in trendingTags" 
-                    :key="tag"
-                    @click="$router.push(`/search?q=${encodeURIComponent(tag)}`)"
-                    class="px-2.5 py-1 bg-gray-700/50 hover:bg-pink-500/30 text-gray-300 hover:text-pink-400 text-xs rounded-full cursor-pointer transition-all"
+                    v-for="(tag, index) in tagCloudData" 
+                    :key="tag.text"
+                    @click="$router.push(`/search?q=${encodeURIComponent(tag.text)}`)"
+                    class="word-cloud-tag"
+                    :style="{
+                      fontSize: tag.size + 'px',
+                      color: tag.color,
+                      fontWeight: tag.weight
+                    }"
                   >
-                    #{{ tag }}
+                    {{ tag.text }}
                   </span>
                 </div>
               </div>
@@ -189,13 +197,13 @@
           
           <!-- Right: Featured Comics -->
           <div class="w-3/5">
-            <div class="bg-gradient-to-br from-gray-800/60 to-gray-900/70 backdrop-blur-sm rounded-xl h-full p-3 flex gap-3">
+            <div class="bg-gray-900/60 backdrop-blur-sm border border-white/10 rounded-xl h-full p-3 flex gap-3">
               <!-- Left: Main Featured Comic -->
               <div class="w-1/3">
                 <router-link
                   v-if="heroComics[0]"
                   :to="`/chapter/${heroComics[0].id}`"
-                  class="block relative h-full rounded-lg overflow-hidden bg-gray-900 group"
+                  class="block relative h-full rounded-lg overflow-hidden bg-gray-800/50 border border-white/10 group hover:border-pink-500/30 transition-all"
                 >
                   <img
                     :src="heroComics[0].coverImage"
@@ -205,7 +213,7 @@
                   />
                   <!-- Featured Badge -->
                   <div class="absolute top-2 left-2 z-10">
-                    <span class="px-2 py-1 bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs font-bold rounded">
+                    <span class="px-2 py-1 bg-pink-600/70 backdrop-blur-sm border border-pink-400/60 text-white text-xs font-bold rounded">
                       主推
                     </span>
                   </div>
@@ -220,13 +228,13 @@
                             <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
                             <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
                           </svg>
-                          {{ formatNumber(heroComics[0]?.views) }}万
+                          {{ formatNumber(heroComics[0]?.views) }}
                         </span>
                         <span class="flex items-center gap-1">
                           <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
                           </svg>
-                          {{ formatNumber(heroComics[0]?.likes) }}万
+                          {{ formatNumber(heroComics[0]?.likes) }}
                         </span>
                       </div>
                     </div>
@@ -241,7 +249,7 @@
                   v-for="(comic, idx) in heroComics.slice(1, 7)"
                   :key="`feat-${comic.id}-${idx}`"
                   :to="`/chapter/${comic.id}`"
-                  class="group relative rounded overflow-hidden bg-gray-900"
+                  class="group relative rounded overflow-hidden bg-gray-800/50 border border-white/10 hover:border-pink-500/30 transition-all"
                 >
                   <img
                     :src="comic.coverImage"
@@ -252,7 +260,7 @@
                   
                   <!-- Mini badge -->
                   <div v-if="idx < 3" class="absolute top-1 right-1 z-10">
-                    <span class="px-1.5 py-0.5 bg-red-500 text-white text-[9px] font-bold rounded">
+                    <span class="px-1.5 py-0.5 bg-red-600/70 backdrop-blur-sm border border-red-400/60 text-white text-[9px] font-bold rounded">
                       {{ idx + 1 }}
                     </span>
                   </div>
@@ -266,13 +274,13 @@
                           <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
                           <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
                         </svg>
-                        {{ formatNumber(comic.views) }}万
+                        {{ formatNumber(comic.views) }}
                       </span>
                       <span class="flex items-center gap-0.5">
                         <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
                           <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
                         </svg>
-                        {{ formatNumber(comic.likes) }}万
+                        {{ formatNumber(comic.likes) }}
                       </span>
                     </div>
                   </div>
@@ -313,11 +321,12 @@
               :key="tab.value"
               @click="selectUpdateType(tab.value)"
               :class="[
-                'px-3 py-1 rounded-md text-xs font-medium transition-all cursor-pointer',
+                'px-4 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer',
                 selectedUpdateType === tab.value
                   ? 'bg-pink-500 text-white'
                   : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
               ]"
+              :disabled="loadingWeekly"
             >
               {{ tab.label }}
             </button>
@@ -325,49 +334,76 @@
         </div>
         
         <div class="px-1">
-          <HorizontalSlider>
-            <router-link
-              v-for="comic in weeklyUpdates"
-              :key="comic.id"
-              :to="`/chapter/${comic.id}`"
-              class="flex-shrink-0 w-32 sm:w-36 md:w-40 group block"
+          <!-- Mobile: Horizontal Slider -->
+          <div class="md:hidden relative">
+            <!-- Loading overlay for mobile -->
+            <div v-if="loadingWeekly" class="absolute inset-0 bg-gray-900/50 backdrop-blur-sm rounded-lg z-10 flex items-center justify-center min-h-[200px]">
+              <LoadingSpinner />
+            </div>
+            <HorizontalSlider>
+              <router-link
+                v-for="comic in weeklyUpdates"
+                :key="comic.id"
+                :to="`/chapter/${comic.id}`"
+                class="flex-shrink-0 w-32 sm:w-36 group block"
+              >
+                <div class="relative">
+                  <!-- Gradient border effect on hover -->
+                  <div class="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-lg opacity-0 group-hover:opacity-50 blur-sm transition-opacity"></div>
+                  <div class="relative bg-gray-900/60 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden group-hover:border-pink-500/30 transition-all">
+                    <div class="relative aspect-[3/4] bg-gray-800/50">
+                    <img
+                      :src="getAlbumCover(comic.id)"
+                      :alt="comic.name"
+                      class="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
+                      loading="lazy"
+                      @error="handleImageError"
+                    />
+                    <!-- New Badge -->
+                    <div class="absolute top-2 right-2">
+                      <span class="px-2 py-1 text-xs bg-red-600/70 backdrop-blur-sm border border-red-400/60 text-white font-medium rounded-full">
+                        新
+                      </span>
+                    </div>
+                    <!-- Category Label -->
+                    <div v-if="comic.category" class="absolute top-2 left-2">
+                      <span class="px-2 py-1 text-xs bg-pink-600/70 backdrop-blur-sm border border-pink-400/60 text-white font-medium rounded-full">
+                        {{ comic.category?.title || comic.category }}
+                      </span>
+                    </div>
+                    </div>
+                    <div class="p-2">
+                      <h3 class="text-xs sm:text-sm font-semibold text-white truncate">
+                        {{ comic.name }}
+                      </h3>
+                      <p class="text-xs text-gray-400 mt-0.5 truncate">
+                        {{ comic.author || '未知作者' }}
+                      </p>
+                      <div class="text-xs text-gray-500 mt-1">
+                        {{ formatUpdateTime(comic.update_at) }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </router-link>
+            </HorizontalSlider>
+          </div>
+          
+          <!-- Desktop: Grid with Load More -->
+          <div class="hidden md:block">
+            <GridWithLoadMore
+              :items="weeklyUpdates"
+              :initial-count="6"
+              :increment-count="6"
+              :show-new-badge="true"
             >
-              <div class="bg-gray-800 rounded-lg overflow-hidden hover:ring-2 hover:ring-pink-500 transition-all">
-                <div class="relative aspect-[3/4] bg-gray-700">
-                  <img
-                    :src="getAlbumCover(comic.id)"
-                    :alt="comic.name"
-                    class="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
-                    loading="lazy"
-                    @error="handleImageError"
-                  />
-                  <!-- New Badge -->
-                  <div class="absolute top-2 right-2">
-                    <span class="px-2 py-1 text-xs text-white bg-red-500 rounded-full">
-                      新
-                    </span>
-                  </div>
-                  <!-- Category Label -->
-                  <div v-if="comic.category" class="absolute top-2 left-2">
-                    <span class="px-2 py-1 text-xs text-white bg-pink-500/80 backdrop-blur rounded-full">
-                      {{ comic.category?.title || comic.category }}
-                    </span>
-                  </div>
+              <template #loading-overlay>
+                <div v-if="loadingWeekly" class="absolute inset-0 bg-gray-900/50 backdrop-blur-sm rounded-lg z-10 flex items-center justify-center min-h-[200px]">
+                  <LoadingSpinner />
                 </div>
-                <div class="p-2">
-                  <h3 class="text-xs font-semibold text-white truncate">
-                    {{ comic.name }}
-                  </h3>
-                  <p class="text-xs text-gray-400 mt-0.5 truncate">
-                    {{ comic.author || '未知作者' }}
-                  </p>
-                  <div class="text-xs text-gray-500 mt-1">
-                    {{ formatUpdateTime(comic.update_at) }}
-                  </div>
-                </div>
-              </div>
-            </router-link>
-          </HorizontalSlider>
+              </template>
+            </GridWithLoadMore>
+          </div>
         </div>
       </div>
 
@@ -393,17 +429,21 @@
             <span class="text-sm text-gray-400 md:hidden">滑动查看更多 →</span>
           </div>
           
-          <!-- Horizontal Slider Component -->
-          <div class="px-1">
+          <!-- Mobile: Horizontal Slider Component -->
+          <div class="px-1 md:hidden">
             <HorizontalSlider>
               <router-link
                 v-for="comic in promotion.content"
                 :key="comic.id"
                 :to="`/chapter/${comic.id}`"
-                class="flex-shrink-0 w-32 sm:w-36 md:w-40 group block"
+                class="flex-shrink-0 w-32 sm:w-36 group block relative"
               >
-                <div class="bg-gray-800 rounded-lg overflow-hidden hover:ring-2 hover:ring-pink-500 transition-all">
-                <div class="relative aspect-[3/4] bg-gray-700">
+                <!-- Gradient border effect on hover -->
+                <div class="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-lg opacity-0 group-hover:opacity-50 blur-sm transition-opacity"></div>
+                
+                <!-- Main card with glassmorphism -->
+                <div class="relative bg-gray-900/60 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden group-hover:border-pink-500/30 transition-all">
+                <div class="relative aspect-[3/4] bg-gray-800/50">
                   <img
                     :src="getAlbumCover(comic.id)"
                     :alt="comic.name"
@@ -413,13 +453,13 @@
                   />
                   <!-- Category Label -->
                   <div v-if="comic.category" class="absolute top-2 left-2">
-                    <span class="px-2 py-1 text-xs text-white bg-pink-500/80 backdrop-blur rounded-full">
+                    <span class="px-2 py-1 text-xs bg-pink-600/70 backdrop-blur-sm border border-pink-400/60 text-white font-medium rounded-full">
                       {{ typeof comic.category === 'object' ? (comic.category.title || comic.category.name) : comic.category }}
                     </span>
                   </div>
                 </div>
                 <div class="p-2">
-                  <h3 class="text-xs font-semibold text-white truncate">
+                  <h3 class="text-xs sm:text-sm font-semibold text-white truncate">
                     {{ comic.name }}
                   </h3>
                   <p class="text-xs text-gray-400 mt-0.5 truncate">
@@ -429,6 +469,15 @@
                 </div>
               </router-link>
             </HorizontalSlider>
+          </div>
+          
+          <!-- Desktop: Grid with Load More -->
+          <div class="px-1 hidden md:block">
+            <GridWithLoadMore
+              :items="promotion.content"
+              :initial-count="6"
+              :increment-count="6"
+            />
           </div>
         </div>
       </div>
@@ -446,7 +495,7 @@
         <p class="text-red-400">{{ error }}</p>
         <button
           @click="() => { dataLoaded = false; loadPromotions() }"
-          class="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          class="mt-4 px-4 py-2 bg-red-600/20 backdrop-blur-sm border border-red-500/50 text-red-400 rounded-lg hover:bg-red-600/30 hover:border-red-400 transition-all cursor-pointer"
         >
           重试
         </button>
@@ -456,6 +505,18 @@
     
     <!-- Fullscreen Search Modal -->
     <FullscreenSearch v-model="showFullscreenSearch" />
+    
+    <!-- Login Prompt Modal -->
+    <ModalDialog
+      v-model="showLoginPrompt"
+      icon="lock"
+      title="需要登录"
+      message="登录后即可使用搜索功能"
+      confirm-text="立即登录"
+      cancel-text="注册账号"
+      @confirm="handleLoginConfirm"
+      @cancel="handleRegister"
+    />
   </AppLayout>
 </template>
 
@@ -469,29 +530,40 @@ export default {
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
+import { useAuthStore } from '@/stores/auth'
 import { getPromotionContent, getWeeklyUpdates, getHotTags, getCategories } from '@/api/request'
 import { addToCollection } from '@/api/collection'
 import AppLayout from '@/components/AppLayout.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import HorizontalSlider from '@/components/HorizontalSlider.vue'
+import GridWithLoadMore from '@/components/GridWithLoadMore.vue'
 import WelcomeDialog from '@/components/WelcomeDialog.vue'
+import ImageServerModal from '@/components/ImageServerModal.vue'
 import ReadingHistory from '@/components/ReadingHistory.vue'
 import HeroSlider from '@/components/HeroSlider.vue'
 import FullscreenSearch from '@/components/FullscreenSearch.vue'
+import ModalDialog from '@/components/ModalDialog.vue'
 import { formatNumber } from '@/utils/format'
 import { getImageServer } from '@/utils/imageServer'
+import { handleImageError } from '@/utils/handleImageError'
 import { request } from '@/api/request'
 
 const router = useRouter()
 const appStore = useAppStore()
+const authStore = useAuthStore()
 
 const promotions = ref([])
 const weeklyUpdates = ref([])
 const loading = ref(false)
+const loadingWeekly = ref(false) // Loading state for weekly updates tab switching
 const pageLoading = ref(true) // Page loading state for AppLayout
 const error = ref('')
 const dataLoaded = ref(false) // Flag to prevent duplicate loading
 const announcementHidden = ref(false) // Track if announcement is hidden
+
+// Load more state for desktop grid layout
+const weeklyUpdatesVisible = ref(12) // Show 12 items initially
+const promotionVisibleItems = ref({}) // Track visible items for each promotion section
 
 // Hero slider data
 const heroComics = ref([])
@@ -501,6 +573,10 @@ const navCategories = ref([]) // Categories for navigation
 // Search
 const searchQuery = ref('')
 const showFullscreenSearch = ref(false)
+const showLoginPrompt = ref(false)
+
+// Image Server Modal
+const showImageServerModal = ref(false)
 
 // Quick rankings data
 const quickRankings = [
@@ -512,6 +588,7 @@ const quickRankings = [
 
 // Trending tags from API
 const trendingTags = ref([])
+const tagCloudData = ref([])
 
 // Update tabs
 const updateTabs = [
@@ -522,16 +599,78 @@ const updateTabs = [
 const selectedUpdateType = ref('all')
 
 
+
+// Generate word cloud data with different sizes and colors
+const generateWordCloud = (tags) => {
+  const colors = [
+    '#ec4899', // pink-500
+    '#a855f7', // purple-500
+    '#3b82f6', // blue-500
+    '#f59e0b', // amber-500
+    '#10b981', // emerald-500
+    '#ef4444', // red-500
+    '#8b5cf6', // violet-500
+    '#06b6d4', // cyan-500
+  ]
+  
+  // Smaller size ranges for more compact design
+  const sizes = [20, 18, 17, 16, 15, 14, 13, 12, 11, 10]
+  const weights = [600, 600, 500, 500, 500, 400, 400, 400, 300, 300]
+  
+  return tags.slice(0, 25).map((tag, index) => {
+    // Randomly assign size (but keep first 3 tags larger for emphasis)
+    let sizeIndex
+    if (index < 3) {
+      // First 3 tags should be larger (randomly from first 3 sizes)
+      sizeIndex = Math.floor(Math.random() * 3)
+    } else {
+      // Other tags can be any size
+      sizeIndex = Math.floor(Math.random() * sizes.length)
+    }
+    
+    const colorIndex = Math.floor(Math.random() * colors.length)
+    
+    return {
+      text: tag,
+      size: sizes[sizeIndex],
+      color: colors[colorIndex],
+      weight: weights[sizeIndex]
+    }
+  })
+}
+
 const loadHotTags = async () => {
   try {
+    // Check cache first (1 day cache)
+    const cached = localStorage.getItem('hotTagsCache')
+    if (cached) {
+      const { tags, timestamp } = JSON.parse(cached)
+      // Check if cache is less than 1 day old
+      if (Date.now() - timestamp < 24 * 60 * 60 * 1000) {
+        trendingTags.value = tags.slice(0, 20)
+        tagCloudData.value = generateWordCloud(trendingTags.value)
+        return
+      }
+    }
+    
+    // If no cache or cache expired, try API
     const tags = await getHotTags()
     if (tags && Array.isArray(tags)) {
-      trendingTags.value = tags.slice(0, 12) // Get first 12 tags
+      // Cache for 1 day
+      const hotTagsCache = {
+        tags: tags,
+        timestamp: Date.now()
+      }
+      localStorage.setItem('hotTagsCache', JSON.stringify(hotTagsCache))
+      
+      trendingTags.value = tags.slice(0, 20)
+      tagCloudData.value = generateWordCloud(trendingTags.value)
     }
   } catch (error) {
     console.error('Failed to load hot tags:', error)
     // Use fallback tags if API fails
-    trendingTags.value = ['异世界', '重生', '系统', '穿越', '霸总', '甜宠', '末世', '修仙']
+    trendingTags.value = ['异世界', '重生', '系统', '穿越', '霸总', '甜宠', '末世', '修仙', '都市', '玄幻', '热血', '恋爱', '校园', '悬疑', '冒险']
+    tagCloudData.value = generateWordCloud(trendingTags.value)
   }
 }
 
@@ -590,9 +729,6 @@ const getAlbumCover = (comicId) => {
   return `${server}/media/albums/${comicId}_3x4.jpg`
 }
 
-const handleImageError = (e) => {
-  e.target.src = '/default.jpeg'
-}
 
 // Fetch random comics for hero section
 const fetchRandomComics = async () => {
@@ -619,6 +755,19 @@ const fetchRandomComics = async () => {
           tags: comic.tags || []
         }
       })
+      
+      // Extract hot_tags from response and update tag cloud
+      if (response.data.hot_tags && Array.isArray(response.data.hot_tags)) {
+        // Cache hot tags for 1 day
+        const hotTagsCache = {
+          tags: response.data.hot_tags,
+          timestamp: Date.now()
+        }
+        localStorage.setItem('hotTagsCache', JSON.stringify(hotTagsCache))
+        
+        trendingTags.value = response.data.hot_tags.slice(0, 20)
+        tagCloudData.value = generateWordCloud(trendingTags.value)
+      }
     }
   } catch (error) {
     console.error('Failed to fetch random comics:', error)
@@ -640,7 +789,11 @@ const searchTag = (tag) => {
 }
 
 const selectUpdateType = async (type) => {
+  if (loadingWeekly.value) return // Prevent multiple simultaneous requests
+  
   selectedUpdateType.value = type
+  loadingWeekly.value = true
+  
   try {
     const data = await getWeeklyUpdates(type)
     if (data?.list) {
@@ -648,6 +801,22 @@ const selectUpdateType = async (type) => {
     }
   } catch (err) {
     console.error('Failed to load weekly updates:', err)
+  } finally {
+    loadingWeekly.value = false
+  }
+}
+
+// Handle welcome dialog close - show image server modal for first-time users
+const handleWelcomeClose = () => {
+  // Check if this is the first time user (no image server selected)
+  const hasSelectedServer = localStorage.getItem('imageServerSelected')
+  if (!hasSelectedServer) {
+    // Show image server modal after a short delay
+    setTimeout(() => {
+      showImageServerModal.value = true
+      // Mark that we've shown the image server modal
+      localStorage.setItem('imageServerSelected', 'pending')
+    }, 500)
   }
 }
 
@@ -693,6 +862,28 @@ const addToCollectionHandler = async (comicId) => {
   }
 }
 
+// Functions
+const handleSearchClick = () => {
+  if (!authStore.isLoggedIn) {
+    showLoginPrompt.value = true
+  } else {
+    showFullscreenSearch.value = true
+  }
+}
+
+const handleLoginConfirm = () => {
+  showLoginPrompt.value = false
+  router.push({
+    path: '/login',
+    query: { redirect: router.currentRoute.value.fullPath }
+  })
+}
+
+const handleRegister = () => {
+  showLoginPrompt.value = false
+  router.push('/register')
+}
+
 onMounted(async () => {
   // Check if announcement was previously hidden
   const hidden = localStorage.getItem('announcementHidden')
@@ -721,6 +912,34 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+/* Word Cloud Styles */
+.word-cloud-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.5rem;
+  align-items: baseline;
+  justify-content: center;
+  padding: 0.25rem;
+  min-height: 60px;
+  line-height: 1;
+}
+
+.word-cloud-tag {
+  display: inline-block;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  opacity: 0.85;
+  white-space: nowrap;
+  padding: 0 0.2rem;
+}
+
+.word-cloud-tag:hover {
+  opacity: 1;
+  transform: scale(1.05);
+  filter: brightness(1.2);
+  text-shadow: 0 0 8px currentColor;
+}
+
 @keyframes ping {
   0% {
     transform: scale(1);

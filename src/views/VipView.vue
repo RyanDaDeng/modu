@@ -22,15 +22,15 @@
           v-for="plan in plans" 
           :key="plan.key"
           :class="[
-            'relative bg-gray-800 rounded-xl p-4 sm:p-6 border-2 transition-all flex flex-col',
+            'relative bg-gray-900/60 backdrop-blur-sm rounded-xl p-4 sm:p-6 border transition-all flex flex-col',
             plan.popular 
-              ? 'border-pink-500 shadow-lg shadow-pink-500/20' 
-              : 'border-gray-700 hover:border-gray-600'
+              ? 'border-pink-500/50 shadow-lg shadow-pink-500/20' 
+              : 'border-white/10 hover:border-pink-500/30'
           ]"
         >
           <!-- Popular Badge -->
           <div v-if="plan.popular" class="absolute -top-3 left-1/2 transform -translate-x-1/2">
-            <span class="px-3 py-1 bg-pink-500 text-white text-xs font-bold rounded-full">
+            <span class="px-3 py-1 bg-pink-600/90 backdrop-blur-sm border border-pink-400/60 text-white text-xs font-bold rounded-full shadow-lg">
               最受欢迎
             </span>
           </div>
@@ -62,7 +62,7 @@
             </div>
             
             <!-- Feature - flex-grow to push divider down -->
-            <div class="flex-grow flex items-center justify-center border-t border-gray-700 py-4">
+            <div class="flex-grow flex items-center justify-center border-t border-white/10 py-4">
               <div v-for="feature in plan.features" :key="feature" class="flex items-center justify-center gap-2 text-gray-300 text-sm">
                 <svg class="w-4 h-4 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -75,14 +75,14 @@
             <div class="space-y-2">
               <button
                 @click.stop="handlePurchase(plan, 'alipay')"
-                class="w-full py-2 px-4 rounded-lg font-medium transition-all cursor-pointer bg-gray-700 text-white hover:bg-gray-600 border border-gray-600 hover:border-gray-500 flex items-center justify-center gap-2"
+                class="w-full py-2 px-4 rounded-lg font-medium transition-all cursor-pointer bg-gray-800/50 backdrop-blur-sm text-white hover:bg-gray-700/50 border border-white/10 hover:border-white/20 flex items-center justify-center gap-2"
               >
                 <span class="text-blue-400">支付宝</span>
                 支付
               </button>
               <button
                 @click.stop="handlePurchase(plan, 'wechat')"
-                class="w-full py-2 px-4 rounded-lg font-medium transition-all cursor-pointer bg-gray-700 text-white hover:bg-gray-600 border border-gray-600 hover:border-gray-500 flex items-center justify-center gap-2"
+                class="w-full py-2 px-4 rounded-lg font-medium transition-all cursor-pointer bg-gray-800/50 backdrop-blur-sm text-white hover:bg-gray-700/50 border border-white/10 hover:border-white/20 flex items-center justify-center gap-2"
               >
                 <span class="text-green-400">微信</span>
                 支付
@@ -95,63 +95,63 @@
       <!-- FAQ Section -->
       <div class="mt-12 max-w-md mx-auto sm:max-w-2xl">
         <h3 class="text-lg font-semibold text-white mb-4 text-center">常见问题</h3>
-        <div class="bg-gray-800 rounded-lg divide-y divide-gray-700">
+        <div class="bg-gray-900/60 backdrop-blur-sm border border-white/10 rounded-lg divide-y divide-white/10">
           <details class="group">
-            <summary class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-750 transition-colors">
+            <summary class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-800/50 transition-colors">
               <span class="text-gray-300 text-sm">VIP会员可以看所有漫画吗？</span>
               <svg class="w-5 h-5 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </summary>
-            <div class="px-4 pb-4 text-gray-400 text-sm">
+            <div class="px-4 pt-2 pb-4 text-gray-400 text-sm">
               是的，VIP会员可以无限制阅读全站所有漫画内容。
             </div>
           </details>
           
           <details class="group">
-            <summary class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-750 transition-colors">
+            <summary class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-800/50 transition-colors">
               <span class="text-gray-300 text-sm">VIP会员到期后会怎样？</span>
               <svg class="w-5 h-5 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </summary>
-            <div class="px-4 pb-4 text-gray-400 text-sm">
+            <div class="px-4 pt-2 pb-4 text-gray-400 text-sm">
               到期后将恢复为普通用户，您的收藏记录会保留。
             </div>
           </details>
           
           <details class="group">
-            <summary class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-750 transition-colors">
+            <summary class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-800/50 transition-colors">
               <span class="text-gray-300 text-sm">支持哪些支付方式？</span>
               <svg class="w-5 h-5 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </summary>
-            <div class="px-4 pb-4 text-gray-400 text-sm">
+            <div class="px-4 pt-2 pb-4 text-gray-400 text-sm">
               目前支持支付宝和微信支付。
             </div>
           </details>
           
           <details class="group">
-            <summary class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-750 transition-colors">
+            <summary class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-800/50 transition-colors">
               <span class="text-gray-300 text-sm">在哪里查看支付状态？</span>
               <svg class="w-5 h-5 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </summary>
-            <div class="px-4 pb-4 text-gray-400 text-sm">
+            <div class="px-4 pt-2 pb-4 text-gray-400 text-sm">
               您可以在"个人中心" → "充值记录"页面查看所有支付订单的状态。
             </div>
           </details>
           
           <details class="group">
-            <summary class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-750 transition-colors">
+            <summary class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-800/50 transition-colors">
               <span class="text-gray-300 text-sm">支付后多久到账？</span>
               <svg class="w-5 h-5 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </summary>
-            <div class="px-4 pb-4 text-gray-400 text-sm">
+            <div class="px-4 pt-2 pb-4 text-gray-400 text-sm">
               支付成功后，VIP权益会在十几秒到几分钟内自动到账。如果长时间未到账，请前往"个人中心" → "联系我们"反馈问题。
             </div>
           </details>
@@ -185,7 +185,7 @@
     
     <!-- Payment Processing Modal -->
     <div v-if="processingPayment" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 text-center max-w-sm mx-4">
+      <div class="bg-gray-900/90 backdrop-blur-xl rounded-xl p-6 border border-white/10 text-center max-w-sm mx-4">
         <LoadingSpinner size="large" />
         <p class="text-white mt-4 text-lg font-medium">{{ paymentMessage }}</p>
         <p class="text-gray-400 mt-2 text-sm">请稍候，请勿关闭页面...</p>

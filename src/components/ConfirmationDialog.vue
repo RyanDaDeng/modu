@@ -7,10 +7,10 @@
         @click.self="handleBackdropClick"
       >
         <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/50"></div>
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
         
         <!-- Modal Content -->
-        <div class="relative bg-gray-800 rounded-xl p-6 w-full max-w-md shadow-2xl">
+        <div class="relative bg-gray-900/90 backdrop-blur-xl rounded-xl p-6 w-full max-w-md shadow-2xl border border-white/10">
           <!-- Icon (optional) -->
           <div v-if="icon || type" class="text-center mb-4">
             <div 
@@ -58,7 +58,7 @@
           <div class="flex gap-3">
             <button
               @click="handleCancel"
-              class="flex-1 py-2 px-4 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors cursor-pointer"
+              class="flex-1 py-2 px-4 bg-gray-800/50 backdrop-blur-sm border border-white/10 hover:bg-gray-700/50 hover:border-white/20 text-white rounded-lg font-medium transition-all cursor-pointer"
             >
               {{ cancelText }}
             </button>
@@ -169,14 +169,14 @@ const confirmButtonClassComputed = computed(() => {
   if (props.confirmButtonClass) return props.confirmButtonClass
   
   const classes = {
-    warning: 'bg-yellow-600 hover:bg-yellow-700 text-white',
-    info: 'bg-blue-600 hover:bg-blue-700 text-white',
-    error: 'bg-red-600 hover:bg-red-700 text-white',
-    danger: 'bg-red-600 hover:bg-red-700 text-white',
-    success: 'bg-green-600 hover:bg-green-700 text-white'
+    warning: 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white shadow-lg hover:shadow-xl',
+    info: 'bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-lg hover:shadow-xl',
+    error: 'bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white shadow-lg hover:shadow-xl',
+    danger: 'bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white shadow-lg hover:shadow-xl',
+    success: 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg hover:shadow-xl'
   }
   
-  return classes[iconType.value] || 'bg-pink-600 hover:bg-pink-700 text-white'
+  return classes[iconType.value] || 'bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl'
 })
 
 // Methods

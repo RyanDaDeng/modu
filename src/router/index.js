@@ -32,6 +32,12 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/reading-history',
+      name: 'reading-history',
+      component: () => import('../views/ReadingHistoryView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/catalog',
       name: 'catalog',
       component: () => import('../views/CatalogView.vue')

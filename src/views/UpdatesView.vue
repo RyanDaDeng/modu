@@ -3,44 +3,48 @@
     <div class="container mx-auto px-4 py-6">
       
       <!-- Tab Navigation -->
-      <div class="bg-gray-800 rounded-lg p-2 sm:p-4 mb-4">
-        <!-- Type Tabs -->
-        <div class="flex gap-2 mb-3">
-          <button
-            v-for="tab in typeTabs"
-            :key="tab.value"
-            @click="selectType(tab.value)"
-            :class="[
-              'px-3 sm:px-4 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm font-medium transition-all',
-              selectedType === tab.value
-                ? 'bg-pink-500 text-white'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-            ]"
-          >
-            {{ tab.label }}
-          </button>
-        </div>
-        
-        <!-- Weekday Tabs -->
-        <div class="flex overflow-x-auto gap-1 sm:gap-2 pb-1 -mx-2 px-2 sm:mx-0 sm:px-0 no-scrollbar">
-          <button
-            v-for="day in weekdayTabs"
-            :key="day.value"
-            @click="selectDate(day.value)"
-            :class="[
-              'flex-shrink-0 px-2 sm:px-4 py-1 sm:py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap',
-              selectedDate === day.value
-                ? 'bg-pink-500 text-white'
-                : day.value === currentWeekday
-                ? 'bg-orange-500 text-white'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-            ]"
-          >
-            {{ day.label }}
-            <span v-if="day.value === currentWeekday" class="ml-1 text-[10px] sm:text-xs">
-              (今日)
-            </span>
-          </button>
+      <div class="relative mb-4">
+        <!-- Gradient border effect -->
+        <div class="absolute inset-0 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-blue-500/10 rounded-lg blur-xl"></div>
+        <div class="relative bg-gray-900/60 backdrop-blur-xl border border-white/10 rounded-lg p-2 sm:p-4">
+          <!-- Type Tabs -->
+          <div class="flex gap-2 mb-3">
+            <button
+              v-for="tab in typeTabs"
+              :key="tab.value"
+              @click="selectType(tab.value)"
+              :class="[
+                'px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors cursor-pointer',
+                selectedType === tab.value
+                  ? 'bg-pink-500/20 text-pink-400 border border-pink-500/50'
+                  : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white border border-gray-700'
+              ]"
+            >
+              {{ tab.label }}
+            </button>
+          </div>
+          
+          <!-- Weekday Tabs -->
+          <div class="flex overflow-x-auto gap-1 sm:gap-2 pb-1 -mx-2 px-2 sm:mx-0 sm:px-0 no-scrollbar">
+            <button
+              v-for="day in weekdayTabs"
+              :key="day.value"
+              @click="selectDate(day.value)"
+              :class="[
+                'flex-shrink-0 px-2 sm:px-4 py-1 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap cursor-pointer',
+                selectedDate === day.value
+                  ? 'bg-pink-500/20 text-pink-400 border border-pink-500/50'
+                  : day.value === currentWeekday
+                  ? 'bg-orange-500/20 text-orange-400 border border-orange-500/50'
+                  : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white border border-gray-700'
+              ]"
+            >
+              {{ day.label }}
+              <span v-if="day.value === currentWeekday" class="ml-1 text-[10px] sm:text-xs">
+                (今日)
+              </span>
+            </button>
+          </div>
         </div>
       </div>
       

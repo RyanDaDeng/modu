@@ -26,16 +26,42 @@
         <!-- Comic details -->
         <div class="relative container mx-auto px-4 py-8">
           <div class="flex flex-col md:flex-row gap-6">
-            <!-- Cover Image -->
-            <div class="w-32 sm:w-48 h-44 sm:h-64 flex-shrink-0 mx-auto md:mx-0">
-              <img 
-                v-if="comicInfo.id"
-                :src="getAlbumCover(comicInfo.id)" 
-                :alt="comicInfo.name"
-                class="w-full h-full object-cover rounded-lg shadow-2xl"
-                @error="handleImageError"
-              />
-              <div v-else class="w-full h-full bg-gray-700 rounded-lg animate-pulse"></div>
+            <!-- Cover Image and Collection Button -->
+            <div class="flex flex-col items-center gap-4 flex-shrink-0 mx-auto md:mx-0">
+              <!-- Cover Image -->
+              <div class="w-32 sm:w-48 h-44 sm:h-64">
+                <img 
+                  v-if="comicInfo.id"
+                  :src="getAlbumCover(comicInfo.id)" 
+                  :alt="comicInfo.name"
+                  class="w-full h-full object-cover rounded-lg shadow-2xl"
+                  @error="handleImageError"
+                />
+                <div v-else class="w-full h-full bg-gray-700 rounded-lg animate-pulse"></div>
+              </div>
+              
+              <!-- Collection Button -->
+              <button
+                @click="toggleCollect"
+                :disabled="favoriteLoading"
+                class="w-full px-4 py-2 rounded-lg font-medium transition-all cursor-pointer flex items-center justify-center gap-2"
+                :class="isCollected 
+                  ? 'bg-pink-500/20 backdrop-blur-sm border border-pink-500/50 text-pink-400 hover:bg-pink-500/30 hover:border-pink-400' 
+                  : 'bg-gray-800/50 backdrop-blur-sm border border-white/10 text-gray-300 hover:bg-gray-700/50 hover:border-white/20'"
+              >
+                <svg 
+                  class="w-5 h-5" 
+                  fill="currentColor" 
+                  viewBox="0 0 20 20"
+                >
+                  <path 
+                    fill-rule="evenodd" 
+                    d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" 
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                <span>{{ isCollected ? '已收藏' : '收藏' }}</span>
+              </button>
             </div>
             
             <!-- Comic Information -->
@@ -119,7 +145,7 @@
         </div>
 
         <!-- Tab Content -->
-        <div class="bg-gray-800 rounded-xl p-4 sm:p-6">
+        <div class="bg-gray-900/60 backdrop-blur-sm border border-white/10 rounded-xl p-4 sm:p-6">
           <!-- Chapters Tab -->
           <div v-if="activeTab === 'chapters'" class="space-y-4">
             <!-- Series buttons -->
@@ -131,10 +157,10 @@
                 class="relative px-4 py-3 rounded-lg transition-all text-center cursor-pointer transform hover:scale-105 group border"
                 :class="[
                   index === lastReadChapterIndex
-                    ? 'bg-pink-900/30 border-pink-500 hover:bg-pink-800/40 hover:border-pink-400'
+                    ? 'bg-pink-500/20 backdrop-blur-sm border-pink-500/50 hover:bg-pink-500/30 hover:border-pink-400'
                     : isChapterLocked(index) 
-                      ? 'bg-gray-800 hover:bg-gray-700 hover:shadow-lg border-gray-700 hover:border-yellow-500' 
-                      : 'bg-gray-700 hover:bg-gray-600 hover:shadow-lg border-gray-700 hover:border-green-500'
+                      ? 'bg-gray-800/50 backdrop-blur-sm hover:bg-gray-700/50 hover:shadow-lg border-white/10 hover:border-yellow-500/50' 
+                      : 'bg-gray-800/50 backdrop-blur-sm hover:bg-gray-700/50 hover:shadow-lg border-white/10 hover:border-green-500/50'
                 ]"
               >
                 <!-- Chapter Label (Free/Locked/Last Read) -->
@@ -179,7 +205,7 @@
             <div v-else class="flex flex-col items-center gap-4">
               <button
                 @click="handleSingleChapterClick()"
-                class="relative px-8 py-4 bg-pink-500 hover:bg-pink-600 rounded-lg transition-all flex items-center gap-3 cursor-pointer transform hover:scale-105 group hover:shadow-lg"
+                class="relative px-8 py-4 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 rounded-lg transition-all flex items-center gap-3 cursor-pointer transform hover:scale-105 group shadow-lg hover:shadow-xl"
               >
                 <!-- Preview Badge for non-VIP -->
                 <div v-if="!isUserVip()" class="absolute -top-2 -right-2 z-10 pointer-events-none">
@@ -200,14 +226,14 @@
               <!-- Preview info -->
               <div class="text-center text-gray-400 text-sm">
                 <p v-if="!isUserVip()">
-                  <span class="text-green-400">✨ 免费预览前5页</span>
+                  <span class="text-green-400">✨ 免费预览前10页</span>
                   <span class="mx-2">•</span>
                   <span>VIP可阅读完整内容</span>
                 </p>
                 <router-link v-if="!appStore.isLoggedIn" to="/login" class="text-pink-500 hover:text-pink-400 font-medium">
                   立即登录
                 </router-link>
-                <button v-else @click="showVipPrompt = true" class="text-yellow-500 hover:text-yellow-400 font-medium">
+                <button v-else-if="!isUserVip()" @click="showVipPrompt = true" class="text-yellow-500 hover:text-yellow-400 font-medium">
                   成为VIP
                 </button>
               </div>
@@ -265,7 +291,7 @@
       
       <!-- Related Comics Section -->
       <div v-if="comicInfo.related_list && comicInfo.related_list.length > 0" class="container mx-auto px-4 pb-6">
-        <div class="bg-gray-800 rounded-lg p-4 sm:p-6">
+        <div class="bg-gray-900/60 backdrop-blur-sm border border-white/10 rounded-lg p-4 sm:p-6">
           <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
             <svg class="w-6 h-6 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14v6m-3-3h6M6 10h2a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2zm10 0h2a2 2 0 002-2V6a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2zM6 20h2a2 2 0 002-2v-2a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2z" />
@@ -275,40 +301,15 @@
           
           <!-- Related Comics Grid - 3 columns on mobile, 6 on desktop -->
           <div class="grid grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
-          <router-link
-            v-for="related in comicInfo.related_list.slice(0, 12)"
-            :key="related.id"
-            :to="`/chapter/${related.id}`"
-            class="group relative bg-gray-800 rounded-lg overflow-hidden hover:shadow-xl hover:shadow-pink-500/20 transition-all duration-300 cursor-pointer"
-          >
-            <!-- Cover Image -->
-            <div class="aspect-[3/4] relative overflow-hidden bg-gray-900">
-              <img
-                :src="getRelatedCover(related.id)"
-                :alt="related.name"
-                class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                loading="lazy"
-                @error="handleImageError"
-              />
-              
-              <!-- Gradient overlay -->
-              <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none"></div>
-            </div>
-            
-            <!-- Comic Info -->
-            <div class="p-2 md:p-3">
-              <h3 class="text-white font-medium text-xs md:text-sm mb-1 line-clamp-2 group-hover:text-pink-400 transition-colors">
-                {{ related.name }}
-              </h3>
-              <p class="text-gray-400 text-xs line-clamp-1 hidden md:block">
-                {{ related.author || 'N/A' }}
-              </p>
-            </div>
-            
-            <!-- Hover Effect -->
-            <div class="absolute inset-0 border-2 border-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg pointer-events-none"></div>
-          </router-link>
-        </div>
+            <UnifiedComicCard
+              v-for="related in comicInfo.related_list.slice(0, 12)"
+              :key="related.id"
+              :comic="related"
+              :show-category="false"
+              :show-stats="false"
+              :show-tags="false"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -325,7 +326,7 @@
             <!-- Left section: Close button -->
             <button
               @click="exitReading"
-              class="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded-lg text-white text-sm font-medium transition-all flex items-center gap-1.5"
+              class="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded-lg text-white text-sm font-medium transition-all flex items-center gap-1.5 cursor-pointer"
               title="关闭 (ESC)"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -351,7 +352,7 @@
               <button
                 @click="showAutoScrollSettings = true"
                 :class="[
-                  'px-2 sm:px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1 sm:gap-1.5',
+                  'px-2 sm:px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1 sm:gap-1.5 cursor-pointer',
                   autoScrollEnabled 
                     ? 'bg-green-600 hover:bg-green-700 text-white' 
                     : 'bg-gray-600 hover:bg-gray-700 text-gray-300'
@@ -368,7 +369,7 @@
               <button
                 v-if="hasPrevChapter"
                 @click="goToPrevChapter"
-                class="px-2 sm:px-3 py-1.5 bg-gray-600 hover:bg-gray-700 rounded-lg text-white text-sm font-medium transition-all flex items-center gap-1 sm:gap-1.5"
+                class="px-2 sm:px-3 py-1.5 bg-gray-600 hover:bg-gray-700 rounded-lg text-white text-sm font-medium transition-all flex items-center gap-1 sm:gap-1.5 cursor-pointer"
                 title="上一话"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -381,7 +382,7 @@
                 v-if="hasNextChapter"
                 @click="goToNextChapter"
                 :class="[
-                  'px-2 sm:px-3 py-1.5 rounded-lg text-white text-sm font-medium transition-all flex items-center gap-1 sm:gap-1.5',
+                  'px-2 sm:px-3 py-1.5 rounded-lg text-white text-sm font-medium transition-all flex items-center gap-1 sm:gap-1.5 cursor-pointer',
                   isNextChapterLocked 
                     ? 'bg-yellow-500 hover:bg-yellow-600' 
                     : 'bg-pink-500 hover:bg-pink-600'
@@ -460,7 +461,7 @@
             </button>
             <button
               @click="exitReading"
-              class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors cursor-pointer"
             >
               退出
             </button>
@@ -556,25 +557,88 @@
             </div>
           </div>
           
-          <!-- Next Chapter Button -->
-          <div v-if="hasNextChapter && !isPreviewMode" class="mt-8 flex justify-center">
-            <button
+          <!-- Next Chapter Button - Beautiful Design -->
+          <div v-if="hasNextChapter && !isPreviewMode" class="mt-12 mb-8">
+            <!-- Full-width clickable area with gradient background -->
+            <div 
               @click="loadNextChapter"
-              :class="[
-                'px-8 py-4 text-white rounded-lg transition-all shadow-lg flex items-center gap-3 text-lg font-semibold',
-                isNextChapterLocked 
-                  ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700' 
-                  : 'bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700'
-              ]"
+              class="relative group cursor-pointer"
             >
-              <svg v-if="isNextChapterLocked" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
-              </svg>
-              <span>{{ isNextChapterLocked ? '下一话 (需要VIP)' : '下一话' }}</span>
-              <svg v-if="!isNextChapterLocked" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </button>
+              <!-- Background gradient effect -->
+              <div class="absolute inset-0 bg-gradient-to-r from-transparent via-gray-900/50 to-transparent"></div>
+              
+              <!-- Main content container -->
+              <div class="relative px-4 py-8 sm:py-12">
+                <!-- Decorative lines -->
+                <div class="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-[1px] bg-gradient-to-r from-transparent via-gray-700 to-transparent"></div>
+                
+                <!-- Center content -->
+                <div class="relative max-w-md mx-auto">
+                  <!-- Glassmorphism card -->
+                  <div class="relative overflow-hidden rounded-2xl bg-gray-900/60 backdrop-blur-xl border border-white/10 p-6 sm:p-8 transition-all duration-300 group-hover:bg-gray-900/70 group-hover:border-white/20 group-hover:shadow-2xl group-hover:shadow-pink-500/20">
+                    <!-- Gradient glow effect on hover -->
+                    <div class="absolute inset-0 bg-gradient-to-r from-pink-500/0 via-pink-500/10 to-purple-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    
+                    <!-- Content -->
+                    <div class="relative flex items-center justify-between">
+                      <!-- Left side - Chapter info -->
+                      <div class="flex-1">
+                        <p class="text-gray-400 text-xs sm:text-sm mb-1">继续阅读</p>
+                        <h3 class="text-white text-lg sm:text-xl font-bold mb-2">下一话</h3>
+                        <div class="flex items-center gap-2">
+                          <div class="h-1 w-16 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full"></div>
+                          <span class="text-gray-500 text-xs">轻触继续</span>
+                        </div>
+                      </div>
+                      
+                      <!-- Right side - Arrow button -->
+                      <div class="relative">
+                        <!-- Animated ring -->
+                        <div class="absolute inset-0 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 opacity-20 blur-xl group-hover:opacity-40 transition-opacity"></div>
+                        
+                        <!-- Button -->
+                        <div 
+                          :class="[
+                            'relative w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110',
+                            isNextChapterLocked 
+                              ? 'bg-gradient-to-br from-yellow-500 to-orange-600' 
+                              : 'bg-gradient-to-br from-pink-500 to-purple-600'
+                          ]"
+                        >
+                          <!-- Lock icon for VIP chapters -->
+                          <svg v-if="isNextChapterLocked" class="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                          </svg>
+                          
+                          <!-- Arrow for normal chapters -->
+                          <svg v-else class="w-8 h-8 sm:w-10 sm:h-10 text-white transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                          </svg>
+                        </div>
+                        
+                        <!-- Pulse animation -->
+                        <div class="absolute inset-0 rounded-full bg-white opacity-0 group-hover:animate-ping"></div>
+                      </div>
+                    </div>
+                    
+                    <!-- VIP notice -->
+                    <div v-if="isNextChapterLocked" class="mt-4 pt-4 border-t border-white/10">
+                      <p class="text-yellow-400 text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                        需要VIP会员才能阅读
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Mobile hint -->
+                <div class="mt-6 text-center sm:hidden">
+                  <p class="text-gray-600 text-xs">👆 点击任意位置继续</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -582,9 +646,34 @@
       <!-- Auto-scroll Settings Modal -->
       <teleport to="body">
         <transition name="fade">
-          <div v-if="showAutoScrollSettings" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-2 sm:p-4">
-            <div class="bg-gray-900 rounded-lg sm:rounded-xl max-w-sm w-full p-3 sm:p-6 border border-gray-700">
-              <h3 class="text-base sm:text-lg font-bold text-white mb-3 sm:mb-4">自动滚动设置</h3>
+          <div v-if="showAutoScrollSettings" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-6" @click.self="showAutoScrollSettings = false">
+            <!-- Glassmorphism Modal with Gradient Border -->
+            <div class="relative w-full max-w-lg sm:max-w-xl">
+              <!-- Gradient border glow -->
+              <div class="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-2xl blur-sm opacity-50"></div>
+              
+              <!-- Main modal content -->
+              <div class="relative bg-gray-900/90 backdrop-blur-xl rounded-2xl w-full p-4 sm:p-8 border border-white/10">
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-4 sm:mb-6">
+                  <h3 class="text-lg sm:text-2xl font-bold text-white flex items-center gap-2">
+                    <div class="p-2 bg-pink-500/20 rounded-lg">
+                      <svg class="w-5 h-5 sm:w-6 sm:h-6 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    </div>
+                    自动滚动设置
+                  </h3>
+                  <button
+                    @click="showAutoScrollSettings = false"
+                    class="p-1.5 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+                  >
+                    <svg class="w-4 h-4 text-gray-400 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
               
               <!-- Speed Slider for Smooth Mode -->
               <div v-if="autoScrollMode === 'smooth'" class="mb-3 sm:mb-6">
@@ -600,7 +689,7 @@
                   step="10"
                   class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
                 >
-                <div class="flex justify-between text-[10px] sm:text-xs text-gray-500 mt-1">
+                <div class="flex justify-between text-xs sm:text-sm text-gray-500 mt-2">
                   <span>慢</span>
                   <span>中</span>
                   <span>快</span>
@@ -623,7 +712,7 @@
                     step="0.5"
                     class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
                   >
-                  <div class="flex justify-between text-[10px] sm:text-xs text-gray-500 mt-1">
+                  <div class="flex justify-between text-xs sm:text-sm text-gray-500 mt-2">
                     <span>快速</span>
                     <span>中等</span>
                     <span>缓慢</span>
@@ -643,7 +732,7 @@
                     step="25"
                     class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
                   >
-                  <div class="flex justify-between text-[10px] sm:text-xs text-gray-500 mt-1">
+                  <div class="flex justify-between text-xs sm:text-sm text-gray-500 mt-2">
                     <span>小</span>
                     <span>中</span>
                     <span>大</span>
@@ -653,18 +742,18 @@
               </div>
               
               <!-- Scroll Mode -->
-              <div class="mb-3 sm:mb-6">
-                <label class="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">
+              <div class="mb-4 sm:mb-6">
+                <label class="block text-sm sm:text-base font-medium text-gray-300 mb-2 sm:mb-3">
                   滚动模式
                 </label>
-                <div class="grid grid-cols-2 gap-1.5 sm:gap-2">
+                <div class="grid grid-cols-2 gap-2 sm:gap-3">
                   <button
                     @click="setScrollMode('smooth')"
                     :class="[
-                      'px-2 sm:px-3 py-1.5 sm:py-2 rounded-md sm:rounded-lg text-xs sm:text-sm font-medium transition-all',
+                      'px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-medium transition-all cursor-pointer',
                       autoScrollMode === 'smooth'
-                        ? 'bg-green-600 text-white'
-                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg'
+                        : 'bg-gray-800/50 backdrop-blur-sm border border-white/10 text-gray-300 hover:bg-gray-700/50 hover:border-white/20'
                     ]"
                   >
                     平滑滚动
@@ -672,10 +761,10 @@
                   <button
                     @click="setScrollMode('stepped')"
                     :class="[
-                      'px-2 sm:px-3 py-1.5 sm:py-2 rounded-md sm:rounded-lg text-xs sm:text-sm font-medium transition-all',
+                      'px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-medium transition-all cursor-pointer',
                       autoScrollMode === 'stepped'
-                        ? 'bg-green-600 text-white'
-                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg'
+                        : 'bg-gray-800/50 backdrop-blur-sm border border-white/10 text-gray-300 hover:bg-gray-700/50 hover:border-white/20'
                     ]"
                   >
                     段落滚动
@@ -703,43 +792,48 @@
               </div>
               
               <!-- Load All Images Button -->
-              <div class="mb-3 sm:mb-6">
+              <div class="mb-4 sm:mb-6">
                 <button
                   @click="loadAllImages"
-                  :disabled="loadingAllImages"
+                  :disabled="loadingAllImages || allImagesLoaded"
                   :class="[
-                    'w-full py-2 sm:py-3 px-3 sm:px-4 rounded-md sm:rounded-lg text-xs sm:text-sm font-medium transition-all',
+                    'w-full py-2.5 sm:py-3 px-4 sm:px-5 rounded-lg text-sm sm:text-base font-medium transition-all',
                     loadingAllImages
-                      ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                      : 'bg-gray-700 hover:bg-gray-600 text-gray-400'
+                      ? 'bg-gray-800/30 text-gray-500 cursor-not-allowed'
+                      : allImagesLoaded
+                        ? 'bg-green-500/20 border border-green-500/30 text-green-400 cursor-not-allowed'
+                        : 'bg-gray-800/50 backdrop-blur-sm border border-white/10 hover:bg-gray-700/50 hover:border-white/20 text-gray-300 cursor-pointer'
                   ]"
                 >
-                  <span v-if="!loadingAllImages">加载全部图片</span>
-                  <span v-else class="flex items-center justify-center gap-1 sm:gap-2">
-                    <svg class="animate-spin h-3 sm:h-4 w-3 sm:w-4" fill="none" viewBox="0 0 24 24">
+                  <span v-if="allImagesLoaded" class="flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                    <span>已加载全部 {{ images.length }} 张图片</span>
+                  </span>
+                  <span v-else-if="loadingAllImages" class="flex items-center justify-center gap-2">
+                    <svg class="animate-spin h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24">
                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    <span class="text-xs sm:text-sm">加载中... {{ loadedCount }}/{{ images.length }}</span>
+                    <span>加载中... {{ loadedCount }}/{{ images.length }}</span>
                   </span>
+                  <span v-else>加载全部图片</span>
                 </button>
-                <p class="text-[10px] sm:text-xs text-gray-500 mt-1 sm:mt-2">
-                  立即加载所有图片，不再等待滚动触发
+                <p class="text-xs sm:text-sm text-gray-500 mt-2">
+                  <span v-if="allImagesLoaded">所有图片已加载完成</span>
+                  <span v-else>立即加载所有图片，不再等待滚动触发</span>
                 </p>
-              </div>
-              
-              <!-- Tips -->
-              <div class="text-[10px] sm:text-xs text-gray-500 space-y-0.5 sm:space-y-1 mb-3 sm:mb-4">
-                <p>• 自动滚动会在图片加载完成后继续</p>
               </div>
               
               <!-- Close Button -->
               <button
                 @click="showAutoScrollSettings = false"
-                class="w-full py-1.5 sm:py-2 px-3 sm:px-4 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-md sm:rounded-lg text-xs sm:text-sm font-medium transition-colors"
+                class="w-full py-1.5 sm:py-2 px-3 sm:px-4 bg-gray-800/50 backdrop-blur-sm border border-white/10 hover:bg-gray-700/50 hover:border-white/20 text-gray-300 rounded-md sm:rounded-lg text-xs sm:text-sm font-medium transition-all cursor-pointer"
               >
                 关闭
               </button>
+              </div>
             </div>
           </div>
         </transition>
@@ -783,18 +877,22 @@ import { getImageServer } from '@/utils/imageServer'
 import { formatNumber } from '@/utils/format'
 import { checkCollection, toggleCollection } from '@/api/collection'
 import readingHistoryService from '@/services/readingHistory'
+import { useNotification } from '@/composables/useNotification'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import ModalDialog from '@/components/ModalDialog.vue'
 import AppLayout from '@/components/AppLayout.vue'
+import UnifiedComicCard from '@/components/UnifiedComicCard.vue'
 
 const route = useRoute()
 const router = useRouter()
 const appStore = useAppStore()
+const notification = useNotification()
 
 // Main comic info
 const comicId = computed(() => route.params.id)
 const comicInfo = ref({})
 const isFavorited = ref(false) // Track favorite status from API
+const favoriteLoading = ref(false) // Track loading state for favorite button
 const comments = ref([])
 const loading = ref(false)
 const loadingComments = ref(false)
@@ -914,6 +1012,11 @@ const nextChapterId = computed(() => {
   return null
 })
 
+const allImagesLoaded = computed(() => {
+  if (!images.value.length) return false
+  return images.value.every(img => img.loaded || img.error)
+})
+
 const isNextChapterLocked = computed(() => {
   if (!hasNextChapter.value) return false
   
@@ -944,16 +1047,15 @@ const handleAvatarError = (e) => {
   e.target.src = '/default.jpeg'
 }
 
-const getRelatedCover = (id) => {
-  const server = getImageServer()
-  return `${server}/media/albums/${id}_3x4.jpg`
-}
-
 const toggleCollect = async () => {
   if (!appStore.isLoggedIn) {
     showLoginPrompt.value = true
     return
   }
+  
+  if (favoriteLoading.value) return // Prevent double clicks
+  
+  favoriteLoading.value = true
   
   try {
     const response = await toggleCollection({
@@ -965,10 +1067,21 @@ const toggleCollect = async () => {
     // Update local state based on response
     if ('is_collected' in response) {
       isFavorited.value = response.is_collected
+      
+      // Show success message
+      if (response.is_collected) {
+        notification.success('收藏成功')
+      } else {
+        notification.success('取消收藏成功')
+      }
+      
       console.log('Toggled favorite, new status:', response.is_collected)
     }
   } catch (error) {
     console.error('Failed to toggle favorite:', error)
+    notification.error('操作失败，请稍后重试')
+  } finally {
+    favoriteLoading.value = false
   }
 }
 
@@ -1083,7 +1196,7 @@ const isChapterLocked = (index) => {
     return index >= 10
   }
   
-  // Single chapter comics are free to preview (first 5 images)
+  // Single chapter comics are free to preview (first 10 images)
   return false
 }
 
@@ -1187,7 +1300,7 @@ const startReading = async (seriesId, isSingleChapter = false) => {
       // Check if we need to limit images for non-VIP users (single chapter preview)
       const isVip = appStore.isLoggedIn && isUserVip()
       const shouldLimitImages = isSingleChapter && !isVip
-      const maxPreviewImages = 5
+      const maxPreviewImages = 10
       
       // Initialize image objects
       const allImages = chapterData.images
@@ -1805,6 +1918,7 @@ const loadAllImages = async () => {
     if (unloadedImages.length === 0) {
       // All images are already loaded
       loadingAllImages.value = false
+      notification.info('所有图片已加载完成')
       return
     }
     
@@ -1833,12 +1947,16 @@ const loadAllImages = async () => {
     
     console.log('All images loaded successfully')
     
+    // Show success notification
+    notification.success(`成功加载 ${unloadedImages.length} 张图片`)
+    
     // Re-enable lazy loading observer
     await nextTick()
     setupLazyLoading()
     
   } catch (error) {
     console.error('Failed to load all images:', error)
+    notification.error('部分图片加载失败')
   } finally {
     loadingAllImages.value = false
   }

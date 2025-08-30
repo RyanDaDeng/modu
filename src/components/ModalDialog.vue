@@ -7,10 +7,10 @@
         @click.self="handleBackdropClick"
       >
         <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/50" :class="backdropClass"></div>
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" :class="backdropClass"></div>
         
         <!-- Modal Content -->
-        <div class="relative bg-gray-800 rounded-xl p-6 w-full shadow-2xl" :class="sizeClass">
+        <div class="relative bg-gray-900/90 backdrop-blur-xl rounded-xl p-6 w-full shadow-2xl border border-white/10" :class="sizeClass">
           <!-- Close button (optional) -->
           <button
             v-if="showClose"
@@ -75,7 +75,7 @@
             <button
               v-if="showCancel"
               @click="handleCancel"
-              class="flex-1 py-2 px-4 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors cursor-pointer"
+              class="flex-1 py-2 px-4 bg-gray-800/50 backdrop-blur-sm border border-white/10 hover:bg-gray-700/50 hover:border-white/20 text-white rounded-lg font-medium transition-all cursor-pointer"
               :class="cancelButtonClass"
             >
               {{ cancelText }}
@@ -156,7 +156,7 @@ const props = defineProps({
   // Custom classes
   confirmButtonClass: {
     type: String,
-    default: 'bg-pink-600 hover:bg-pink-700 text-white'
+    default: 'bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl'
   },
   cancelButtonClass: String,
   backdropClass: String

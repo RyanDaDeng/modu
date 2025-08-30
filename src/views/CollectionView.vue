@@ -17,7 +17,7 @@
         <p class="text-gray-400 mb-4">还没有收藏任何漫画</p>
         <router-link
           to="/latest"
-          class="inline-block px-6 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors"
+          class="inline-block px-6 py-2 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white rounded-lg transition-all cursor-pointer shadow-lg hover:shadow-xl"
         >
           去看看最新漫画
         </router-link>
@@ -25,24 +25,38 @@
 
       <div v-else>
         <!-- Collection Grid -->
-        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-6 gap-3">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
           <div
             v-for="comic in collections"
-            :key="comic.id || comic.comic_id"
+            :key="comic.comic_id || comic.id"
             class="relative group"
+            @click.stop
           >
-            <ComicCard :comic="comic" :show-collection-date="true" />
-            
-            <!-- Remove Button -->
-            <button
-              @click.prevent="removeFromCollectionHandler(comic)"
-              class="absolute top-2 right-2 p-1.5 bg-red-500/90 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-600 z-10"
-              title="移除收藏"
-            >
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+            <!-- Card wrapper to prevent navigation on button click -->
+            <div class="relative">
+              <UnifiedComicCard 
+                :comic="formatComicForCard(comic)" 
+                :show-collection-date="true"
+                :show-category="false"
+                :show-episode="false"
+                :show-stats="false"
+                :show-author="false"
+                :show-description="false"
+                :show-tags="false"
+              />
+              
+              <!-- Remove Button - Always visible on mobile, hover on desktop -->
+              <button
+                type="button"
+                @click.stop.prevent="handleRemoveClick(comic)"
+                class="absolute top-2 right-2 p-2 bg-red-600 sm:bg-gray-900/90 hover:bg-red-600 text-white rounded-full opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200 shadow-lg z-50 cursor-pointer"
+                title="移除收藏"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
         
@@ -77,14 +91,16 @@ import { ref, onMounted, onActivated } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { getCollections, removeFromCollection } from '@/api/collection'
+import { useNotification } from '@/composables/useNotification'
 import AppLayout from '@/components/AppLayout.vue'
-import ComicCard from '@/components/ComicCard.vue'
+import UnifiedComicCard from '@/components/UnifiedComicCard.vue'
 import Pagination from '@/components/Pagination.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 
 const router = useRouter()
 const appStore = useAppStore()
+const notification = useNotification()
 
 // Data
 const collections = ref([])
@@ -97,6 +113,17 @@ const perPage = 24
 // Confirmation dialog
 const showRemoveConfirm = ref(false)
 const comicToRemove = ref(null)
+
+// Format comic data for UnifiedComicCard
+const formatComicForCard = (comic) => {
+  // UnifiedComicCard will construct the image URL from the ID if no image is provided
+  return {
+    id: comic.comic_id || comic.id,
+    name: comic.name || comic.title,
+    title: comic.name || comic.title,
+    created_at: comic.created_at
+  }
+}
 
 // Methods
 const loadCollections = async (page = 1) => {
@@ -124,7 +151,14 @@ const loadCollections = async (page = 1) => {
   }
 }
 
+// Handle remove button click
+const handleRemoveClick = (comic) => {
+  console.log('Remove button clicked for comic:', comic)
+  removeFromCollectionHandler(comic)
+}
+
 const removeFromCollectionHandler = (comic) => {
+  console.log('Remove handler called for comic:', comic)
   comicToRemove.value = comic
   showRemoveConfirm.value = true
 }
@@ -132,27 +166,40 @@ const removeFromCollectionHandler = (comic) => {
 const confirmRemove = async () => {
   if (!comicToRemove.value) return
   
+  const comicId = comicToRemove.value.comic_id || comicToRemove.value.id
+  console.log('Removing comic with ID:', comicId)
+  
   try {
-    await removeFromCollection(comicToRemove.value.comic_id || comicToRemove.value.id)
+    const response = await removeFromCollection(comicId)
+    console.log('Remove response:', response)
     
     // Remove from local list
-    const index = collections.value.findIndex(c => (c.comic_id || c.id) === (comicToRemove.value.comic_id || comicToRemove.value.id))
+    const index = collections.value.findIndex(c => (c.comic_id || c.id) === comicId)
     if (index > -1) {
       collections.value.splice(index, 1)
       totalCollections.value--
     }
     
     // Update app store
-    const storeIndex = appStore.collectedComics.findIndex(c => (c.comic_id || c.id) === (comicToRemove.value.comic_id || comicToRemove.value.id))
+    const storeIndex = appStore.collectedComics.findIndex(c => (c.comic_id || c.id) === comicId)
     if (storeIndex > -1) {
       appStore.collectedComics.splice(storeIndex, 1)
     }
     
+    // Show success notification
+    notification.success('已移除收藏')
+    
     showRemoveConfirm.value = false
     comicToRemove.value = null
+    
+    // If no more items and not on first page, go to previous page
+    if (collections.value.length === 0 && currentPage.value > 1) {
+      handlePageChange(currentPage.value - 1)
+    }
   } catch (error) {
     console.error('Failed to remove collection:', error)
-    // You might want to show a toast notification here instead of alert
+    console.error('Error details:', error.response?.data)
+    notification.error(error.response?.data?.message || '移除失败，请稍后重试')
     showRemoveConfirm.value = false
     comicToRemove.value = null
   }

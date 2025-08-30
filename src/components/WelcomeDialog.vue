@@ -27,9 +27,13 @@
         >
           <div
             v-if="visible"
-            class="relative bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 p-[2px] rounded-2xl w-full max-w-md"
+            class="relative w-full max-w-md"
           >
-            <div class="bg-gray-900 rounded-2xl p-6 sm:p-8">
+            <!-- Gradient border effect -->
+            <div class="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-2xl blur-sm opacity-50"></div>
+            
+            <!-- Main content with glassmorphism -->
+            <div class="relative bg-gray-900/90 backdrop-blur-xl rounded-2xl p-6 sm:p-8 border border-white/10">
               <!-- Header -->
               <div class="flex items-center justify-between mb-6">
                 <SiteLogo size="normal" />
@@ -87,7 +91,7 @@
               <div class="mt-6">
                 <button
                   @click="closeAndDontShowAgain"
-                  class="w-full px-4 py-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white font-semibold rounded-lg transition-all transform hover:scale-105 cursor-pointer"
+                  class="w-full px-4 py-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold rounded-lg transition-all transform hover:scale-105 cursor-pointer shadow-lg hover:shadow-xl"
                 >
                   开始探索
                 </button>

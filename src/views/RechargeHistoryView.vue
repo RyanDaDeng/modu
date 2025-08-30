@@ -17,7 +17,7 @@
           </svg>
           <p class="text-lg mb-4">暂无充值记录</p>
         </div>
-        <router-link to="/vip" class="inline-block px-6 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors cursor-pointer">
+        <router-link to="/vip" class="inline-block px-6 py-2 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white rounded-lg transition-all cursor-pointer shadow-lg hover:shadow-xl">
           立即充值
         </router-link>
       </div>
@@ -27,7 +27,7 @@
         <div 
           v-for="order in orders" 
           :key="order.id"
-          class="bg-gray-800 rounded-lg p-4 border border-gray-700"
+          class="bg-gray-900/60 backdrop-blur-sm rounded-lg p-4 border border-white/10 hover:border-pink-500/30 transition-all"
         >
           <div class="flex justify-between items-start mb-2">
             <div>
@@ -67,7 +67,7 @@
           <button
             @click="changePage(pagination.current_page - 1)"
             :disabled="pagination.current_page === 1"
-            class="px-3 py-1 bg-gray-800 text-gray-400 rounded border border-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700 cursor-pointer"
+            class="px-3 py-1 bg-gray-800/50 backdrop-blur-sm text-gray-400 rounded border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/50 hover:border-white/20 transition-all cursor-pointer"
           >
             上一页
           </button>
@@ -81,7 +81,7 @@
           <button
             @click="changePage(pagination.current_page + 1)"
             :disabled="pagination.current_page === pagination.last_page"
-            class="px-3 py-1 bg-gray-800 text-gray-400 rounded border border-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700 cursor-pointer"
+            class="px-3 py-1 bg-gray-800/50 backdrop-blur-sm text-gray-400 rounded border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/50 hover:border-white/20 transition-all cursor-pointer"
           >
             下一页
           </button>
@@ -93,7 +93,7 @@
         class="mt-6 text-center sm:hidden">
         <button
           @click="loadMore"
-          class="px-6 py-2 bg-gray-800 text-gray-300 rounded-lg border border-gray-700 hover:bg-gray-700 cursor-pointer"
+          class="px-6 py-2 bg-gray-800/50 backdrop-blur-sm text-gray-300 rounded-lg border border-white/10 hover:bg-gray-700/50 hover:border-white/20 transition-all cursor-pointer"
         >
           加载更多
         </button>

@@ -96,6 +96,21 @@
             </svg>
           </router-link>
           
+          <!-- Reading History -->
+          <router-link to="/reading-history" class="flex items-center justify-between p-4 hover:bg-gray-750 transition-colors cursor-pointer">
+            <div class="flex items-center gap-3">
+              <div class="p-2 bg-purple-500/20 rounded-lg">
+                <svg class="w-5 h-5 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.669 0-3.218.51-4.5 1.385V4.804z" />
+                </svg>
+              </div>
+              <div class="text-white font-medium">阅读历史</div>
+            </div>
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </router-link>
+          
           <!-- VIP -->
           <button @click="handleVipClick" class="w-full flex items-center justify-between p-4 hover:bg-gray-750 transition-colors cursor-pointer">
             <div class="flex items-center gap-3">

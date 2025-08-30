@@ -1,9 +1,14 @@
 <template>
   <router-link
     :to="`/chapter/${comic.id}`"
-    class="block bg-gray-800 rounded-lg overflow-hidden hover:ring-2 hover:ring-pink-500 transition-all group"
+    class="block relative group"
   >
-    <div class="relative aspect-[3/4] bg-gray-700">
+    <!-- Gradient border effect on hover -->
+    <div class="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-lg opacity-0 group-hover:opacity-50 blur-sm transition-opacity"></div>
+    
+    <!-- Main card with glassmorphism -->
+    <div class="relative bg-gray-900/60 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden group-hover:border-pink-500/30 transition-all">
+      <div class="relative aspect-[3/4] bg-gray-800/50">
       <img
         :src="getComicImage()"
         :alt="comic.name"
@@ -12,7 +17,7 @@
         @error="handleImageError"
       />
       <div v-if="comic.category" class="absolute top-1 left-1 sm:top-2 sm:left-2">
-        <span class="px-1.5 sm:px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs text-white bg-pink-500/80 backdrop-blur rounded-full">
+        <span class="px-1.5 sm:px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs bg-pink-600/70 backdrop-blur-sm border border-pink-400/60 text-white font-medium rounded-full">
           {{ typeof comic.category === 'object' ? (comic.category.title || comic.category.name || '') : comic.category }}
         </span>
       </div>
@@ -32,10 +37,10 @@
             {{ formatNumber(comic.liked) }}
           </span>
         </div>
+        </div>
       </div>
-    </div>
-    <div class="p-1.5 sm:p-2">
-      <h3 class="text-[10px] sm:text-xs font-semibold text-white truncate">
+      <div class="p-1.5 sm:p-2">
+      <h3 class="text-xs sm:text-sm font-semibold text-white truncate">
         {{ comic.name || comic.title || 'Unknown' }}
       </h3>
       <p v-if="showCollectionDate && comic.created_at" class="text-[10px] sm:text-xs text-gray-400 mt-0.5 truncate">
@@ -44,9 +49,6 @@
       <p v-else-if="comic.author || comic.authors" class="text-[10px] sm:text-xs text-gray-400 mt-0.5 truncate">
         {{ comic.author || (Array.isArray(comic.authors) ? comic.authors.join(', ') : comic.authors) || '' }}
       </p>
-      <div v-if="comic.description && typeof comic.description === 'string'" class="hidden sm:block text-xs text-gray-500 mt-1 line-clamp-2">
-        {{ comic.description }}
-      </div>
       <div v-if="comic.tags && comic.tags.length" class="hidden sm:flex flex-wrap gap-1 mt-1">
         <span
           v-for="tag in comic.tags.slice(0, 2)"
@@ -55,6 +57,7 @@
         >
           {{ tag }}
         </span>
+      </div>
       </div>
     </div>
   </router-link>
