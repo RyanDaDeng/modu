@@ -1,1 +1,0 @@
-import{a3 as n}from"./index-CstFYGIV.js";function e(){const i=n();return{success:(o,r)=>i.success(o,r),error:(o,r)=>i.error(o,r),warning:(o,r)=>i.warning(o,r),info:(o,r)=>i.info(o,r),notify:o=>i.add(o),clear:()=>i.clear()}}export{e as u};
