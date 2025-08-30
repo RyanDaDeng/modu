@@ -1,5 +1,5 @@
 <template>
-  <AppLayout title="分类浏览">
+  <AppLayout title="分类浏览" :page-loading="pageLoading">
     <!-- Filter Bar Container -->
     <div class="container mx-auto px-4 py-6">
 
@@ -207,6 +207,7 @@ const sortOptions = [
 // Comics data
 const comics = ref([])
 const loading = ref(false)
+const pageLoading = ref(true) // Page loading state for AppLayout
 const loadingCategories = ref(true)
 const loadingMore = ref(false) // Separate loading state for load more
 const currentPage = ref(1)
@@ -326,6 +327,7 @@ const loadCategories = async () => {
     console.error('Failed to load categories:', error)
   } finally {
     loadingCategories.value = false
+    pageLoading.value = false // Hide page loading after initial load
   }
 }
 

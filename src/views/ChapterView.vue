@@ -146,7 +146,7 @@
                     上次阅读
                   </span>
                   <span 
-                    v-else-if="!appStore.isLoggedIn && index < 3"
+                    v-else-if="!appStore.isLoggedIn && index < 10"
                     class="inline-flex items-center px-2 py-0.5 text-xs font-bold bg-green-500 text-white rounded-full"
                   >
                     免费
@@ -380,11 +380,19 @@
               <button
                 v-if="hasNextChapter"
                 @click="goToNextChapter"
-                class="px-2 sm:px-3 py-1.5 bg-pink-500 hover:bg-pink-600 rounded-lg text-white text-sm font-medium transition-all flex items-center gap-1 sm:gap-1.5"
-                title="下一话"
+                :class="[
+                  'px-2 sm:px-3 py-1.5 rounded-lg text-white text-sm font-medium transition-all flex items-center gap-1 sm:gap-1.5',
+                  isNextChapterLocked 
+                    ? 'bg-yellow-500 hover:bg-yellow-600' 
+                    : 'bg-pink-500 hover:bg-pink-600'
+                ]"
+                :title="isNextChapterLocked ? '下一话(需要VIP)' : '下一话'"
               >
+                <svg v-if="isNextChapterLocked" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                </svg>
                 <span class="hidden sm:inline">下一话</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg v-if="!isNextChapterLocked" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
               </button>
@@ -552,10 +560,18 @@
           <div v-if="hasNextChapter && !isPreviewMode" class="mt-8 flex justify-center">
             <button
               @click="loadNextChapter"
-              class="px-8 py-4 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-lg hover:from-pink-600 hover:to-pink-700 transition-all shadow-lg flex items-center gap-3 text-lg font-semibold"
+              :class="[
+                'px-8 py-4 text-white rounded-lg transition-all shadow-lg flex items-center gap-3 text-lg font-semibold',
+                isNextChapterLocked 
+                  ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700' 
+                  : 'bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700'
+              ]"
             >
-              <span>下一话</span>
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg v-if="isNextChapterLocked" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+              </svg>
+              <span>{{ isNextChapterLocked ? '下一话 (需要VIP)' : '下一话' }}</span>
+              <svg v-if="!isNextChapterLocked" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
             </button>
@@ -898,6 +914,15 @@ const nextChapterId = computed(() => {
   return null
 })
 
+const isNextChapterLocked = computed(() => {
+  if (!hasNextChapter.value) return false
+  
+  const currentIndex = comicInfo.value.series.findIndex(s => s.id == currentReadingId.value)
+  const nextIndex = currentIndex + 1
+  
+  return isChapterLocked(nextIndex)
+})
+
 // Methods
 const getAlbumCover = (id) => {
   const server = getImageServer()
@@ -1046,16 +1071,16 @@ const isUserVip = () => {
   return new Date(appStore.user.vip_expired_at) > new Date()
 }
 
-// Check if a chapter is locked (non-VIP users can only access first 3 chapters)
+// Check if a chapter is locked (non-VIP users can only access first 10 chapters)
 const isChapterLocked = (index) => {
   // If user is VIP, nothing is locked
   if (appStore.isLoggedIn && isUserVip()) {
     return false
   }
   
-  // For multi-chapter comics, first 3 chapters are free for everyone
+  // For multi-chapter comics, first 10 chapters are free for everyone
   if (comicInfo.value.series?.length) {
-    return index >= 3
+    return index >= 10
   }
   
   // Single chapter comics are free to preview (first 5 images)
@@ -1273,6 +1298,23 @@ const exitReading = () => {
 // Load next chapter
 const loadNextChapter = () => {
   if (nextChapterId.value) {
+    // Check if next chapter is locked
+    const currentIndex = comicInfo.value.series.findIndex(s => s.id == currentReadingId.value)
+    const nextIndex = currentIndex + 1
+    
+    if (isChapterLocked(nextIndex)) {
+      // Exit reading mode first
+      exitReading()
+      
+      // Show appropriate prompt based on login status
+      if (!appStore.isLoggedIn) {
+        showLoginPrompt.value = true
+      } else {
+        showVipPrompt.value = true
+      }
+      return
+    }
+    
     // Pause auto-scroll if it's running
     if (autoScrollEnabled.value && !autoScrollPaused.value) {
       pauseAutoScroll()

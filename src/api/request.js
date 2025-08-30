@@ -1,6 +1,6 @@
 import axios from 'axios'
-import { decryptData, deobfuscateResponse } from './crypto'
 import { useAppStore } from '@/stores/app'
+import { processEncryptedResponse } from './customCrypto'
 
 // 使用后端代理服务器
 // 开发环境：优先使用 VITE_DEV_API_URL，如果没有则使用代理（空字符串）
@@ -9,104 +9,87 @@ const BACKEND_PROXY = import.meta.env.PROD
   ? (import.meta.env.VITE_BACKEND_API_URL || '') 
   : (import.meta.env.VITE_DEV_API_URL || '')
 
-/**
- * Process response with google_recaptcha field
- * @param {Object} response - Axios response object
- * @returns {Object} Processed response data
- */
-function processProxyResponse(response) {
-  const data = response.data
-  
-  // Check if response has google_recaptcha field (new format)
-  if (data && data.google_recaptcha) {
-    try {
-      // Deobfuscate the outer layer
-      const deobfuscated = deobfuscateResponse(data.google_recaptcha)
-      // Parse the JSON to get the original {code: ..., data: ...} structure
-      const originalData = JSON.parse(deobfuscated)
-      // Replace response.data with the deobfuscated data
-      response.data = originalData
-    } catch (error) {
-      console.error('Failed to deobfuscate google_recaptcha:', error)
-      throw new Error('Invalid response format')
-    }
-  }
-  
-  return response
-}
-
-/**
- * Helper function to get proxy data and decrypt it
- * @param {string} url - The API endpoint URL
- * @returns {Object} Decrypted data
- */
-async function getProxyData(url) {
-  const appStore = useAppStore()
-  
-  // Make the request
-  let response = await api.get(url)
-  
-  // Process google_recaptcha if present
-  response = processProxyResponse(response)
-  
-  // Use timestamp from header if available (for cached responses)
-  const timestamp = response.headers['x-timestamp'] || appStore.currentKey
-  
-  // Decrypt and return the data
-  return decryptData(timestamp, response.data.data)
-}
-
 const api = axios.create({
   baseURL: BACKEND_PROXY,
   timeout: 30000,
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  }
+})
+
+// Request interceptor to add auth token
+api.interceptors.request.use(
+  config => {
+    const token = localStorage.getItem('auth_token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
   },
-  withCredentials: false // No longer using cookies
-})
-
-api.interceptors.request.use(config => {
-  const appStore = useAppStore()
-  
-  // Add auth token if available
-  const token = localStorage.getItem('auth_token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+  error => {
+    return Promise.reject(error)
   }
-  
-  // 发送currentKey给后端，让后端使用相同的key生成token
-  if (appStore.currentKey) {
-    config.headers['X-Client-Key'] = appStore.currentKey
-  }
-  return config
-})
+)
 
-export async function getSearchResults(searchQuery, page = 1) {
-  const appStore = useAppStore()
-  // Match original format - remove spaces like original does
-  const cleanQuery = searchQuery.replace(/\s/g, '')
-  const url = `${BACKEND_PROXY}/api/search?search_query=${cleanQuery}&o=mv&page=${page}`
-  console.log('Searching URL:', url)
-  let response = await api.get(url)
+// Response interceptor for handling errors and decryption
+api.interceptors.response.use(
+  async response => {
+    // Check if response has encrypted data
+    if (response.data && response.data.encrypted) {
+      try {
+        // Decrypt the data
+        const decrypted = await processEncryptedResponse(response)
+        // Replace response data with decrypted data
+        response.data = decrypted
+      } catch (error) {
+        console.error('Failed to decrypt response:', error)
+        // Keep original response if decryption fails
+      }
+    }
+    return response
+  },
+  error => {
+    if (error.response?.status === 401) {
+      // Clear auth data on 401
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('user_data')
+      // Optionally redirect to login
+      // window.location.href = '/login'
+    }
+    return Promise.reject(error)
+  }
+)
+
+export async function getLatestComics(page = 1) {
+  const response = await api.get(
+    `${BACKEND_PROXY}/api/latest`,
+    { params: { page } }
+  )
   
-  // Process google_recaptcha if present
-  response = processProxyResponse(response)
-  console.log('Raw search response:', response.data)
-  
-  // Use timestamp from header if available (for cached responses)
-  const timestamp = response.headers['x-timestamp'] || appStore.currentKey
-  const decrypted = decryptData(timestamp, response.data.data)
-  console.log('Decrypted search data:', decrypted)
-  return decrypted
+  // Backend now handles decryption
+  return response.data.data || response.data
 }
 
-export async function getLatestContent(page = 1) {
-  return getProxyData(`${BACKEND_PROXY}/api/latest?page=${page}`)
+export async function searchComics(query, page = 1, order = 'mv') {
+  const cleanQuery = query.replace(/\s/g, '')
+  
+  const response = await api.get(
+    `${BACKEND_PROXY}/api/search`, 
+    {
+      params: {
+        search_query: cleanQuery,
+        o: order,
+        page: page
+      }
+    }
+  )
+  
+  // Backend now handles decryption
+  return response.data.data || response.data
 }
 
-export async function getPromotionContent() {
-  const appStore = useAppStore()
-  
+export async function getPromotionComics() {
   // Check cache first
   const cached = localStorage.getItem('promotionData')
   if (cached) {
@@ -116,118 +99,74 @@ export async function getPromotionContent() {
     }
   }
   
-  let response = await api.get(
-    `${BACKEND_PROXY}/api/promote?page=1`
+  const response = await api.get(
+    `${BACKEND_PROXY}/api/promote`,
+    { params: { page: 1 } }
   )
   
-  // Process google_recaptcha if present
-  response = processProxyResponse(response)
-  
-  // Use timestamp from header if available (for cached responses)
-  const timestamp = response.headers['x-timestamp'] || appStore.currentKey
-  const decrypted = decryptData(timestamp, response.data.data)
+  // Backend now handles decryption
+  const result = response.data.data || response.data
   
   // Cache for 24 hours
   localStorage.setItem('promotionData', JSON.stringify({
-    data: decrypted,
+    data: result,
     timestamp: Date.now()
   }))
   
-  return decrypted
+  return result
 }
 
 export async function getComicAlbum(comicId) {
-  const appStore = useAppStore()
-  console.log('Getting album for comic:', comicId)
-  console.log('Current key:', appStore.currentKey)
-  
-  let response = await api.get(
-    `${BACKEND_PROXY}/api/album?id=${comicId}`
+  const response = await api.get(
+    `${BACKEND_PROXY}/api/album`,
+    { params: { id: comicId } }
   )
   
-  // Process google_recaptcha if present
-  response = processProxyResponse(response)
-  console.log('Raw album response:', response.data)
+  console.log('Album response:', response.data)
   
-  // 检查响应格式
-  if (!response.data.data) {
-    console.error('Unexpected response format:', response.data)
-    throw new Error('Invalid response format from API')
-  }
-  
-  // Use timestamp from header if available (for cached responses)
-  const timestamp = response.headers['x-timestamp'] || appStore.currentKey
-  const decrypted = decryptData(timestamp, response.data.data)
-  console.log('Decrypted album data:', decrypted)
-  
-  return decrypted
+  // Backend now handles decryption
+  return response.data.data || response.data
 }
 
 export async function getComicChapter(comicId) {
-  const appStore = useAppStore()
   console.log('Getting chapter for comic:', comicId)
-  console.log('Current key:', appStore.currentKey)
   
-  let response = await api.get(
+  const response = await api.get(
     `${BACKEND_PROXY}/api/chapter?id=${comicId}`
   )
   
-  // Process google_recaptcha if present
-  response = processProxyResponse(response)
-  console.log('Raw chapter response:', response.data)
+  console.log('Chapter response:', response.data)
   
-  // 检查响应格式
-  if (!response.data.data) {
-    console.error('Unexpected response format:', response.data)
-    throw new Error('Invalid response format from API')
-  }
-  
-  // Use timestamp from header if available (for cached responses)
-  const timestamp = response.headers['x-timestamp'] || appStore.currentKey
-  const decrypted = decryptData(timestamp, response.data.data)
-  console.log('Decrypted chapter data:', decrypted)
-  
-  return decrypted
+  // Backend now handles decryption
+  return response.data.data || response.data
 }
 
 export async function getForumComments(albumId, page = 1) {
-  const appStore = useAppStore()
-  let response = await api.get(
+  const response = await api.get(
     `${BACKEND_PROXY}/api/forum?page=${page}&mode=manhua&aid=${albumId}`
   )
   
-  // Process google_recaptcha if present
-  response = processProxyResponse(response)
-  
-  // Use timestamp from header if available (for cached responses)
-  const timestamp = response.headers['x-timestamp'] || appStore.currentKey
-  const decrypted = decryptData(timestamp, response.data.data)
-  return decrypted.list || []
+  // Backend now handles decryption
+  const result = response.data.data || response.data
+  return result.list || []
 }
 
 export async function getHotTags() {
-  const appStore = useAppStore()
-  
   // Check cache first
   const cached = localStorage.getItem('hotTagsData')
   if (cached) {
     const { data, timestamp } = JSON.parse(cached)
-    // Cache for 24 hours
     if (Date.now() - timestamp < 24 * 60 * 60 * 1000) {
       return data
     }
   }
   
-  let response = await api.get(
-    `${BACKEND_PROXY}/api/hot_tags`
+  const response = await api.get(
+    `${BACKEND_PROXY}/api/hottag`
   )
   
-  // Process google_recaptcha if present
-  response = processProxyResponse(response)
-  
-  // Use timestamp from header if available (for cached responses)
-  const timestamp = response.headers['x-timestamp'] || appStore.currentKey
-  const hotTags = decryptData(timestamp, response.data.data)
+  // Backend now handles decryption
+  const hotTags = response.data.data || response.data
   
   // Cache for 24 hours
   localStorage.setItem('hotTagsData', JSON.stringify({
@@ -239,17 +178,12 @@ export async function getHotTags() {
 }
 
 export async function getCategories() {
-  const appStore = useAppStore()
-  let response = await api.get(
+  const response = await api.get(
     `${BACKEND_PROXY}/api/categories`
   )
   
-  // Process google_recaptcha if present
-  response = processProxyResponse(response)
-  
-  // Use timestamp from header if available (for cached responses)
-  const timestamp = response.headers['x-timestamp'] || appStore.currentKey
-  return decryptData(timestamp, response.data.data)
+  // Backend now handles decryption, return data directly
+  return response.data.data || response.data
 }
 
 export async function getImageServers() {
@@ -265,54 +199,67 @@ export async function updateUserImageServer(imgServer) {
 }
 
 export async function getCategoriesFilter(page = 1, order = '', category = '') {
-  const appStore = useAppStore()
-  
-  // Build query parameters
-  const params = new URLSearchParams()
-  params.append('page', page)
-  if (order) params.append('o', order)
-  if (category) params.append('c', category)
-  
-  let response = await api.get(
-    `${BACKEND_PROXY}/api/categories/filter?${params.toString()}`
+  const response = await api.get(
+    `${BACKEND_PROXY}/api/categories/filter?page=${page}&o=${order}&c=${category}`
   )
   
-  // Process google_recaptcha if present
-  response = processProxyResponse(response)
-  
-  // Use timestamp from header if available (for cached responses)
-  const timestamp = response.headers['x-timestamp'] || appStore.currentKey
-  return decryptData(timestamp, response.data.data)
+  // Backend now handles decryption
+  return response.data.data || response.data
 }
 
-export async function getSerialization(type = 'all', date = 1, page = 1) {
-  const appStore = useAppStore()
-  let response = await api.get(
-    `${BACKEND_PROXY}/api/serialization?type=${type}&date=${date}&page=${page}`
+export async function updateCategories(page = 1) {
+  // Use latest API as fallback for updates
+  const response = await api.get(
+    `${BACKEND_PROXY}/api/latest`,
+    { params: { page } }
   )
   
-  // Process google_recaptcha if present
-  response = processProxyResponse(response)
-  
-  // Use timestamp from header if available (for cached responses)
-  const timestamp = response.headers['x-timestamp'] || appStore.currentKey
-  return decryptData(timestamp, response.data.data)
+  // Backend now handles decryption
+  return response.data.data || response.data
 }
 
-export async function getWeeklyUpdates(type = 'all') {
-  const appStore = useAppStore()
-  let response = await api.get(
-    `${BACKEND_PROXY}/api/week/filter?type=${type}`
+export async function getWeeklyList(type = 'all', page = 1) {
+  // Use week/filter API for weekly updates
+  const response = await api.get(
+    `${BACKEND_PROXY}/api/week/filter`,
+    { params: { type, page } }
   )
   
-  // Process google_recaptcha if present
-  response = processProxyResponse(response)
-  
-  // Use timestamp from header if available (for cached responses)
-  const timestamp = response.headers['x-timestamp'] || appStore.currentKey
-  return decryptData(timestamp, response.data.data)
+  // Backend now handles decryption
+  return response.data.data || response.data
 }
 
-// Export the api instance for direct use
-export { api as request }
+// Export axios instance for direct use
+export const request = api
 
+// Export with both names for compatibility
+export const getPromotionContent = getPromotionComics
+export const getWeeklyUpdates = getWeeklyList
+export const getLatestContent = getLatestComics
+export const getSearchResults = searchComics
+
+// getSerialization doesn't exist, create a stub that uses weekly updates
+export async function getSerialization(page = 1) {
+  return getWeeklyList('all', page)
+}
+
+export default {
+  getLatestComics,
+  searchComics,
+  getPromotionComics,
+  getPromotionContent, // Alias for compatibility
+  getComicAlbum,
+  getComicChapter,
+  getForumComments,
+  getHotTags,
+  getCategories,
+  getImageServers,
+  updateUserImageServer,
+  getCategoriesFilter,
+  updateCategories,
+  getWeeklyList,
+  getWeeklyUpdates, // Alias for compatibility
+  getLatestContent, // Alias for compatibility
+  getSearchResults, // Alias for compatibility
+  getSerialization // New function
+}

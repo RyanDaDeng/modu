@@ -1,6 +1,5 @@
 import axios from 'axios'
-import { decryptData } from './crypto'
-import { useAppStore } from '@/stores/app'
+import { processEncryptedResponse } from './customCrypto'
 
 // 使用与auth.js相同的配置
 const API_URL = import.meta.env.PROD 
@@ -32,9 +31,30 @@ api.interceptors.request.use(
   }
 )
 
+// Response interceptor for decryption
+api.interceptors.response.use(
+  async response => {
+    // Check if response has encrypted data
+    if (response.data && response.data.encrypted) {
+      try {
+        // Decrypt the data
+        const decrypted = await processEncryptedResponse(response)
+        // Replace response data with decrypted data
+        response.data = decrypted
+      } catch (error) {
+        console.error('Failed to decrypt response:', error)
+        // Keep original response if decryption fails
+      }
+    }
+    return response
+  },
+  error => {
+    return Promise.reject(error)
+  }
+)
+
 // 搜索漫画
 export async function getSearchResults(searchQuery, page = 1) {
-  const appStore = useAppStore()
   const cleanQuery = searchQuery.replace(/\s/g, '')
   
   const { data } = await api.get('/api/comic/search', {
@@ -45,25 +65,20 @@ export async function getSearchResults(searchQuery, page = 1) {
     }
   })
   
-  console.log('Raw search response:', data)
-  const decrypted = decryptData(appStore.currentKey, data.data)
-  console.log('Decrypted search data:', decrypted)
-  return decrypted
+  // Backend now handles decryption
+  return data.data || data
 }
 
 // 获取最新内容
 export async function getLatestContent(page = 1) {
-  const appStore = useAppStore()
   const { data } = await api.get('/api/comic/latest', {
     params: { page }
   })
-  return decryptData(appStore.currentKey, data.data)
+  return data.data || data
 }
 
 // 获取推广内容
 export async function getPromotionContent() {
-  const appStore = useAppStore()
-  
   // Check cache first
   const cached = localStorage.getItem('promotionData')
   if (cached) {
@@ -76,38 +91,35 @@ export async function getPromotionContent() {
   const { data } = await api.get('/api/comic/promote', {
     params: { page: 1 }
   })
-  const decrypted = decryptData(appStore.currentKey, data.data)
+  const result = data.data || data
   
   // Cache for 24 hours
   localStorage.setItem('promotionData', JSON.stringify({
-    data: decrypted,
+    data: result,
     timestamp: Date.now()
   }))
   
-  return decrypted
+  return result
 }
 
 // 获取漫画专辑
 export async function getComicAlbum(comicId) {
-  const appStore = useAppStore()
   const { data } = await api.get('/api/comic/album', {
     params: { id: comicId }
   })
-  return decryptData(appStore.currentKey, data.data)
+  return data.data || data
 }
 
 // 获取漫画章节
 export async function getComicChapter(comicId) {
-  const appStore = useAppStore()
   const { data } = await api.get('/api/comic/chapter', {
     params: { id: comicId }
   })
-  return decryptData(appStore.currentKey, data.data)
+  return data.data || data
 }
 
 // 获取论坛评论
 export async function getForumComments(albumId, page = 1) {
-  const appStore = useAppStore()
   const { data } = await api.get('/api/comic/forum', {
     params: {
       page: page,
@@ -115,14 +127,12 @@ export async function getForumComments(albumId, page = 1) {
       aid: albumId
     }
   })
-  const decrypted = decryptData(appStore.currentKey, data.data)
-  return decrypted.list || []
+  const result = data.data || data
+  return result.list || []
 }
 
 // 获取热门标签
 export async function getHotTags() {
-  const appStore = useAppStore()
-  
   // Check cache first
   const cached = localStorage.getItem('hotTagsData')
   if (cached) {
@@ -133,20 +143,19 @@ export async function getHotTags() {
   }
   
   const { data } = await api.get('/api/comic/hottag')
-  const decrypted = decryptData(appStore.currentKey, data.data)
+  const result = data.data || data
   
   // Cache for 24 hours
   localStorage.setItem('hotTagsData', JSON.stringify({
-    data: decrypted,
+    data: result,
     timestamp: Date.now()
   }))
   
-  return decrypted
+  return result
 }
 
 // 获取分类内容
 export async function getCatalogContent(mode, page = 1) {
-  const appStore = useAppStore()
   const { data } = await api.get('/api/comic/search', {
     params: {
       mode: mode,
@@ -154,13 +163,11 @@ export async function getCatalogContent(mode, page = 1) {
       o: 'mv'
     }
   })
-  return decryptData(appStore.currentKey, data.data)
+  return data.data || data
 }
 
 // 获取随机漫画
 export async function getRandomComics() {
-  const appStore = useAppStore()
-  
   // Check cache first
   const cached = localStorage.getItem('randomComicsData')
   if (cached) {
@@ -174,15 +181,15 @@ export async function getRandomComics() {
   const { data } = await api.get('/api/comic/forum', {
     params: { mode: 'random' }
   })
-  const decrypted = decryptData(appStore.currentKey, data.data)
+  const result = data.data || data
   
   // Cache for 5 minutes
   localStorage.setItem('randomComicsData', JSON.stringify({
-    data: decrypted,
+    data: result,
     timestamp: Date.now()
   }))
   
-  return decrypted
+  return result
 }
 
 // 导出所有函数以保持兼容性

@@ -5,6 +5,7 @@
     :show-bottom-nav="true"
     :no-header="true"
     :show-top-nav="true"
+    :page-loading="pageLoading"
   >
     <!-- Gradient overlay from top of content fading down -->
     <div class="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-black/90 to-transparent pointer-events-none"></div>
@@ -69,7 +70,7 @@
 
       </div>
       <!-- Mobile Search Bar -->
-      <div class="sm:hidden sticky top-0 z-40 bg-gradient-to-b from-gray-900/95 to-gray-900/80 backdrop-blur-sm px-4 py-3">
+      <div class="sm:hidden sticky top-0 z-30 bg-gradient-to-b from-gray-900/95 to-gray-900/80 backdrop-blur-sm px-4 py-3">
         <div class="relative">
           <input
             v-model="searchQuery"
@@ -112,9 +113,9 @@
               <!-- Close button -->
               <button
                   @click="hideAnnouncement"
-                  class="flex-shrink-0 text-gray-400 hover:text-gray-200 text-xs transition-colors cursor-pointer p-1"
+                  class="flex-shrink-0 text-gray-300 hover:text-white text-sm font-medium transition-colors cursor-pointer px-2 py-1 hover:bg-gray-800/50 rounded"
               >
-                ✕
+                关闭
               </button>
             </div>
           </div>
@@ -487,6 +488,7 @@ const appStore = useAppStore()
 const promotions = ref([])
 const weeklyUpdates = ref([])
 const loading = ref(false)
+const pageLoading = ref(true) // Page loading state for AppLayout
 const error = ref('')
 const dataLoaded = ref(false) // Flag to prevent duplicate loading
 const announcementHidden = ref(false) // Track if announcement is hidden
@@ -691,18 +693,26 @@ const addToCollectionHandler = async (comicId) => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   // Check if announcement was previously hidden
   const hidden = localStorage.getItem('announcementHidden')
   if (hidden === 'true') {
     announcementHidden.value = true
   }
   
-  // Load all data
-  fetchRandomComics() // Load random comics for hero section
-  loadPromotions()
-  loadHotTags() // Load hot tags from API
-  loadNavCategories() // Load categories for navigation
+  // Load all data in parallel
+  try {
+    await Promise.all([
+      fetchRandomComics(), // Load random comics for hero section
+      loadPromotions(),
+      loadHotTags(), // Load hot tags from API
+      loadNavCategories() // Load categories for navigation
+    ])
+  } catch (error) {
+    console.error('Error loading initial data:', error)
+  } finally {
+    pageLoading.value = false // Hide page loading after initial load
+  }
 })
 
 onUnmounted(() => {

@@ -14,7 +14,7 @@
       </div>
       
       <!-- Top Navigation Bar -->
-      <nav class="relative z-20">
+      <nav class="relative z-40">
         <div class="container mx-auto px-4">
           <div class="flex items-center justify-between h-16 sm:h-20">
             <!-- Left Section: Logo and Main Nav -->
@@ -130,7 +130,7 @@
               </div>
 
               <!-- User Avatar / Login Button -->
-              <div v-if="authStore.isLoggedIn" class="relative">
+              <div v-if="authStore.isLoggedIn" class="relative user-dropdown-container">
                 <button
                   @click="showUserMenu = !showUserMenu"
                   class="flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-full transition-all"
@@ -144,10 +144,17 @@
                   </svg>
                 </button>
                 
+                <!-- Backdrop for mobile -->
+                <div 
+                  v-if="showUserMenu"
+                  @click="showUserMenu = false"
+                  class="fixed inset-0 z-[99] sm:hidden"
+                ></div>
+                
                 <!-- User Dropdown Menu -->
                 <div
                   v-if="showUserMenu"
-                  class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-50"
+                  class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-[100]"
                 >
                   <router-link
                     to="/profile"

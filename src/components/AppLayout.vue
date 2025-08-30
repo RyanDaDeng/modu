@@ -4,24 +4,32 @@
     <AppHeader v-if="!hideAppHeader" :class="showTopNav ? '' : 'hidden lg:block'" />
     
     <!-- Mobile Header with back button - Show on mobile when showTopNav is false -->
-    <div v-if="!showTopNav && !noHeader" class="lg:hidden sticky top-0 left-0 right-0 z-50 bg-gray-800 shadow-lg">
-      <div class="container mx-auto px-4">
+    <div v-if="!showTopNav && !noHeader" class="lg:hidden sticky top-0 left-0 right-0 z-50">
+      <!-- Glassmorphism background -->
+      <div class="absolute inset-0 bg-gray-900/80 backdrop-blur-xl border-b border-white/10"></div>
+      
+      <!-- Gradient bottom border -->
+      <div class="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500"></div>
+      
+      <div class="relative container mx-auto px-4">
         <div class="flex items-center justify-between h-14">
           <!-- Back Button -->
           <button
             v-if="shouldShowBack"
             @click="handleBack"
-            class="flex items-center space-x-1 text-white hover:text-pink-400 transition-colors flex-shrink-0 cursor-pointer"
+            class="group flex items-center space-x-1 text-gray-300 hover:text-pink-400 transition-all duration-300 flex-shrink-0 cursor-pointer relative"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- Glow effect on hover -->
+            <div class="absolute -inset-2 bg-pink-500/0 group-hover:bg-pink-500/10 rounded-lg transition-all duration-300"></div>
+            <svg class="w-5 h-5 relative transition-transform group-active:scale-95" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
-            <span class="text-sm">{{ backText }}</span>
+            <span class="text-sm font-medium relative">{{ backText }}</span>
           </button>
           <div v-else class="w-16"></div>
           
-          <!-- Title -->
-          <h1 class="text-white font-semibold text-base truncate px-2 flex-1 text-center">
+          <!-- Title with gradient text on hover -->
+          <h1 class="text-gray-100 font-semibold text-base truncate px-2 flex-1 text-center transition-all duration-300 hover:bg-gradient-to-r hover:from-pink-400 hover:to-purple-400 hover:bg-clip-text hover:text-transparent">
             {{ title }}
           </h1>
           
@@ -86,7 +94,15 @@
           </div>
         </div>
         
-        <slot></slot>
+        <!-- Page Loading Overlay -->
+        <div v-if="pageLoading" class="min-h-[60vh] flex items-center justify-center">
+          <LoadingSpinner />
+        </div>
+        
+        <!-- Page Content -->
+        <div v-show="!pageLoading">
+          <slot></slot>
+        </div>
       </div>
     </div>
     
@@ -100,6 +116,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { computed } from 'vue'
 import AppHeader from '@/components/AppHeader.vue'
 import MobileBottomNav from '@/components/MobileBottomNav.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const props = defineProps({
   title: {
@@ -141,6 +158,11 @@ const props = defineProps({
   customBreadcrumbs: {
     type: Array,
     default: null
+  },
+  // Page loading state
+  pageLoading: {
+    type: Boolean,
+    default: false
   },
   // Background customization
   backgroundColor: {
