@@ -5,11 +5,18 @@
       class="relative overflow-hidden rounded-2xl bg-gray-900/60 backdrop-blur-sm border border-white/10 h-full"
       @mouseenter="handleMouseEnter"
       @mouseleave="handleMouseLeave"
+      @touchstart="handleTouchStart"
+      @touchmove="handleTouchMove"
+      @touchend="handleTouchEnd"
     >
       <!-- Slides -->
       <div 
-        class="flex transition-transform duration-500 ease-in-out" 
-        :style="`transform: translateX(-${currentIndex * 100}%)`"
+        ref="slidesContainer"
+        class="flex transition-transform ease-in-out" 
+        :style="{
+          transform: `translateX(calc(-${currentIndex * 100}% + ${touchOffset}px))`,
+          transitionDuration: isTransitioning ? '500ms' : '0ms'
+        }"
       >
         <div 
           v-for="item in items"
@@ -209,7 +216,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { handleImageError } from '@/utils/handleImageError'
 
 const props = defineProps({
@@ -231,6 +238,14 @@ const props = defineProps({
 const currentIndex = ref(0)
 const isPaused = ref(false)
 let autoPlayTimer = null
+
+// Touch handling variables
+const touchStartX = ref(0)
+const touchEndX = ref(0)
+const touchOffset = ref(0)
+const isTransitioning = ref(true)
+const isTouching = ref(false)
+const slidesContainer = ref(null)
 
 const formatNumber = (num) => {
   if (!num) return '0'
@@ -264,7 +279,7 @@ const startAutoPlay = () => {
   stopAutoPlay() // Clear any existing timer first
   if (props.autoPlay && props.items.length > 1 && !isPaused.value) {
     autoPlayTimer = setInterval(() => {
-      if (!isPaused.value) {
+      if (!isPaused.value && props.items.length > 0) {
         nextSlide()
       }
     }, props.interval)
@@ -295,10 +310,90 @@ const handleMouseLeave = () => {
   startAutoPlay()
 }
 
+// Touch event handlers
+const handleTouchStart = (e) => {
+  if (props.items.length <= 1) return
+  
+  isTouching.value = true
+  touchStartX.value = e.touches[0].clientX
+  touchEndX.value = e.touches[0].clientX
+  isTransitioning.value = false
+  
+  // Pause autoplay while touching
+  isPaused.value = true
+  stopAutoPlay()
+}
+
+const handleTouchMove = (e) => {
+  if (!isTouching.value || props.items.length <= 1) return
+  
+  touchEndX.value = e.touches[0].clientX
+  const diff = touchEndX.value - touchStartX.value
+  
+  // Add resistance at edges
+  if ((currentIndex.value === 0 && diff > 0) || 
+      (currentIndex.value === props.items.length - 1 && diff < 0)) {
+    touchOffset.value = diff * 0.3 // Reduced movement at edges
+  } else {
+    touchOffset.value = diff
+  }
+}
+
+const handleTouchEnd = (e) => {
+  if (!isTouching.value || props.items.length <= 1) return
+  
+  isTouching.value = false
+  isTransitioning.value = true
+  
+  const diff = touchEndX.value - touchStartX.value
+  const threshold = 50 // Minimum swipe distance
+  
+  if (Math.abs(diff) > threshold) {
+    if (diff > 0) {
+      // Swiped right - go to previous
+      prevSlide()
+    } else {
+      // Swiped left - go to next
+      nextSlide()
+    }
+  }
+  
+  // Reset offset
+  touchOffset.value = 0
+  
+  // Resume autoplay after touch
+  setTimeout(() => {
+    isPaused.value = false
+    startAutoPlay()
+  }, 500)
+}
+
+// Watch for items changes and restart autoplay
+watch(() => props.items, (newItems) => {
+  if (newItems && newItems.length > 1) {
+    // Reset to first slide when items change
+    currentIndex.value = 0
+    // Restart autoplay with new items
+    resetAutoPlay()
+  }
+}, { immediate: false })
+
+// Watch for autoPlay prop changes
+watch(() => props.autoPlay, (newValue) => {
+  if (newValue) {
+    startAutoPlay()
+  } else {
+    stopAutoPlay()
+  }
+})
+
 onMounted(() => {
   // Start autoplay immediately when component mounts
-  if (props.items.length > 1) {
-    startAutoPlay()
+  if (props.items && props.items.length > 1 && props.autoPlay) {
+    // Add a small delay to ensure DOM is ready
+    setTimeout(() => {
+      startAutoPlay()
+    }, 100)
   }
 })
 

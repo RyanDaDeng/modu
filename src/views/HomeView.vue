@@ -73,35 +73,12 @@
 
       </div>
       <!-- Mobile Search Bar -->
-      <div class="sm:hidden sticky top-0 z-30 bg-gradient-to-b from-gray-900/95 to-gray-900/80 backdrop-blur-xl px-4 py-3">
-        <div class="relative group">
-          <!-- Gradient border glow effect -->
-          <div class="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-full blur opacity-0 group-hover:opacity-30 transition-opacity"></div>
-          
-          <!-- Search input with glassmorphism -->
-          <input
-            v-model="searchQuery"
-            @click="handleSearchClick"
-            @focus="handleSearchClick"
-            type="text"
-            placeholder="搜索漫画、作者..."
-            class="relative w-full px-4 py-2.5 pl-10 bg-gray-900/70 backdrop-blur-xl border border-white/20 rounded-full text-gray-200 placeholder-gray-400 focus:outline-none focus:border-pink-500/50 focus:bg-gray-900/80 transition-all cursor-pointer text-sm"
-            readonly
-          />
-          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          
-          <!-- Search button with glassmorphism -->
-          <button
-            @click="handleSearchClick"
-            class="absolute right-1 top-1/2 -translate-y-1/2 px-4 py-1.5 bg-gradient-to-r from-pink-500/30 to-purple-500/30 backdrop-blur-sm border border-pink-400/50 hover:from-pink-500/40 hover:to-purple-500/40 hover:border-pink-400/70 text-pink-200 hover:text-white text-xs font-medium rounded-full transition-all cursor-pointer"
-          >
-            搜索
-          </button>
-        </div>
-        
-        <!-- Mobile New User Guide Banner - Below Search -->
+      <MobileSearchBar 
+        v-model="searchQuery"
+        @click="handleSearchClick"
+      >
+        <template #announcement>
+          <!-- Mobile New User Guide Banner - Below Search -->
         <div v-show="!announcementHidden" class="sm:hidden mt-3 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-lg p-[1px]">
           <div class="bg-gray-900/90 backdrop-blur-sm rounded-lg p-3">
             <div class="flex items-start space-x-2">
@@ -129,7 +106,8 @@
             </div>
           </div>
         </div>
-      </div>
+        </template>
+      </MobileSearchBar>
 
       <!-- Hero Slider Section - Featured Comics -->
       <div class="relative">
@@ -145,13 +123,186 @@
       
       <!-- Hero Section with Split Layout -->
       <div class="container mx-auto px-4 py-4 sm:py-6">
-        <!-- Mobile: Full width slider -->
+        <!-- Mobile: Full width slider + Quick Access -->
         <div class="sm:hidden">
           <HeroSlider :items="heroComics" :auto-play="true" :interval="5000" />
+          
+          <!-- Quick Access & Tag Cloud Section for Mobile -->
+          <div class="bg-gray-900/60 backdrop-blur-sm border border-white/10 rounded-xl p-2 mt-3">
+            <!-- Quick Rankings -->
+            <div class="grid grid-cols-4 gap-1.5 mb-2">
+              <button 
+                v-for="ranking in quickRankings" 
+                :key="ranking.name"
+                @click="$router.push(ranking.path)"
+                class="group relative overflow-hidden rounded-lg bg-gray-800/50 backdrop-blur-sm border border-white/10 p-2 hover:bg-gray-700/50 hover:border-white/20 transition-all duration-200 cursor-pointer"
+              >
+                <div class="relative z-10 flex flex-col items-center">
+                  <div class="text-lg mb-0.5">{{ ranking.icon }}</div>
+                  <p class="text-white text-[10px] font-medium">{{ ranking.name }}</p>
+                </div>
+              </button>
+            </div>
+            
+            <!-- Word Cloud -->
+            <div class="border-t border-white/10 pt-2">
+              <div class="word-cloud-container">
+                <span 
+                  v-for="(tag, index) in tagCloudData" 
+                  :key="tag.text"
+                  @click="$router.push(`/search?wd=${encodeURIComponent(tag.text)}`)"
+                  class="word-cloud-tag text-[11px]"
+                  :style="{
+                    fontSize: (tag.size * 0.8) + 'px',
+                    color: tag.color,
+                    fontWeight: tag.weight
+                  }"
+                >
+                  {{ tag.text }}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
         
-        <!-- Desktop: Split Layout -->
-        <div class="hidden sm:flex gap-3 items-stretch">
+        <!-- Tablet: Stack Layout for medium screens -->
+        <div class="hidden sm:block lg:hidden">
+          <div class="flex flex-col gap-3">
+            <!-- Slider Full Width -->
+            <HeroSlider :items="heroComics" :auto-play="true" :interval="5000" />
+            
+            <!-- Quick Access & Tag Cloud Section Below Slider -->
+            <div class="bg-gray-900/60 backdrop-blur-sm border border-white/10 rounded-xl p-3">
+              <!-- Quick Rankings -->
+              <div class="grid grid-cols-4 gap-2 mb-3">
+                <button 
+                  v-for="ranking in quickRankings" 
+                  :key="ranking.name"
+                  @click="$router.push(ranking.path)"
+                  class="group relative overflow-hidden rounded-lg bg-gray-800/50 backdrop-blur-sm border border-white/10 p-3 hover:bg-gray-700/50 hover:border-white/20 transition-all duration-200 cursor-pointer"
+                >
+                  <div class="relative z-10">
+                    <div class="text-2xl mb-1">{{ ranking.icon }}</div>
+                    <p class="text-white text-xs font-medium">{{ ranking.name }}</p>
+                  </div>
+                </button>
+              </div>
+              
+              <!-- Word Cloud -->
+              <div class="border-t border-white/10 pt-3">
+                <div class="word-cloud-container">
+                  <span 
+                    v-for="(tag, index) in tagCloudData" 
+                    :key="tag.text"
+                    @click="$router.push(`/search?wd=${encodeURIComponent(tag.text)}`)"
+                    class="word-cloud-tag"
+                    :style="{
+                      fontSize: tag.size + 'px',
+                      color: tag.color,
+                      fontWeight: tag.weight
+                    }"
+                  >
+                    {{ tag.text }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Featured Comics Section Below for Tablet -->
+            <div class="bg-gray-900/60 backdrop-blur-sm border border-white/10 rounded-xl p-3">
+              <div class="grid grid-cols-4 gap-3">
+                <!-- Main Featured Comic -->
+                <router-link
+                  v-if="heroComics[0]"
+                  :to="`/chapter/${heroComics[0].id}`"
+                  class="col-span-2 row-span-2 block relative rounded-lg overflow-hidden bg-gray-800/50 border border-white/10 group hover:border-pink-500/30 transition-all"
+                >
+                  <img
+                    :src="heroComics[0].coverImage"
+                    :alt="heroComics[0].name"
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    @error="handleImageError"
+                  />
+                  
+                  <!-- Badge -->
+                  <div class="absolute top-2 left-2 z-10">
+                    <span class="px-2 py-1 bg-gradient-to-r from-pink-600 to-purple-600 text-white text-xs font-bold rounded-full shadow-lg">
+                      热门推荐
+                    </span>
+                  </div>
+                  
+                  <!-- Overlay with info -->
+                  <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black via-black/80 to-transparent">
+                    <p class="text-white text-sm font-bold truncate mb-1">{{ heroComics[0]?.name }}</p>
+                    <div class="text-xs text-gray-300">
+                      <div class="mb-1">{{ heroComics[0]?.category }}</div>
+                      <div class="flex items-center gap-3">
+                        <span class="flex items-center gap-1">
+                          <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                            <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                          </svg>
+                          {{ formatNumber(heroComics[0]?.views) }}
+                        </span>
+                        <span class="flex items-center gap-1">
+                          <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
+                          </svg>
+                          {{ formatNumber(heroComics[0]?.likes) }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </router-link>
+                
+                <!-- Other Featured Comics -->
+                <router-link
+                  v-for="(comic, idx) in heroComics.slice(1, 9)"
+                  :key="`feat-${comic.id}-${idx}`"
+                  :to="`/chapter/${comic.id}`"
+                  class="group relative rounded overflow-hidden bg-gray-800/50 border border-white/10 hover:border-pink-500/30 transition-all"
+                >
+                  <img
+                    :src="comic.coverImage"
+                    :alt="comic.name"
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    @error="handleImageError"
+                  />
+                  
+                  <!-- Mini badge -->
+                  <div v-if="idx < 3" class="absolute top-1 right-1 z-10">
+                    <span class="px-1.5 py-0.5 bg-red-600/70 backdrop-blur-sm border border-red-400/60 text-white text-[9px] font-bold rounded">
+                      {{ idx + 1 }}
+                    </span>
+                  </div>
+                  
+                  <!-- Overlay with stats -->
+                  <div class="absolute bottom-0 left-0 right-0 p-1.5 bg-gradient-to-t from-black via-black/80 to-transparent">
+                    <p class="text-white text-[10px] font-medium truncate mb-1">{{ comic.name }}</p>
+                    <div class="flex items-center gap-2 text-[9px] text-gray-300">
+                      <span class="flex items-center gap-0.5">
+                        <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                          <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                        </svg>
+                        {{ formatNumber(comic.views) }}
+                      </span>
+                      <span class="flex items-center gap-0.5">
+                        <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
+                        </svg>
+                        {{ formatNumber(comic.likes) }}
+                      </span>
+                    </div>
+                  </div>
+                </router-link>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Desktop: Split Layout (large screens and above) -->
+        <div class="hidden lg:flex gap-3 items-stretch">
           <!-- Left: Slider (2/5 width) -->
           <div class="w-2/5 flex flex-col gap-3">
             <!-- Main Slider -->
@@ -180,7 +331,7 @@
                   <span 
                     v-for="(tag, index) in tagCloudData" 
                     :key="tag.text"
-                    @click="$router.push(`/search?q=${encodeURIComponent(tag.text)}`)"
+                    @click="$router.push(`/search?wd=${encodeURIComponent(tag.text)}`)"
                     class="word-cloud-tag"
                     :style="{
                       fontSize: tag.size + 'px',
@@ -543,6 +694,7 @@ import ReadingHistory from '@/components/ReadingHistory.vue'
 import HeroSlider from '@/components/HeroSlider.vue'
 import FullscreenSearch from '@/components/FullscreenSearch.vue'
 import ModalDialog from '@/components/ModalDialog.vue'
+import MobileSearchBar from '@/components/MobileSearchBar.vue'
 import { formatNumber } from '@/utils/format'
 import { getImageServer } from '@/utils/imageServer'
 import { handleImageError } from '@/utils/handleImageError'
@@ -784,7 +936,7 @@ const hideAnnouncement = () => {
 const searchTag = (tag) => {
   router.push({
     path: '/search',
-    query: { q: tag }
+    query: { wd: tag }
   })
 }
 

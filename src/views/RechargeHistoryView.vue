@@ -1,8 +1,20 @@
 <template>
   <AppLayout title="充值记录">
-    
-    <!-- Order List -->
-    <div class="container mx-auto px-4 py-6 max-w-4xl">
+    <div class="container mx-auto px-4 py-6">
+      <!-- Header with count -->
+      <div class="mb-6">
+        <div class="flex justify-between items-center">
+          <div>
+            <h1 class="text-2xl font-bold text-white mb-2">充值记录</h1>
+            <p class="text-gray-400">
+              共 <span class="text-pink-500 font-medium">{{ totalOrders }}</span> 条记录
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Order List -->
+      <div class="max-w-4xl">
       <!-- Loading State -->
       <div v-if="loading && !orders.length" class="flex justify-center py-20">
         <LoadingSpinner />
@@ -99,16 +111,17 @@
         </button>
       </div>
 
-      <!-- Loading More Indicator -->
-      <div v-if="loadingMore" class="mt-6 flex justify-center">
-        <LoadingSpinner size="small" />
+        <!-- Loading More Indicator -->
+        <div v-if="loadingMore" class="mt-6 flex justify-center">
+          <LoadingSpinner size="small" />
+        </div>
       </div>
     </div>
   </AppLayout>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { getRechargeHistory } from '@/api/vip'
@@ -123,6 +136,9 @@ const orders = ref([])
 const pagination = ref(null)
 const loading = ref(false)
 const loadingMore = ref(false)
+
+// Computed
+const totalOrders = computed(() => orders.value.length)
 
 // Load orders
 const loadOrders = async (page = 1, append = false) => {

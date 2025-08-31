@@ -52,6 +52,11 @@
               <svg v-if="icon === 'lock'" class="w-8 h-8" :class="iconClass" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
               </svg>
+              
+              <!-- Bookmark Icon -->
+              <svg v-if="icon === 'bookmark'" class="w-8 h-8" :class="iconClass" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+              </svg>
             </div>
           </div>
           
@@ -113,7 +118,7 @@ const props = defineProps({
   // Icon
   icon: {
     type: String,
-    validator: (value) => ['success', 'warning', 'error', 'info', 'lock'].includes(value)
+    validator: (value) => ['success', 'warning', 'error', 'info', 'lock', 'bookmark'].includes(value)
   },
   
   // Buttons
@@ -182,7 +187,8 @@ const iconClass = computed(() => {
     warning: 'text-yellow-500',
     error: 'text-red-500',
     info: 'text-blue-500',
-    lock: 'text-red-500'
+    lock: 'text-red-500',
+    bookmark: 'text-yellow-500'
   }
   return classes[props.icon]
 })
@@ -194,7 +200,8 @@ const iconContainerClass = computed(() => {
     warning: 'bg-yellow-500/20',
     error: 'bg-red-500/20',
     info: 'bg-blue-500/20',
-    lock: 'bg-red-500/20'
+    lock: 'bg-red-500/20',
+    bookmark: 'bg-yellow-500/20'
   }
   return classes[props.icon]
 })

@@ -350,8 +350,21 @@
               <span class="text-gray-400">{{ currentImageIndex + 1 }}/{{ images.length }}</span>
             </div>
             
-            <!-- Right section: Auto-scroll toggle and chapter navigation buttons -->
+            <!-- Right section: Bookmark, Auto-scroll toggle and chapter navigation buttons -->
             <div class="flex items-center gap-1 sm:gap-2">
+              <!-- Bookmark button -->
+              <button
+                v-if="authStore.isLoggedIn"
+                @click="handleBookmark"
+                class="px-2 sm:px-3 py-1.5 bg-gray-600 hover:bg-gray-700 text-gray-300 rounded-lg transition-all flex items-center gap-1 sm:gap-1.5 cursor-pointer text-sm font-medium"
+                title="添加书签"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                </svg>
+                <span class="hidden sm:inline">书签</span>
+              </button>
+              
               <!-- Auto-scroll settings button -->
               <button
                 @click="showAutoScrollSettings = true"
@@ -891,6 +904,19 @@
       @confirm="handleVipUpgrade"
       @cancel="showVipPrompt = false"
     />
+    
+    <!-- Bookmark Confirmation Modal -->
+    <ModalDialog
+      v-model="showBookmarkDialog"
+      icon="bookmark"
+      title="添加书签"
+      :message="bookmarkMessage"
+      confirm-text="确认"
+      cancel-text="取消"
+      confirm-button-class="bg-yellow-500 hover:bg-yellow-600 text-white"
+      @confirm="confirmBookmark"
+      @cancel="showBookmarkDialog = false"
+    />
   </AppLayout>
 </template>
 
@@ -898,11 +924,13 @@
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
+import { useAuthStore } from '@/stores/auth'
 import { getComicAlbum, getComicChapter, getForumComments } from '@/api/request'
 import { cutImage, getImageUrl, getMaxRequestCount } from '@/utils/image'
 import { getImageServer } from '@/utils/imageServer'
 import { formatNumber } from '@/utils/format'
 import { checkCollection, toggleCollection } from '@/api/collection'
+import { addBookmark } from '@/api/bookmark'
 import readingHistoryService from '@/services/readingHistory'
 import { useNotification } from '@/composables/useNotification'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
@@ -913,6 +941,7 @@ import UnifiedComicCard from '@/components/UnifiedComicCard.vue'
 const route = useRoute()
 const router = useRouter()
 const appStore = useAppStore()
+const authStore = useAuthStore()
 const notification = useNotification()
 
 // Main comic info
@@ -973,6 +1002,10 @@ const isHeaderSticky = ref(false)
 // Login/VIP prompt modals
 const showLoginPrompt = ref(false)
 const showVipPrompt = ref(false)
+
+// Bookmark related
+const showBookmarkDialog = ref(false)
+const bookmarkMessage = ref('')
 
 // Image loading queue
 let loadingQueue = []
@@ -1294,6 +1327,47 @@ const handleVipUpgrade = () => {
   showVipPrompt.value = false
   // Navigate to VIP page
   router.push('/vip')
+}
+
+// Bookmark methods
+const handleBookmark = () => {
+  if (!currentReadingId.value) {
+    notification.warning('请先选择一个章节')
+    return
+  }
+  
+  bookmarkMessage.value = `是否要为《${comicInfo.value.name}》${currentChapterTitle.value}添加书签？`
+  showBookmarkDialog.value = true
+}
+
+const confirmBookmark = async () => {
+  try {
+    const bookmarkData = {
+      comic_id: comicId.value,
+      chapter_id: currentReadingId.value,
+      comic_name: comicInfo.value.name
+    }
+    
+    // Call bookmark API
+    const data = await addBookmark(bookmarkData)
+    
+    if (data.already_exists) {
+      notification.info('该章节已添加书签')
+    } else if (data.is_update) {
+      notification.info('书签已更新到当前章节')
+    } else {
+      notification.success('书签添加成功')
+    }
+  } catch (error) {
+    console.error('Bookmark error:', error)
+    if (error.response?.data?.error_type === 'limit_reached') {
+      notification.error(error.response.data.message || '书签数量已达上限（50个），请删除一些书签后再试')
+    } else {
+      notification.error(error.response?.data?.message || '添加书签失败，请稍后再试')
+    }
+  } finally {
+    showBookmarkDialog.value = false
+  }
 }
 
 // Start reading a specific series/chapter
@@ -2082,9 +2156,26 @@ const loadAllImages = async () => {
 
 
 // Lifecycle hooks
-onMounted(() => {
+onMounted(async () => {
   loadReadingHistory() // Load reading history first
-  loadComicInfo()
+  await loadComicInfo()
+  
+  // Check if there's a chapter parameter in URL for auto-open (for bookmarks)
+  const chapterParam = route.query.chapter
+  if (chapterParam && authStore.isLoggedIn) {
+    // Find the chapter and start reading
+    if (comicInfo.value.series?.length) {
+      const chapter = comicInfo.value.series.find(s => s.id == chapterParam)
+      if (chapter) {
+        // Auto-start reading the bookmarked chapter
+        startReading(chapter.id)
+      }
+    } else if (comicInfo.value.id == chapterParam) {
+      // Single chapter comic
+      handleSingleChapterClick()
+    }
+  }
+  
   window.addEventListener('scroll', handleScroll)
   window.addEventListener('keydown', handleKeydown)
 })

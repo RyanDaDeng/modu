@@ -186,7 +186,7 @@ export default {
 </script>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getCategoriesFilter, getCategories } from '@/api/request'
 import AppLayout from '@/components/AppLayout.vue'
@@ -222,7 +222,7 @@ const loading = ref(false)
 const pageLoading = ref(true) // Page loading state for AppLayout
 const loadingCategories = ref(true)
 const loadingMore = ref(false) // Separate loading state for load more
-const currentPage = ref(1)
+const currentPage = ref(0) // Start at 0 to detect if initialized
 const hasMore = ref(true)
 const hasSearched = ref(false)
 
@@ -236,15 +236,15 @@ const displayPage = ref(1) // For pagination display
 const parseQueryParams = () => {
   const query = route.query
   
-  // Parse page parameter - reset to 1 if not provided
+  // Parse page parameter
   if (query.page) {
     const page = parseInt(query.page)
     if (!isNaN(page) && page > 0) {
       currentPage.value = page
       displayPage.value = page
     }
-  } else {
-    // Reset to page 1 when no page parameter
+  } else if (currentPage.value === 0) {
+    // Only set to 1 if not initialized yet
     currentPage.value = 1
     displayPage.value = 1
   }
@@ -287,10 +287,8 @@ const parseQueryParams = () => {
 const updateURL = () => {
   const query = {}
   
-  // Add page if not 1
-  if (displayPage.value > 1) {
-    query.page = displayPage.value
-  }
+  // Always include page in URL
+  query.page = displayPage.value
   
   // Add sort if not default
   if (selectedSort.value && selectedSort.value !== 'mv') {
@@ -308,8 +306,8 @@ const updateURL = () => {
     }
   }
   
-  // Update URL without triggering navigation
-  router.replace({ query })
+  // Always use push to maintain proper history
+  router.push({ query })
 }
 
 // Load categories
@@ -332,7 +330,7 @@ const loadCategories = async () => {
       
       // Load comics with current settings
       if (selectedCategory.value) {
-        applyFilter()
+        applyFilter(false) // Don't reset page on initial load
       }
     }
   } catch (error) {
@@ -395,7 +393,10 @@ const loadComics = async (reset = false) => {
       // Update display page for pagination component
       displayPage.value = currentPage.value
       
-      currentPage.value++
+      // Only increment currentPage if not using reset (for load more functionality)
+      if (!reset) {
+        currentPage.value++
+      }
       hasMore.value = data.content.length >= 80
     } else {
       hasMore.value = false
@@ -471,19 +472,23 @@ const handlePageChange = (page) => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-// Watch for route query changes
-watch(() => route.query, (newQuery, oldQuery) => {
-  // Only react to changes if categories are loaded
-  if (categories.value.length > 0) {
-    parseQueryParams()
-    // Reset page if sort or category changed
-    const shouldResetPage = (newQuery.o !== oldQuery?.o) || (newQuery.c !== oldQuery?.c)
-    applyFilter(shouldResetPage)
-  }
-}, { deep: true })
+// Don't use watch - it causes too many problems with keep-alive
+// Navigation within the page is handled by button clicks which call applyFilter directly
 
 onMounted(() => {
-  loadCategories()
+  // Only load categories if they haven't been loaded yet
+  if (categories.value.length === 0) {
+    // Parse initial query params
+    parseQueryParams()
+    
+    // Initialize page if not set
+    if (currentPage.value === 0) {
+      currentPage.value = 1
+      displayPage.value = 1
+    }
+    
+    loadCategories()
+  }
 })
 </script>
 

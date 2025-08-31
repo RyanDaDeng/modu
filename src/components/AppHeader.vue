@@ -84,6 +84,18 @@
                 </button>
                 
                 <router-link
+                  v-if="authStore.isLoggedIn"
+                  to="/bookmarks"
+                  class="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                  title="我的书签"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                  </svg>
+                </router-link>
+                
+                <router-link
+                  v-if="authStore.isLoggedIn"
                   to="/collection"
                   class="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all"
                   title="我的收藏"
@@ -93,7 +105,9 @@
                   </svg>
                 </router-link>
                 
+                <!-- VIP Button - Only show if not logged in or not VIP -->
                 <router-link
+                  v-if="!authStore.isLoggedIn || !isUserVip"
                   to="/vip"
                   class="relative group"
                 >
@@ -106,7 +120,7 @@
                       <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                       </svg>
-                      {{ isUserVip ? 'VIP' : '开通VIP' }}
+                      开通VIP
                     </div>
                   </div>
                 </router-link>
@@ -126,8 +140,21 @@
                   </svg>
                 </button>
                 
+                <!-- Bookmarks Icon -->
+                <router-link
+                  v-if="authStore.isLoggedIn"
+                  to="/bookmarks"
+                  class="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                  title="我的书签"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                  </svg>
+                </router-link>
+                
                 <!-- Collection Icon -->
                 <router-link
+                  v-if="authStore.isLoggedIn"
                   to="/collection"
                   class="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all"
                   title="我的收藏"
@@ -137,8 +164,9 @@
                   </svg>
                 </router-link>
                 
-                <!-- VIP Button -->
+                <!-- VIP Button - Only show if not logged in or not VIP -->
                 <router-link
+                  v-if="!authStore.isLoggedIn || !isUserVip"
                   to="/vip"
                   class="relative group"
                 >
@@ -147,7 +175,7 @@
                   
                   <!-- Mobile VIP button -->
                   <div class="relative px-2 py-1 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur-sm border border-yellow-400/40 text-yellow-300 text-xs font-medium rounded-full transition-all cursor-pointer">
-                    {{ isUserVip ? 'VIP' : '开通VIP' }}
+                    开通VIP
                   </div>
                 </router-link>
               </div>
@@ -158,10 +186,25 @@
                   @click="showUserMenu = !showUserMenu"
                   class="flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-full transition-all cursor-pointer"
                 >
-                  <div class="w-7 h-7 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                    {{ userInitial }}
+                  <!-- VIP Badge integrated with Avatar -->
+                  <div class="relative">
+                    <div class="w-7 h-7 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                      {{ userInitial }}
+                    </div>
+                    <!-- VIP Crown Badge -->
+                    <div v-if="isUserVip" class="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                      <svg class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    </div>
                   </div>
-                  <span class="text-white text-sm hidden sm:block">{{ authStore.user?.name }}</span>
+                  <div class="flex items-center gap-1">
+                    <span class="text-white text-sm hidden sm:block">{{ authStore.user?.name }}</span>
+                    <!-- VIP Text Badge for desktop -->
+                    <span v-if="isUserVip" class="hidden sm:inline-flex items-center px-1.5 py-0.5 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold rounded-full">
+                      VIP
+                    </span>
+                  </div>
                   <svg class="w-4 h-4 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                   </svg>
@@ -177,7 +220,7 @@
                 <!-- User Dropdown Menu -->
                 <div
                   v-if="showUserMenu"
-                  class="absolute right-0 mt-2 w-48 z-[100]"
+                  class="absolute right-0 mt-2 w-48 z-50"
                 >
                   <!-- Glassmorphism dropdown with gradient border -->
                   <div class="relative">
@@ -187,6 +230,36 @@
                     <!-- Main dropdown content -->
                     <div class="relative bg-gray-900/95 backdrop-blur-xl rounded-lg border border-white/10 overflow-hidden">
                       <div class="py-2">
+                        <!-- VIP Status / Upgrade Section -->
+                        <div v-if="isUserVip" class="px-4 py-2 border-b border-white/10">
+                          <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                              <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                              <span class="text-yellow-400 font-medium text-sm">VIP会员</span>
+                            </div>
+                            <span class="text-gray-400 text-xs">{{ vipExpireText }}</span>
+                          </div>
+                        </div>
+                        <router-link
+                          v-else
+                          to="/vip"
+                          @click="showUserMenu = false"
+                          class="block px-4 py-2 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 hover:from-yellow-500/20 hover:to-orange-500/20 border-b border-white/10 transition-colors cursor-pointer"
+                        >
+                          <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                              <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                              <span class="text-yellow-400 font-medium">开通VIP</span>
+                            </div>
+                            <svg class="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                          </div>
+                        </router-link>
                         <router-link
                           to="/profile"
                           @click="showUserMenu = false"
@@ -200,6 +273,7 @@
                           </div>
                         </router-link>
                         <router-link
+                          v-if="authStore.isLoggedIn"
                           to="/collection"
                           @click="showUserMenu = false"
                           class="block px-4 py-2 text-gray-200 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
@@ -221,6 +295,18 @@
                               <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.669 0-3.218.51-4.5 1.385V4.804z" />
                             </svg>
                             阅读历史
+                          </div>
+                        </router-link>
+                        <router-link
+                          to="/bookmarks"
+                          @click="showUserMenu = false"
+                          class="block px-4 py-2 text-gray-200 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+                        >
+                          <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                            </svg>
+                            我的书签
                           </div>
                         </router-link>
                         <router-link
@@ -368,10 +454,25 @@ const isUserVip = computed(() => {
   return new Date(authStore.user.vip_expired_at) > new Date()
 })
 
+// VIP expire text
+const vipExpireText = computed(() => {
+  if (!authStore.user?.vip_expired_at) return ''
+  const expireDate = new Date(authStore.user.vip_expired_at)
+  const now = new Date()
+  const daysLeft = Math.ceil((expireDate - now) / (1000 * 60 * 60 * 24))
+  
+  if (daysLeft <= 0) return '已过期'
+  if (daysLeft === 1) return '明天到期'
+  if (daysLeft <= 7) return `${daysLeft}天后到期`
+  if (daysLeft <= 30) return `${Math.ceil(daysLeft / 7)}周后到期`
+  
+  return `${Math.ceil(daysLeft / 30)}月后到期`
+})
+
 // Methods
 const handleSearch = () => {
   if (searchQuery.value.trim()) {
-    router.push(`/search?q=${encodeURIComponent(searchQuery.value.trim())}`)
+    router.push(`/search?wd=${encodeURIComponent(searchQuery.value.trim())}`)
     searchQuery.value = ''
   }
 }

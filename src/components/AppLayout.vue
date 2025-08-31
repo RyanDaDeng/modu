@@ -4,7 +4,7 @@
     <AppHeader v-if="!hideAppHeader" :class="showTopNav ? '' : 'hidden lg:block'" />
     
     <!-- Mobile Header with back button - Show on mobile when showTopNav is false -->
-    <div v-if="!showTopNav && !noHeader" class="lg:hidden sticky top-0 left-0 right-0 z-50">
+    <div v-if="!showTopNav && !noHeader" class="lg:hidden sticky top-0 left-0 right-0 z-20">
       <!-- Glassmorphism background -->
       <div class="absolute inset-0 bg-gray-900/80 backdrop-blur-xl border-b border-white/10"></div>
       

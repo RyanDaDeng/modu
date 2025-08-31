@@ -120,7 +120,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'search'])
 
 const router = useRouter()
 const appStore = useAppStore()
@@ -137,9 +137,13 @@ const close = () => {
 const handleSearch = () => {
   const query = searchQuery.value.trim()
   if (query) {
-    if (Number.isInteger(+query) && +query >= 10) {
-      router.push(`/chapter/${query}`)
+    // Check if we're already on the search page
+    if (router.currentRoute.value.path === '/search') {
+      // Emit search event instead of changing URL
+      emit('search', query)
+      appStore.addSearchHistory(query)
     } else {
+      // Navigate to search page if not already there
       appStore.addSearchHistory(query)
       router.push({
         path: '/search',
@@ -156,10 +160,17 @@ const selectHistory = (query) => {
 }
 
 const searchTag = (tag) => {
-  router.push({
-    path: '/search',
-    query: { q: tag }
-  })
+  // Check if we're already on the search page
+  if (router.currentRoute.value.path === '/search') {
+    // Emit search event instead of changing URL
+    emit('search', tag)
+  } else {
+    // Navigate to search page if not already there
+    router.push({
+      path: '/search',
+      query: { wd: tag }
+    })
+  }
   close()
 }
 

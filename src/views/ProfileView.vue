@@ -13,8 +13,17 @@
       
       <!-- Content -->
       <div class="relative z-10 container mx-auto px-4 py-8">
-        <!-- User Info Card with glassmorphism effect -->
-        <div class="bg-gray-900/40 backdrop-blur-md rounded-2xl p-6 sm:p-8 border border-gray-800/50 shadow-2xl">
+        <!-- User Info Card with glassmorphism effect and background image -->
+        <div class="relative rounded-2xl p-6 sm:p-8 border border-gray-800/50 shadow-2xl overflow-hidden">
+          <!-- Background image decoration - maximum clarity -->
+          <div class="absolute inset-0">
+            <img src="/img_14.png" alt="" class="w-full h-full object-cover" />
+          </div>
+          <!-- Minimal overlay only where needed for text -->
+          <div class="absolute inset-0 bg-gray-900/20"></div>
+          
+          <!-- Content wrapper -->
+          <div class="relative z-10">
           <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
             <!-- Avatar -->
             <div class="relative group">
@@ -73,6 +82,7 @@
               </button>
             </div>
           </div>
+          </div>
         </div>
       </div>
     </div>
@@ -105,6 +115,21 @@
                 </svg>
               </div>
               <div class="text-white font-medium">阅读历史</div>
+            </div>
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </router-link>
+          
+          <!-- Bookmarks -->
+          <router-link to="/bookmarks" class="flex items-center justify-between p-4 hover:bg-gray-750 transition-colors cursor-pointer">
+            <div class="flex items-center gap-3">
+              <div class="p-2 bg-cyan-500/20 rounded-lg">
+                <svg class="w-5 h-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                </svg>
+              </div>
+              <div class="text-white font-medium">我的书签</div>
             </div>
             <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />

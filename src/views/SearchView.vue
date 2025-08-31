@@ -1,5 +1,14 @@
 <template>
   <AppLayout :title="searchQuery ? `搜索结果: ${searchQuery}` : '搜索'">
+    <!-- Mobile Search Bar -->
+    <MobileSearchBar 
+      v-if="authStore.isLoggedIn"
+      v-model="searchQuery"
+      :show-current-query="true"
+      @click="handleSearchClick"
+      @clear="handleClear"
+    />
+
     <div class="container mx-auto px-4 py-6">
 
       <!-- Login prompt for non-logged users -->
@@ -27,11 +36,50 @@
         </div>
       </div>
 
-      <div v-else-if="!searchQuery" class="text-center py-12">
-        <svg class="w-24 h-24 text-gray-600 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-        </svg>
-        <p class="text-gray-400">请输入搜索关键词</p>
+      <div v-else-if="!searchQuery">
+        <!-- Categories Tags Display -->
+        <div v-if="categoryBlocks.length > 0" class="space-y-6 max-w-5xl mx-auto">
+          <div class="text-center mb-8">
+            <h2 class="text-2xl sm:text-3xl font-bold text-white mb-3 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">热门标签</h2>
+            <p class="text-gray-400">点击标签快速搜索相关漫画</p>
+          </div>
+          
+          <div class="grid gap-6 md:grid-cols-2">
+            <div v-for="block in categoryBlocks" :key="block.title" 
+                 class="group bg-gradient-to-br from-gray-800/40 to-gray-900/40 backdrop-blur-sm rounded-2xl p-5 border border-white/10 hover:border-pink-500/30 transition-all duration-300">
+              <h3 class="text-lg font-bold text-white mb-4 flex items-center">
+                <span class="w-1.5 h-6 bg-gradient-to-b from-pink-500 to-purple-600 rounded-full mr-3 group-hover:h-7 transition-all"></span>
+                {{ block.title }}
+              </h3>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  v-for="tag in block.content"
+                  :key="tag"
+                  @click="searchByTag(tag)"
+                  class="group/tag px-3 py-1.5 bg-gray-800/50 hover:bg-gradient-to-r hover:from-pink-500/30 hover:to-purple-600/30 border border-white/10 hover:border-pink-500/40 text-gray-300 hover:text-white rounded-lg text-sm transition-all duration-200 cursor-pointer hover:shadow-lg hover:shadow-pink-500/20 hover:scale-105 active:scale-95"
+                >
+                  <span class="relative">
+                    {{ tag }}
+                    <span class="absolute inset-0 rounded-lg bg-gradient-to-r from-pink-500 to-purple-600 opacity-0 group-hover/tag:opacity-20 blur transition-opacity"></span>
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Loading Categories -->
+        <div v-else-if="loadingCategories" class="flex justify-center py-12">
+          <LoadingSpinner />
+        </div>
+        
+        <!-- Fallback if no categories -->
+        <div v-else class="text-center py-12">
+          <svg class="w-24 h-24 text-gray-600 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+          </svg>
+          <p class="text-gray-400">请输入搜索关键词</p>
+        </div>
       </div>
 
       <div v-else>
@@ -65,6 +113,12 @@
         <div ref="loadMoreTrigger" class="h-20"></div>
       </div>
     </div>
+    
+    <!-- Fullscreen Search Modal -->
+    <FullscreenSearch 
+      v-model="showFullscreenSearch" 
+      @search="handleDirectSearch"
+    />
   </AppLayout>
 </template>
 
@@ -79,10 +133,12 @@ import { ref, watch, onMounted, onUnmounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { useAuthStore } from '@/stores/auth'
-import { getSearchResults } from '@/api/request'
+import { getSearchResults, getCategories } from '@/api/request'
 import AppLayout from '@/components/AppLayout.vue'
 import ComicCard from '@/components/ComicCard.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import FullscreenSearch from '@/components/FullscreenSearch.vue'
+import MobileSearchBar from '@/components/MobileSearchBar.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -95,8 +151,81 @@ const loading = ref(false)
 const currentPage = ref(1)
 const hasMore = ref(true)
 const loadMoreTrigger = ref(null)
+const showFullscreenSearch = ref(false)
+const categoryBlocks = ref([])
+const loadingCategories = ref(false)
 
 let observer = null
+
+// Handle search click
+const handleSearchClick = () => {
+  showFullscreenSearch.value = true
+}
+
+// Handle direct search (from FullscreenSearch component when already on search page)
+const handleDirectSearch = (query) => {
+  searchQuery.value = query
+  // Clear previous results
+  comics.value = []
+  currentPage.value = 1
+  hasMore.value = true
+  // Clear saved state
+  sessionStorage.removeItem(SEARCH_STATE_KEY)
+  sessionStorage.removeItem(SEARCH_SCROLL_KEY)
+  // Search directly without changing URL
+  searchComics(true)
+}
+
+// Handle clear
+const handleClear = () => {
+  searchQuery.value = ''
+  comics.value = []
+  hasMore.value = true
+  currentPage.value = 1
+  // Clear saved state
+  sessionStorage.removeItem(SEARCH_STATE_KEY)
+  sessionStorage.removeItem(SEARCH_SCROLL_KEY)
+  // Navigate to search without query
+  router.push('/search')
+  // Load categories if not already loaded
+  loadCategories()
+}
+
+// Load categories
+const loadCategories = async () => {
+  if (!authStore.isLoggedIn || categoryBlocks.value.length > 0) return
+  
+  loadingCategories.value = true
+  try {
+    const response = await getCategories()
+    if (response && response.blocks) {
+      categoryBlocks.value = response.blocks
+    }
+  } catch (error) {
+    console.error('Failed to load categories:', error)
+  } finally {
+    loadingCategories.value = false
+  }
+}
+
+// Search by tag
+const searchByTag = (tag) => {
+  console.log('Searching by tag:', tag)
+  searchQuery.value = tag
+  
+  // Clear previous search results and state
+  comics.value = []
+  currentPage.value = 1
+  hasMore.value = true
+  sessionStorage.removeItem(SEARCH_STATE_KEY)
+  sessionStorage.removeItem(SEARCH_SCROLL_KEY)
+  
+  // Add to search history
+  appStore.addSearchHistory(tag)
+  
+  // Search directly without changing URL
+  searchComics(true)
+}
 
 // Session storage keys for state persistence
 const SEARCH_STATE_KEY = 'searchPageState'
@@ -174,6 +303,9 @@ const searchComics = async (reset = false) => {
     // Handle both possible response formats
     const searchResults = Array.isArray(data) ? data : (data?.content || [])
     
+    console.log('Parsed search results:', searchResults)
+    console.log('Number of results:', searchResults.length)
+    
     if (!searchResults || searchResults.length === 0) {
       hasMore.value = false
     } else {
@@ -182,6 +314,8 @@ const searchComics = async (reset = false) => {
         page: currentPage.value
       }))
       comics.value.push(...comicsWithPage)
+      console.log('Comics array after update:', comics.value)
+      console.log('Total comics loaded:', comics.value.length)
       currentPage.value++
       
       // Check if we got less than expected results (indicating last page)
@@ -224,9 +358,10 @@ const saveScrollPosition = () => {
   sessionStorage.setItem(SEARCH_SCROLL_KEY, window.scrollY.toString())
 }
 
-watch(() => route.query.wd || route.query.q, (newQuery) => {
+watch(() => route.query.wd, (newQuery) => {
   console.log('Search query changed:', newQuery, 'Current:', searchQuery.value)
-  if (newQuery !== searchQuery.value) {
+  // Only update if there's an actual change and newQuery is not undefined
+  if (newQuery !== undefined && newQuery !== searchQuery.value) {
     searchQuery.value = newQuery || ''
     if (searchQuery.value && authStore.isLoggedIn) {
       // Only search if user is logged in
@@ -236,12 +371,20 @@ watch(() => route.query.wd || route.query.q, (newQuery) => {
         // Only search if state wasn't restored
         searchComics(true)
       }
+    } else if (!searchQuery.value && authStore.isLoggedIn) {
+      // Load categories when search query is empty
+      loadCategories()
     }
   }
 }, { immediate: true })
 
 onMounted(() => {
   setupInfiniteScroll()
+  
+  // Load categories if no search query
+  if (!searchQuery.value) {
+    loadCategories()
+  }
   
   // Save scroll position when navigating away
   window.addEventListener('beforeunload', saveScrollPosition)

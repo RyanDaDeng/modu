@@ -1,8 +1,16 @@
 <template>
   <AppLayout title="我的收藏">
     <div class="container mx-auto px-4 py-6">
+      <!-- Header with count -->
       <div class="mb-6">
-        <p class="text-gray-400 mt-1">共 {{ totalCollections }} 部作品</p>
+        <div class="flex justify-between items-center">
+          <div>
+            <h1 class="text-2xl font-bold text-white mb-2">我的收藏</h1>
+            <p class="text-gray-400">
+              共 <span class="text-pink-500 font-medium">{{ totalCollections }}</span> 部作品
+            </p>
+          </div>
+        </div>
       </div>
 
       <!-- Loading State -->

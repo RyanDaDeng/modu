@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { usePageStateStore } from '@/stores/pageState'
 import HomeView from '../views/HomeView.vue'
 
 const router = createRouter({
@@ -35,6 +36,12 @@ const router = createRouter({
       path: '/reading-history',
       name: 'reading-history',
       component: () => import('../views/ReadingHistoryView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/bookmarks',
+      name: 'bookmarks',
+      component: () => import('../views/BookmarksView.vue'),
       meta: { requiresAuth: true }
     },
     {
@@ -104,9 +111,15 @@ const router = createRouter({
   }
 })
 
-// 路由守卫 - 检查需要认证的页面
+// 路由守卫 - 保存页面状态和检查认证
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
+  const pageStateStore = usePageStateStore()
+  
+  // Save scroll position when leaving a page
+  if (from.name) {
+    pageStateStore.saveScrollPosition(from.fullPath)
+  }
   
   // 如果路由需要认证
   if (to.meta.requiresAuth) {
@@ -140,6 +153,24 @@ router.beforeEach(async (to, from, next) => {
     // 不需要认证的页面，直接放行
     next()
   }
+})
+
+// After navigation hook - restore scroll position
+router.afterEach((to, from) => {
+  const pageStateStore = usePageStateStore()
+  
+  // Small delay to ensure DOM is ready
+  setTimeout(() => {
+    // Try to restore scroll position
+    const restored = pageStateStore.restoreScrollPosition(to.fullPath)
+    if (!restored) {
+      // If no saved position, scroll to top
+      window.scrollTo(0, 0)
+    }
+  }, 100)
+  
+  // Clean old states periodically
+  pageStateStore.clearOldStates()
 })
 
 export default router

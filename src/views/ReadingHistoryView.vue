@@ -1,6 +1,28 @@
 <template>
-  <AppLayout title="阅读历史" :show-breadcrumbs="true">
+  <AppLayout title="阅读历史">
     <div class="container mx-auto px-4 py-6">
+      <!-- Header with count -->
+      <div class="mb-6">
+        <div class="flex justify-between items-center">
+          <div>
+            <h1 class="text-2xl font-bold text-white mb-2">阅读历史</h1>
+            <p class="text-gray-400">
+              共 <span class="text-pink-500 font-medium">{{ historyItems.length }}</span> 条记录
+            </p>
+          </div>
+          <button 
+            v-if="historyItems.length > 0"
+            @click="clearAllHistory"
+            class="text-sm text-gray-400 hover:text-red-400 transition-colors cursor-pointer flex items-center gap-1"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            清空历史
+          </button>
+        </div>
+      </div>
+      
       <!-- Empty State -->
       <div v-if="historyItems.length === 0 && !loading" class="text-center py-16">
         <svg class="w-24 h-24 text-gray-600 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
@@ -23,24 +45,6 @@
 
       <!-- History Grid -->
       <div v-else>
-        <!-- Header with Clear Button -->
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-lg font-bold text-white flex items-center">
-            <svg class="w-5 h-5 mr-2 text-pink-500" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.669 0-3.218.51-4.5 1.385V4.804z" />
-            </svg>
-            阅读历史 ({{ historyItems.length }})
-          </h2>
-          <button 
-            @click="clearAllHistory"
-            class="text-sm text-gray-400 hover:text-red-400 transition-colors cursor-pointer flex items-center gap-1"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-            清空历史
-          </button>
-        </div>
 
         <!-- History Cards Grid -->
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
