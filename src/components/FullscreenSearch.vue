@@ -105,6 +105,16 @@
       </div>
     </transition>
   </Teleport>
+  
+  <!-- Confirmation Dialog for Clear History -->
+  <ConfirmationDialog
+    v-model="showClearConfirm"
+    title="清空搜索历史"
+    message="确定要清空所有搜索历史吗？"
+    confirmText="清空"
+    cancelText="取消"
+    @confirm="confirmClearHistory"
+  />
 </template>
 
 <script setup>
@@ -112,6 +122,7 @@ import { ref, watch, nextTick, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { getHotTags } from '@/api/request'
+import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 
 const props = defineProps({
   modelValue: {
@@ -128,6 +139,7 @@ const appStore = useAppStore()
 const searchQuery = ref('')
 const searchInput = ref(null)
 const hotTags = ref([])
+const showClearConfirm = ref(false)
 
 const close = () => {
   searchQuery.value = ''
@@ -175,7 +187,12 @@ const searchTag = (tag) => {
 }
 
 const clearHistory = () => {
+  showClearConfirm.value = true
+}
+
+const confirmClearHistory = () => {
   appStore.clearSearchHistory()
+  showClearConfirm.value = false
 }
 
 const removeHistory = (query) => {

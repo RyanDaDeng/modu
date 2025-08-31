@@ -92,6 +92,36 @@
         </div>
       </div>
 
+      <!-- Redemption Code Section -->
+      <div class="mt-8 max-w-md mx-auto sm:max-w-2xl">
+        <div class="bg-gray-900/60 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+          <h3 class="text-lg font-bold text-white mb-4 text-center">使用兑换码</h3>
+          <div class="space-y-4">
+            <input
+              v-model="redemptionCode"
+              type="text"
+              placeholder="请输入兑换码"
+              class="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-pink-500/50 transition-colors"
+              @keyup.enter="handleRedeem"
+            />
+            <button
+              @click="handleRedeem"
+              :disabled="!redemptionCode.trim() || redeeming"
+              class="w-full py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold rounded-lg transition-all disabled:cursor-not-allowed"
+            >
+              <span v-if="!redeeming">兑换</span>
+              <span v-else class="flex items-center justify-center">
+                <svg class="animate-spin h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                兑换中...
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- FAQ Section -->
       <div class="mt-12 max-w-md mx-auto sm:max-w-2xl">
         <h3 class="text-lg font-semibold text-white mb-4 text-center">常见问题</h3>
@@ -198,7 +228,9 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useNotification } from '@/composables/useNotification'
 import { getVipPlans, createVipOrder } from '@/api/vip'
+import { redeemCode } from '@/api/redemption'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import ModalDialog from '@/components/ModalDialog.vue'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
@@ -206,6 +238,7 @@ import AppLayout from '@/components/AppLayout.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const notification = useNotification()
 
 // State
 const plans = ref([])
@@ -216,6 +249,8 @@ const selectedPlan = ref(null)
 const selectedPaymentMethod = ref(null)
 const processingPayment = ref(false)
 const paymentMessage = ref('正在创建订单...')
+const redemptionCode = ref('')
+const redeeming = ref(false)
 
 // Load VIP plans
 const loadPlans = async () => {
@@ -278,6 +313,48 @@ const goToLogin = () => {
     path: '/login',
     query: { redirect: '/vip' }
   })
+}
+
+// Handle redemption code
+const handleRedeem = async () => {
+  const code = redemptionCode.value.trim()
+  
+  if (!code) {
+    notification.error('请输入兑换码')
+    return
+  }
+  
+  // Check if user is logged in
+  if (!authStore.isLoggedIn) {
+    showLoginModal.value = true
+    return
+  }
+  
+  redeeming.value = true
+  
+  try {
+    const response = await redeemCode(code)
+    
+    if (response.success) {
+      notification.success(response.message || `成功兑换 ${response.value} 天 VIP`)
+      redemptionCode.value = ''
+      
+      // Update user's VIP status
+      if (response.vip_expire) {
+        authStore.user.vip_expired_at = response.vip_expire
+      }
+      
+      // Optionally refresh user data
+      await authStore.fetchUser()
+    } else {
+      notification.error(response.message || '兑换失败')
+    }
+  } catch (error) {
+    console.error('Redemption error:', error)
+    notification.error(error.message || '兑换失败，请稍后再试')
+  } finally {
+    redeeming.value = false
+  }
 }
 
 onMounted(() => {
