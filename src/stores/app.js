@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
 import { generateToken } from '@/api/crypto'
+import { toggleCollection, getCollections } from '@/api/collection'
+import { getUser } from '@/api/auth'
 
 export const useAppStore = defineStore('app', {
   state: () => ({
@@ -84,7 +86,6 @@ export const useAppStore = defineStore('app', {
       }
       
       try {
-        const { toggleCollection } = await import('@/api/collection')
         const result = await toggleCollection(comic)
         
         // Update local state
@@ -122,7 +123,6 @@ export const useAppStore = defineStore('app', {
       if (!this.isLoggedIn) return
       
       try {
-        const { getCollections } = await import('@/api/collection')
         const response = await getCollections(1, 100) // Load up to 100 collections
         this.collectedComics = response.data || []
       } catch (error) {
@@ -146,7 +146,6 @@ export const useAppStore = defineStore('app', {
 
     async fetchUser() {
       try {
-        const { getUser } = await import('@/api/auth')
         const user = await getUser()
         if (user) {
           this.setUser(user)

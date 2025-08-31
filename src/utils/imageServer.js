@@ -1,4 +1,5 @@
 import { useAuthStore } from '@/stores/auth'
+import { updateUserImageServer } from '@/api/request'
 
 /**
  * Get the current image server URL
@@ -40,7 +41,6 @@ export async function saveImageServer(serverUrl) {
   // Check both isLoggedIn and that we have a user object
   if (authStore.isLoggedIn && authStore.user) {
     try {
-      const { updateUserImageServer } = await import('@/api/request')
       await updateUserImageServer(serverUrl)
       
       // Update user data in auth store

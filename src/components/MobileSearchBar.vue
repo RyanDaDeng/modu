@@ -1,5 +1,5 @@
 <template>
-  <div class="sm:hidden sticky top-0 z-30">
+  <div class="sm:hidden md:block sticky top-0 z-30">
     <!-- Background layers -->
     <div class="absolute inset-0 overflow-hidden">
       <!-- Light overlay for text readability -->
