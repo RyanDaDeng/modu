@@ -1,12 +1,13 @@
 <template>
   <AppLayout :title="searchQuery ? `搜索结果: ${searchQuery}` : '搜索'">
     <!-- Mobile Search Bar -->
-    <MobileSearchBar 
-      v-if="authStore.isLoggedIn"
-      v-model="searchQuery"
-      :show-current-query="true"
-      @click="handleSearchClick"
-      @clear="handleClear"
+    <MobileSearchBar
+        v-if="authStore.isLoggedIn"
+        v-model="searchQuery"
+        :show-bar="true"
+        :show-current-query="true"
+        @click="handleSearchClick"
+        @clear="handleClear"
     />
 
     <div class="container mx-auto px-4 py-6">
