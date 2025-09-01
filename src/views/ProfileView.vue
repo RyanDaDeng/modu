@@ -169,6 +169,27 @@
             </svg>
           </button>
           
+          <!-- App Download (Only show if not in WebView) -->
+          <router-link v-if="!appStore.isInNativeApp" to="/app-download" class="flex items-center justify-between p-4 hover:bg-gray-750 transition-colors cursor-pointer">
+            <div class="flex items-center gap-3">
+              <div class="p-2 bg-green-500/20 rounded-lg">
+                <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div class="flex-1">
+                <div class="text-white font-medium">下载 App</div>
+                <div class="text-xs text-gray-400 mt-0.5">获得更好的使用体验</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full animate-pulse">New</span>
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </router-link>
+          
           <!-- Settings -->
           <button @click="openSettingsModal" class="w-full flex items-center justify-between p-4 hover:bg-gray-750 transition-colors cursor-pointer">
             <div class="flex items-center gap-3">
@@ -364,6 +385,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useAppStore } from '@/stores/app'
 import { updateProfile, changePassword } from '@/api/auth'
 import { useNotification } from '@/composables/useNotification'
 import ModalDialog from '@/components/ModalDialog.vue'
@@ -372,6 +394,7 @@ import AppLayout from '@/components/AppLayout.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const appStore = useAppStore()
 const notification = useNotification()
 
 // Modal states

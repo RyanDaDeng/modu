@@ -100,6 +100,11 @@ const router = createRouter({
       path: '/privacy',
       name: 'privacy',
       component: () => import('../views/PrivacyView.vue')
+    },
+    {
+      path: '/app-download',
+      name: 'app-download',
+      component: () => import('../views/AppDownloadView.vue')
     }
   ],
   scrollBehavior(to, from, savedPosition) {

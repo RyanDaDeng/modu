@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { generateToken } from '@/api/crypto'
 import { toggleCollection, getCollections } from '@/api/collection'
 import { getUser } from '@/api/auth'
+import { isInApp, initAppDetection, getPlatform } from '@/utils/appDetection'
 
 export const useAppStore = defineStore('app', {
   state: () => ({
@@ -16,7 +17,9 @@ export const useAppStore = defineStore('app', {
     collectedComics: [], // This will be synced with backend
     user: null, // 只在内存中保存，不使用localStorage
     authToken: null, // Sanctum不需要token
-    navCategories: [] // Navigation categories from API
+    navCategories: [], // Navigation categories from API
+    isWebView: false, // Whether user is in WebView/App
+    platform: 'web' // Platform: 'web', 'android', 'ios'
   }),
 
   getters: {
@@ -26,7 +29,9 @@ export const useAppStore = defineStore('app', {
     availableImgServers: (state) => {
       // Return all image servers since we're not checking status
       return state.serverInfo.imgServer
-    }
+    },
+    isInNativeApp: (state) => state.isWebView,
+    shouldShowAppDownload: (state) => !state.isWebView // Only show app download if not in app
   },
 
   actions: {
@@ -35,7 +40,23 @@ export const useAppStore = defineStore('app', {
       this.accessToken = generateToken(this.currentKey)
       this.loadLocalData()
       this.loadServerSettings()
+      this.detectAppEnvironment()
       // Removed server checking - not needed
+    },
+    
+    detectAppEnvironment() {
+      // Initialize app detection
+      initAppDetection()
+      
+      // Set WebView state
+      this.isWebView = isInApp()
+      this.platform = getPlatform()
+      
+      // Log for debugging
+      console.log('App Environment:', {
+        isWebView: this.isWebView,
+        platform: this.platform
+      })
     },
     
     loadServerSettings() {

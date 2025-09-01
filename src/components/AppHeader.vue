@@ -70,6 +70,19 @@
 
             <!-- Right Section: User Actions -->
             <div class="flex items-center gap-2 sm:gap-4">
+              <!-- App Download Button - Mobile and Desktop (Only show if not in WebView) -->
+              <router-link
+                v-if="appStore.shouldShowAppDownload"
+                to="/app-download"
+                class="flex items-center gap-1 px-2.5 py-1 bg-gray-700/40 backdrop-blur-sm border border-gray-500/40 hover:bg-gray-600/50 hover:border-pink-500/30 text-gray-300 hover:text-pink-300 rounded-lg transition-all cursor-pointer"
+                title="下载 App"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                <span class="text-xs font-medium">App</span>
+              </router-link>
+              
               <!-- Quick Links - Desktop -->
               <div class="hidden md:flex items-center gap-2">
                 <button
@@ -295,6 +308,19 @@
                               <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.669 0-3.218.51-4.5 1.385V4.804z" />
                             </svg>
                             阅读历史
+                          </div>
+                        </router-link>
+                        <router-link
+                          v-if="appStore.shouldShowAppDownload"
+                          to="/app-download"
+                          @click="handleDropdownClick"
+                          class="block px-4 py-2 text-gray-200 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+                        >
+                          <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                            App 下载
                           </div>
                         </router-link>
                         <router-link

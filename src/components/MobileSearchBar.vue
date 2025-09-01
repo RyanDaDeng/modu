@@ -1,6 +1,6 @@
 <template>
   <div :class="[
-    showBar ? 'w-full bg-gray-900/80' : 'sm:hidden relative',
+    showBar ? 'w-full bg-gray-900/80' : 'lg:hidden relative',
     'z-30'
   ]">
     <!-- Background layers for mobile only -->
