@@ -1,7 +1,7 @@
 <template>
   <div :class="[
     showBar ? 'w-full bg-gray-900/80 sticky sm:relative top-0' : 'sm:hidden sticky top-0',
-    'z-30'
+    'z-30 pt-safe'
   ]">
     <!-- Background layers for mobile only -->
     <div v-if="!showBar" class="absolute inset-0 overflow-hidden">

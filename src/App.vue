@@ -7,13 +7,7 @@
       enter-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
-      <div v-if="initialLoading" class="fixed inset-0 z-[200] flex items-center justify-center">
-        <!-- Background image -->
-        <div class="absolute inset-0">
-          <img src="/img_14.png" alt="" class="w-full h-full object-cover" />
-        </div>
-        <!-- Dark overlay for better spinner visibility -->
-        <div class="absolute inset-0 bg-black/50"></div>
+      <div v-if="initialLoading" class="fixed inset-0 z-[200] flex items-center justify-center bg-gray-900">
         <!-- Loading spinner -->
         <div class="relative z-10">
           <LoadingSpinner />
