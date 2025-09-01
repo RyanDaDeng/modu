@@ -1,0 +1,10 @@
+{
+  "appId": "com.modu.comic.app",
+  "appName": "ModuComic",
+  "webDir": "dist",
+  "server": {
+    "url": "https://modu18.vip",
+    "androidScheme": "https",
+    "cleartext": false
+  }
+}

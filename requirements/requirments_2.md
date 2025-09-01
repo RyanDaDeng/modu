@@ -344,7 +344,7 @@ date对应
 },
 {
 "id": "602132",
-"author": "TeamBiyam Soomatana",
+"author": [node_modules](..%2Fnode_modules)"TeamBiyam Soomatana",
 "description": null,
 "name": "这可如何是好？/ 分组换换爱 / What do I do now...? [禁漫天堂x不咕鸟汉化组]",
 "image": "/media/albums/602132_3x4.jpg?u=1739867287",

@@ -245,6 +245,7 @@
                         <router-link
                           v-else
                           to="/vip"
+                          @click="handleDropdownClick"
                           class="block px-4 py-2 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 hover:from-yellow-500/20 hover:to-orange-500/20 border-b border-white/10 transition-colors cursor-pointer"
                         >
                           <div class="flex items-center justify-between">
@@ -261,6 +262,7 @@
                         </router-link>
                         <router-link
                           to="/profile"
+                          @click="handleDropdownClick"
                           class="block px-4 py-2 text-gray-200 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
                         >
                           <div class="flex items-center gap-2">
@@ -273,6 +275,7 @@
                         <router-link
                           v-if="authStore.isLoggedIn"
                           to="/collection"
+                          @click="handleDropdownClick"
                           class="block px-4 py-2 text-gray-200 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
                         >
                           <div class="flex items-center gap-2">
@@ -284,6 +287,7 @@
                         </router-link>
                         <router-link
                           to="/reading-history"
+                          @click="handleDropdownClick"
                           class="block px-4 py-2 text-gray-200 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
                         >
                           <div class="flex items-center gap-2">
@@ -295,6 +299,7 @@
                         </router-link>
                         <router-link
                           to="/bookmarks"
+                          @click="handleDropdownClick"
                           class="block px-4 py-2 text-gray-200 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
                         >
                           <div class="flex items-center gap-2">
@@ -306,6 +311,7 @@
                         </router-link>
                         <router-link
                           to="/recharge-history"
+                          @click="handleDropdownClick"
                           class="block px-4 py-2 text-gray-200 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
                         >
                           <div class="flex items-center gap-2">
@@ -502,6 +508,11 @@ const handleRegister = () => {
 const navigateFromDropdown = (path) => {
   showUserMenu.value = false
   router.push(path)
+}
+
+// Handle dropdown click - close menu
+const handleDropdownClick = () => {
+  showUserMenu.value = false
 }
 </script>
 

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ModuComic</string>
+    <string name="title_activity_main">ModuComic</string>
+    <string name="package_name">com.modu.comic.app</string>
+    <string name="custom_url_scheme">com.modu.comic.app</string>
+</resources>
