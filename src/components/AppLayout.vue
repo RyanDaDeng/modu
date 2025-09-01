@@ -29,9 +29,13 @@
           <div v-else class="w-16"></div>
           
           <!-- Title with gradient text on hover -->
-          <h1 class="text-gray-100 font-semibold text-base truncate px-2 flex-1 text-center transition-all duration-300 hover:bg-gradient-to-r hover:from-pink-400 hover:to-purple-400 hover:bg-clip-text hover:text-transparent">
-            {{ title }}
-          </h1>
+          <div class="flex-1 min-w-0 px-2">
+            <slot name="title">
+              <h1 class="text-gray-100 font-semibold text-base truncate text-center transition-all duration-300 hover:bg-gradient-to-r hover:from-pink-400 hover:to-purple-400 hover:bg-clip-text hover:text-transparent">
+                {{ title }}
+              </h1>
+            </slot>
+          </div>
           
           <!-- Right Action Slot -->
           <div class="flex-shrink-0 w-16 flex justify-end">

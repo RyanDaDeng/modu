@@ -4,6 +4,33 @@
     :show-bottom-nav="true"
     :hide-breadcrumbs="true"
   >
+    <!-- Action slot with collection heart icon -->
+    <template #action>
+      <button
+        v-if="comicInfo.id"
+        @click="toggleCollect"
+        :disabled="favoriteLoading"
+        class="lg:hidden p-2 transition-all"
+        :class="isCollected 
+          ? 'text-pink-500' 
+          : 'text-gray-400 hover:text-pink-400'"
+        :title="isCollected ? '取消收藏' : '添加收藏'"
+      >
+        <svg 
+          class="w-5 h-5" 
+          :fill="isCollected ? 'currentColor' : 'none'" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          <path 
+            stroke-linecap="round" 
+            stroke-linejoin="round" 
+            stroke-width="2" 
+            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" 
+          />
+        </svg>
+      </button>
+    </template>
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center min-h-screen">
       <div class="flex flex-col items-center">

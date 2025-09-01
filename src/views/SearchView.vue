@@ -1,5 +1,18 @@
 <template>
   <AppLayout :title="searchQuery ? `搜索结果: ${searchQuery}` : '搜索'">
+    <!-- Action slot with search icon -->
+    <template #action>
+      <button
+        @click="handleSearchClick"
+        class="lg:hidden p-2 text-gray-400 hover:text-pink-400 transition-colors"
+        title="搜索"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </button>
+    </template>
+    
     <!-- Mobile Search Bar -->
     <MobileSearchBar
         v-if="authStore.isLoggedIn"
@@ -213,6 +226,12 @@ const loadCategories = async () => {
 const searchByTag = (tag) => {
   console.log('Searching by tag:', tag)
   searchQuery.value = tag
+  
+  // Show loading immediately
+  loading.value = true
+  
+  // Scroll to top of page
+  window.scrollTo({ top: 0, behavior: 'smooth' })
   
   // Clear previous search results and state
   comics.value = []

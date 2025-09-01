@@ -1,17 +1,16 @@
 <template>
   <div :class="[
-    showBar ? 'w-full bg-gray-900/80 sticky sm:relative top-0' : 'sm:hidden sticky top-0',
-    'z-30',
-    { 'pt-safe': !showBar && isStuck }
+    showBar ? 'w-full bg-gray-900/80' : 'sm:hidden',
+    'z-30'
   ]">
     <!-- Background layers for mobile only -->
-    <div v-if="!showBar" class="absolute inset-0 overflow-hidden">
+    <div v-if="!showBar && !noBackground" class="absolute inset-0 overflow-hidden">
       <!-- Light overlay for text readability -->
       <div class="absolute inset-0 bg-gray-900/80"></div>
     </div>
     
     <!-- Content container with responsive padding -->
-    <div :class="showBar ? 'relative px-4 sm:px-6 lg:px-8 py-2 max-w-7xl mx-auto' : isStuck ? 'relative px-4 py-2 pt-safe' : 'relative px-4 py-2'">
+    <div :class="showBar ? 'relative px-4 sm:px-6 lg:px-8 py-2 max-w-7xl mx-auto' : 'relative px-4 py-2'">
     <div :class="showBar ? 'relative group max-w-2xl mx-auto' : 'relative group'">
       <!-- Gradient border glow effect -->
       <div class="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-full blur opacity-0 group-hover:opacity-30 transition-opacity"></div>
@@ -72,8 +71,6 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
-
 const props = defineProps({
   modelValue: {
     type: String,
@@ -90,12 +87,14 @@ const props = defineProps({
   showBar: {
     type: Boolean,
     default: false
+  },
+  noBackground: {
+    type: Boolean,
+    default: false
   }
 })
 
 const emit = defineEmits(['click', 'update:modelValue', 'clear'])
-
-const isStuck = ref(false)
 
 const handleClick = () => {
   emit('click')
@@ -105,24 +104,4 @@ const handleClear = () => {
   emit('update:modelValue', '')
   emit('clear')
 }
-
-const checkIfStuck = () => {
-  // Check if we've scrolled enough for the search bar to be stuck
-  // Typically the search bar sticks after scrolling past the header
-  isStuck.value = window.scrollY > 100
-}
-
-onMounted(() => {
-  // Only set up scroll listener for mobile sticky search bar
-  if (!props.showBar) {
-    window.addEventListener('scroll', checkIfStuck)
-    checkIfStuck() // Check initial state
-  }
-})
-
-onUnmounted(() => {
-  if (!props.showBar) {
-    window.removeEventListener('scroll', checkIfStuck)
-  }
-})
 </script>
