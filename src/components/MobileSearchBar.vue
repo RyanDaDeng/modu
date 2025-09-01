@@ -1,10 +1,10 @@
 <template>
   <div :class="[
-    showBar ? 'w-full bg-gray-900/80' : 'sm:hidden',
+    showBar ? 'w-full bg-gray-900/80' : 'sm:hidden relative',
     'z-30'
   ]">
     <!-- Background layers for mobile only -->
-    <div v-if="!showBar && !noBackground" class="absolute inset-0 overflow-hidden">
+    <div v-if="!showBar && !noBackground" class="absolute inset-x-0 top-0 bottom-0 overflow-hidden" style="height: 100%;">
       <!-- Light overlay for text readability -->
       <div class="absolute inset-0 bg-gray-900/80"></div>
     </div>
