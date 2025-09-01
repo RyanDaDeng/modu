@@ -153,11 +153,11 @@
                   </svg>
                 </button>
                 
-                <!-- Bookmarks Icon -->
+                <!-- Bookmarks Icon - Hidden on Mobile -->
                 <router-link
                   v-if="authStore.isLoggedIn"
                   to="/bookmarks"
-                  class="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                  class="hidden sm:block p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all"
                   title="我的书签"
                 >
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -165,11 +165,11 @@
                   </svg>
                 </router-link>
                 
-                <!-- Collection Icon -->
+                <!-- Collection Icon - Hidden on Mobile -->
                 <router-link
                   v-if="authStore.isLoggedIn"
                   to="/collection"
-                  class="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                  class="hidden sm:block p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all"
                   title="我的收藏"
                 >
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -299,13 +299,25 @@
                           </div>
                         </router-link>
                         <router-link
+                          to="/bookmarks"
+                          @click="handleDropdownClick"
+                          class="block px-4 py-2 text-gray-200 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+                        >
+                          <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                            </svg>
+                            我的书签
+                          </div>
+                        </router-link>
+                        <router-link
                           to="/reading-history"
                           @click="handleDropdownClick"
                           class="block px-4 py-2 text-gray-200 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
                         >
                           <div class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                              <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.669 0-3.218.51-4.5 1.385V4.804z" />
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                             </svg>
                             阅读历史
                           </div>
@@ -321,18 +333,6 @@
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                             </svg>
                             App 下载
-                          </div>
-                        </router-link>
-                        <router-link
-                          to="/bookmarks"
-                          @click="handleDropdownClick"
-                          class="block px-4 py-2 text-gray-200 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
-                        >
-                          <div class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                            </svg>
-                            我的书签
                           </div>
                         </router-link>
                         <router-link
