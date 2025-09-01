@@ -5,6 +5,7 @@
   "server": {
     "url": "https://modu18.vip",
     "androidScheme": "https",
-    "cleartext": false
+    "cleartext": false,
+    "errorPath": "error.html"
   }
 }

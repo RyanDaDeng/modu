@@ -7,6 +7,9 @@
     :show-top-nav="true"
     :page-loading="pageLoading"
   >
+    <!-- Sticky Mobile Search (appears when main search scrolls out of view) -->
+    <StickyMobileSearch @search-click="handleSearchClick" />
+    
     <!-- Gradient overlay from top of content fading down -->
     <div class="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-black/90 to-transparent pointer-events-none"></div>
     
@@ -76,6 +79,7 @@
       <MobileSearchBar 
         v-model="searchQuery"
         @click="handleSearchClick"
+        class="mobile-search-bar"
       >
         <template #announcement>
           <!-- Mobile New User Guide Banner - Below Search -->
@@ -695,6 +699,7 @@ import HeroSlider from '@/components/HeroSlider.vue'
 import FullscreenSearch from '@/components/FullscreenSearch.vue'
 import ModalDialog from '@/components/ModalDialog.vue'
 import MobileSearchBar from '@/components/MobileSearchBar.vue'
+import StickyMobileSearch from '@/components/StickyMobileSearch.vue'
 import { formatNumber } from '@/utils/format'
 import { getImageServer } from '@/utils/imageServer'
 import { handleImageError } from '@/utils/handleImageError'

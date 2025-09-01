@@ -1,1 +1,0 @@
-import{a5 as n}from"./index-DoGTF3QF.js";function e(){const i=n();return{success:(o,r)=>i.success(o,r),error:(o,r)=>i.error(o,r),warning:(o,r)=>i.warning(o,r),info:(o,r)=>i.info(o,r),notify:o=>i.add(o),clear:()=>i.clear()}}export{e as u};
