@@ -14,7 +14,7 @@
       </div>
       
       <!-- Top Navigation Bar -->
-      <nav class="relative z-40">
+      <nav class="relative z-40 pt-safe">
         <div class="container mx-auto px-4">
           <div class="flex items-center justify-between h-16 sm:h-20">
             <!-- Left Section: Logo and Main Nav -->

@@ -20,7 +20,7 @@
     <div class="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500"></div>
     
     <!-- Navigation Items -->
-    <div class="relative grid grid-cols-6 h-16">
+    <div class="relative grid grid-cols-6 h-16 pb-safe">
       <!-- Home -->
       <router-link
         to="/"

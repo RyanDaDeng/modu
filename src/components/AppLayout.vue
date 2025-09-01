@@ -11,7 +11,7 @@
       <!-- Gradient bottom border -->
       <div class="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500"></div>
       
-      <div class="relative container mx-auto px-4">
+      <div class="relative container mx-auto px-4 pt-safe">
         <div class="flex items-center justify-between h-14">
           <!-- Back Button -->
           <button

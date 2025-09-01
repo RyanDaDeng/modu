@@ -322,7 +322,7 @@
     <div v-if="isReading" ref="readingContainer" class="fixed inset-0 z-50 bg-black overflow-y-auto" @scroll="handleReadingScroll">
       <!-- Reading Header -->
       <div 
-        class="fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800 transition-transform duration-300"
+        class="fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800 transition-transform duration-300 pt-safe"
         :style="{ transform: showHeader ? 'translateY(0)' : 'translateY(-100%)' }"
       >
         <div class="container mx-auto">
