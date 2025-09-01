@@ -214,7 +214,7 @@
                 <div 
                   v-if="showUserMenu"
                   @click="showUserMenu = false"
-                  class="fixed inset-0 z-[99] sm:hidden"
+                  class="fixed inset-0 z-40 sm:hidden"
                 ></div>
                 
                 <!-- User Dropdown Menu -->
@@ -245,7 +245,6 @@
                         <router-link
                           v-else
                           to="/vip"
-                          @click="showUserMenu = false"
                           class="block px-4 py-2 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 hover:from-yellow-500/20 hover:to-orange-500/20 border-b border-white/10 transition-colors cursor-pointer"
                         >
                           <div class="flex items-center justify-between">
@@ -262,7 +261,6 @@
                         </router-link>
                         <router-link
                           to="/profile"
-                          @click="showUserMenu = false"
                           class="block px-4 py-2 text-gray-200 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
                         >
                           <div class="flex items-center gap-2">
@@ -275,7 +273,6 @@
                         <router-link
                           v-if="authStore.isLoggedIn"
                           to="/collection"
-                          @click="showUserMenu = false"
                           class="block px-4 py-2 text-gray-200 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
                         >
                           <div class="flex items-center gap-2">
@@ -287,7 +284,6 @@
                         </router-link>
                         <router-link
                           to="/reading-history"
-                          @click="showUserMenu = false"
                           class="block px-4 py-2 text-gray-200 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
                         >
                           <div class="flex items-center gap-2">
@@ -299,7 +295,6 @@
                         </router-link>
                         <router-link
                           to="/bookmarks"
-                          @click="showUserMenu = false"
                           class="block px-4 py-2 text-gray-200 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
                         >
                           <div class="flex items-center gap-2">
@@ -311,7 +306,6 @@
                         </router-link>
                         <router-link
                           to="/recharge-history"
-                          @click="showUserMenu = false"
                           class="block px-4 py-2 text-gray-200 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
                         >
                           <div class="flex items-center gap-2">
@@ -502,6 +496,12 @@ const handleLoginConfirm = () => {
 const handleRegister = () => {
   showLoginPrompt.value = false
   router.push('/register')
+}
+
+// Handle dropdown navigation
+const navigateFromDropdown = (path) => {
+  showUserMenu.value = false
+  router.push(path)
 }
 </script>
 

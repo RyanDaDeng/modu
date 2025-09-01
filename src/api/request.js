@@ -238,9 +238,21 @@ export const getWeeklyUpdates = getWeeklyList
 export const getLatestContent = getLatestComics
 export const getSearchResults = searchComics
 
-// getSerialization doesn't exist, create a stub that uses weekly updates
-export async function getSerialization(page = 1) {
-  return getWeeklyList('all', page)
+// getSerialization API for updates page
+export async function getSerialization(type = 'all', date = 1, page = 1) {
+  const response = await api.get(
+    `${BACKEND_PROXY}/api/serialization`,
+    { 
+      params: { 
+        type,
+        date,
+        page 
+      } 
+    }
+  )
+  
+  // Backend now handles decryption
+  return response.data.data || response.data
 }
 
 export default {

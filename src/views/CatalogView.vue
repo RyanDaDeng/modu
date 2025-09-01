@@ -15,44 +15,107 @@
         </div>
       </div>
 
-      <!-- Filter Bar -->
-      <div v-if="categories.length > 0" class="relative">
-        <!-- Gradient border effect -->
-        <div class="absolute inset-0 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-blue-500/10 rounded-lg blur-xl"></div>
-        <div class="relative bg-gray-900/60 backdrop-blur-xl border border-white/10 rounded-lg p-2 sm:p-4 space-y-2 sm:space-y-4">
-        <!-- Category Selection -->
-        <div>
-          <label class="text-xs sm:text-sm text-gray-400 mb-1 sm:mb-2 block">分类</label>
-          <div class="flex overflow-x-auto gap-1 sm:gap-2 pb-1 sm:pb-0 -mx-2 px-2 sm:mx-0 sm:px-0 sm:flex-wrap no-scrollbar">
+      <!-- Mobile Filter Bar -->
+      <div v-if="categories.length > 0" class="sm:hidden mb-4">
+        <div class="bg-gradient-to-r from-pink-500/10 to-purple-500/10 rounded-xl p-[1px]">
+          <div class="bg-gray-900/90 backdrop-blur-xl rounded-xl p-3">
+            <!-- Main filter button with better visual cues -->
+            <button 
+              @click="showFilterModal = true"
+              class="w-full mb-3 relative group"
+            >
+              <!-- Animated gradient background -->
+              <div class="absolute inset-0 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-xl blur group-active:blur-xl transition-all"></div>
+              
+              <!-- Button content -->
+              <div class="relative flex items-center justify-between bg-gray-800/90 backdrop-blur rounded-xl px-4 py-3 border border-gray-700 group-hover:border-pink-500/50 group-active:scale-[0.98] transition-all">
+                <div class="flex items-center gap-3">
+                  <!-- Animated filter icon -->
+                  <div class="relative">
+                    <svg class="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                    </svg>
+                    <div class="absolute inset-0 bg-pink-400 blur-lg opacity-50 animate-pulse"></div>
+                  </div>
+                  
+                  <div class="text-left">
+                    <div class="text-xs text-gray-400 mb-0.5">当前筛选</div>
+                    <div class="text-sm font-medium text-white">
+                      {{ selectedCategory?.name || '全部' }} · {{ sortOptions.find(s => s.value === selectedSort)?.label || '最新' }}
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Action indicator -->
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-pink-400 font-medium">点击修改</span>
+                  <div class="bg-pink-500/20 rounded-lg p-1.5 group-hover:bg-pink-500/30 transition-colors">
+                    <svg class="w-4 h-4 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </button>
+          
+          <!-- Quick sort buttons -->
+          <div class="flex gap-2 overflow-x-auto pb-1">
             <button
-              v-for="category in categories"
-              :key="category.id"
-              @click="selectCategory(category)"
+              v-for="sort in quickSortOptions"
+              :key="sort.value"
+              @click="selectSort(sort.value)"
               :class="[
-                'flex-shrink-0 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap cursor-pointer',
-                selectedCategory?.id === category.id
+                'flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
+                selectedSort === sort.value
                   ? 'bg-pink-500/20 text-pink-400 border border-pink-500/50'
-                  : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white border border-gray-700'
+                  : 'bg-gray-800 text-gray-400 border border-gray-700'
               ]"
             >
-              {{ category.name }}
-              <span v-if="category.total_albums > 0" class="hidden sm:inline ml-1 text-xs opacity-70">
-                ({{ formatNumber(category.total_albums) }})
-              </span>
+              {{ sort.label }}
             </button>
+            </div>
           </div>
         </div>
+      </div>
+
+      <!-- Desktop Filter Bar -->
+      <div v-if="categories.length > 0" class="hidden sm:block relative">
+        <!-- Gradient border effect -->
+        <div class="absolute inset-0 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-blue-500/10 rounded-lg blur-xl"></div>
+        <div class="relative bg-gray-900/60 backdrop-blur-xl border border-white/10 rounded-lg p-4 space-y-4">
+          <!-- Category Selection -->
+          <div>
+            <label class="text-sm text-gray-400 mb-2 block">分类</label>
+            <div class="flex flex-wrap gap-2">
+              <button
+                v-for="category in categories"
+                :key="category.id"
+                @click="selectCategory(category)"
+                :class="[
+                  'px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer',
+                  selectedCategory?.id === category.id
+                    ? 'bg-pink-500/20 text-pink-400 border border-pink-500/50'
+                    : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white border border-gray-700'
+                ]"
+              >
+                {{ category.name }}
+                <span v-if="category.total_albums > 0" class="ml-1 text-xs opacity-70">
+                  ({{ formatNumber(category.total_albums) }})
+                </span>
+              </button>
+            </div>
+          </div>
 
           <!-- Sort Options -->
           <div>
-            <label class="text-xs sm:text-sm text-gray-400 mb-1 sm:mb-2 block">排序</label>
-            <div class="flex overflow-x-auto gap-1 sm:gap-2 pb-1 sm:pb-0 -mx-2 px-2 sm:mx-0 sm:px-0 sm:flex-wrap no-scrollbar">
+            <label class="text-sm text-gray-400 mb-2 block">排序</label>
+            <div class="flex flex-wrap gap-2">
               <button
                 v-for="sort in sortOptions"
                 :key="sort.value"
                 @click="selectSort(sort.value)"
                 :class="[
-                  'flex-shrink-0 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap cursor-pointer',
+                  'px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer',
                   selectedSort === sort.value
                     ? 'bg-pink-500/20 text-pink-400 border border-pink-500/50'
                     : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white border border-gray-700'
@@ -65,12 +128,12 @@
 
           <!-- Sub Categories (hide for 最新A漫) -->
           <div v-if="selectedCategory?.sub_categories?.length && selectedCategory.id !== 0">
-            <label class="text-xs sm:text-sm text-gray-400 mb-1 sm:mb-2 block">子分类</label>
-            <div class="flex overflow-x-auto gap-1 sm:gap-2 pb-1 sm:pb-0 -mx-2 px-2 sm:mx-0 sm:px-0 sm:flex-wrap no-scrollbar">
+            <label class="text-sm text-gray-400 mb-2 block">子分类</label>
+            <div class="flex flex-wrap gap-2">
               <button
                 @click="selectSubCategory(null)"
                 :class="[
-                  'flex-shrink-0 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap cursor-pointer',
+                  'px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer',
                   !selectedSubCategory
                     ? 'bg-pink-500/20 text-pink-400 border border-pink-500/50'
                     : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white border border-gray-700'
@@ -83,7 +146,7 @@
                 :key="sub.CID"
                 @click="selectSubCategory(sub)"
                 :class="[
-                  'flex-shrink-0 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap cursor-pointer',
+                  'px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer',
                   selectedSubCategory?.CID === sub.CID
                     ? 'bg-pink-500/20 text-pink-400 border border-pink-500/50'
                     : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white border border-gray-700'
@@ -136,7 +199,7 @@
       </div>
 
       <!-- Comics Grid -->
-      <div v-if="!loading && comics.length > 0" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-6 2xl:grid-cols-7 gap-2 sm:gap-3 md:gap-4 mt-4">
+      <div v-if="!loading && comics.length > 0" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-3 md:gap-4 mt-4">
         <ComicCard
           v-for="comic in comics"
           :key="comic.id"
@@ -175,6 +238,88 @@
           @change="handlePageChange"
         />
       </div>
+      
+      <!-- Mobile Filter Drawer -->
+      <BottomDrawer 
+        v-model="showFilterModal"
+        title="选择筛选条件"
+        class="sm:hidden"
+        max-height="90vh"
+      >
+        <!-- Category Selection -->
+        <div class="px-4 pb-4">
+          <div class="text-sm text-gray-400 mb-3">分类</div>
+          <div class="grid grid-cols-2 gap-2">
+            <button
+              v-for="category in categories"
+              :key="category.id"
+              @click="selectCategoryAndClose(category)"
+              :class="[
+                'py-3 rounded-lg text-sm font-medium transition-colors',
+                selectedCategory?.id === category.id
+                  ? 'bg-pink-500/20 text-pink-400 border border-pink-500/50'
+                  : 'bg-gray-800 text-gray-300 border border-gray-700'
+              ]"
+            >
+              {{ category.name }}
+              <span v-if="category.total_albums > 0" class="block text-xs opacity-70 mt-1">
+                ({{ formatNumber(category.total_albums) }})
+              </span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Sort Options -->
+        <div class="px-4 pb-4">
+          <div class="text-sm text-gray-400 mb-3">排序方式</div>
+          <div class="grid grid-cols-2 gap-2">
+            <button
+              v-for="sort in sortOptions"
+              :key="sort.value"
+              @click="selectSortAndClose(sort.value)"
+              :class="[
+                'py-3 rounded-lg text-sm font-medium transition-colors',
+                selectedSort === sort.value
+                  ? 'bg-pink-500/20 text-pink-400 border border-pink-500/50'
+                  : 'bg-gray-800 text-gray-300 border border-gray-700'
+              ]"
+            >
+              {{ sort.label }}
+            </button>
+          </div>
+        </div>
+        
+        <!-- Sub Categories -->
+        <div v-if="selectedCategory?.sub_categories?.length && selectedCategory.id !== 0" class="px-4 pb-6">
+          <div class="text-sm text-gray-400 mb-3">子分类</div>
+          <div class="grid grid-cols-2 gap-2">
+            <button
+              @click="selectSubCategoryAndClose(null)"
+              :class="[
+                'py-3 rounded-lg text-sm font-medium transition-colors',
+                !selectedSubCategory
+                  ? 'bg-pink-500/20 text-pink-400 border border-pink-500/50'
+                  : 'bg-gray-800 text-gray-300 border border-gray-700'
+              ]"
+            >
+              全部
+            </button>
+            <button
+              v-for="sub in selectedCategory.sub_categories"
+              :key="sub.CID"
+              @click="selectSubCategoryAndClose(sub)"
+              :class="[
+                'py-3 rounded-lg text-sm font-medium transition-colors',
+                selectedSubCategory?.CID === sub.CID
+                  ? 'bg-pink-500/20 text-pink-400 border border-pink-500/50'
+                  : 'bg-gray-800 text-gray-300 border border-gray-700'
+              ]"
+            >
+              {{ sub.name }}
+            </button>
+          </div>
+        </div>
+      </BottomDrawer>
     </div>
   </AppLayout>
 </template>
@@ -186,13 +331,14 @@ export default {
 </script>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getCategoriesFilter, getCategories } from '@/api/request'
 import AppLayout from '@/components/AppLayout.vue'
 import ComicCard from '@/components/ComicCard.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import Pagination from '@/components/Pagination.vue'
+import BottomDrawer from '@/components/BottomDrawer.vue'
 import { formatNumber } from '@/utils/format'
 
 const router = useRouter()
@@ -206,6 +352,7 @@ const themeBlocks = ref([])
 const selectedCategory = ref(null)
 const selectedSubCategory = ref(null)
 const selectedSort = ref('mv') // Default to 总排名
+const showFilterModal = ref(false)
 
 // Sort options
 const sortOptions = [
@@ -215,6 +362,14 @@ const sortOptions = [
   { label: '月排名', value: 'mv_m' },
   { label: '周排名', value: 'mp_w' }
 ]
+
+// Quick sort options for mobile (top 3)
+const quickSortOptions = computed(() => [
+  { label: '最新', value: '' },
+  { label: '总榜', value: 'mv' },
+  { label: '月榜', value: 'mv_m' },
+  { label: '周榜', value: 'mp_w' }
+])
 
 // Comics data
 const comics = ref([])
@@ -436,7 +591,7 @@ const applyFilter = (resetPage = true) => {
 const searchTag = (tag) => {
   router.push({
     path: '/search',
-    query: { q: tag }
+    query: { wd: tag }
   })
 }
 
@@ -457,6 +612,26 @@ const selectSort = (sort) => {
 const selectSubCategory = (subCategory) => {
   selectedSubCategory.value = subCategory
   applyFilter(true) // Reset page when changing sub category
+}
+
+// Mobile methods with drawer close
+const selectCategoryAndClose = (category) => {
+  selectedCategory.value = category
+  selectedSubCategory.value = null
+  showFilterModal.value = false
+  applyFilter(true)
+}
+
+const selectSortAndClose = (sort) => {
+  selectedSort.value = sort
+  showFilterModal.value = false
+  applyFilter(true)
+}
+
+const selectSubCategoryAndClose = (subCategory) => {
+  selectedSubCategory.value = subCategory
+  showFilterModal.value = false
+  applyFilter(true)
 }
 
 // Handle pagination

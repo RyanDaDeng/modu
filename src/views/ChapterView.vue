@@ -1170,6 +1170,13 @@ const stripHtml = (html) => {
 
 // Load comic info and comments (initial load)
 const loadComicInfo = async () => {
+  // Validate comic ID before proceeding
+  if (!comicId.value || comicId.value === 'undefined') {
+    console.warn('Invalid comic ID:', comicId.value)
+    loading.value = false
+    return
+  }
+  
   loading.value = true
   error.value = ''
   
@@ -1181,7 +1188,7 @@ const loadComicInfo = async () => {
     console.log('Album data:', albumData)
     
     // Check favorite status separately if user is logged in
-    if (appStore.isLoggedIn) {
+    if (appStore.isLoggedIn && comicId.value) {
       try {
         const favStatus = await checkCollection(comicId.value)
         isFavorited.value = favStatus.is_collected || false
@@ -1877,7 +1884,7 @@ watch(activeTab, (newTab) => {
 const searchTag = (tag) => {
   router.push({
     path: '/search',
-    query: { q: tag }
+    query: { wd: tag }
   })
 }
 

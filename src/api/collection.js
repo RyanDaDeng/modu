@@ -68,6 +68,10 @@ export const toggleCollection = async (comic) => {
 
 // Check if a comic is collected
 export const checkCollection = async (comicId) => {
+  if (!comicId || comicId === 'undefined') {
+    console.warn('checkCollection called with invalid comicId:', comicId)
+    return { is_collected: false }
+  }
   const response = await api.get(`/api/collections/check/${comicId}`)
   return response.data
 }

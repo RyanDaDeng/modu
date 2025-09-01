@@ -1,5 +1,5 @@
 <template>
-  <footer class="relative border-t border-gray-800">
+  <footer class="relative border-t border-gray-800 pb-16 lg:pb-0">
     <!-- Background Image -->
     <div 
       class="absolute inset-0 bg-cover bg-center bg-fixed"
