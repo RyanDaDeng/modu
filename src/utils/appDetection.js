@@ -80,9 +80,41 @@ export const getPlatform = () => {
 }
 
 /**
+ * Get Chrome/WebView version
+ */
+export const getChromeVersion = () => {
+  const raw = navigator.userAgent.match(/Chrome\/(\d+)/)
+  return raw ? parseInt(raw[1], 10) : 0
+}
+
+/**
+ * Check if WebView version is supported
+ */
+export const checkWebViewCompatibility = () => {
+  const version = getChromeVersion()
+  const minimumVersion = 90
+  
+  if (version && version < minimumVersion) {
+    // Show warning for outdated WebView
+    const message = `⚠️ 检测到您的WebView版本 (${version}) 过旧，\n请更新到 ${minimumVersion} 以上以正常使用。\n\n解决方法：\n1. 打开 Google Play 商店\n2. 搜索 "Android System WebView"\n3. 点击更新`
+    
+    // Use both alert and console warning
+    alert(message)
+    console.warn('WebView version too old:', version)
+    
+    return false
+  }
+  
+  return true
+}
+
+/**
  * Initialize app detection and communicate with native app if available
  */
 export const initAppDetection = () => {
+  // Check WebView compatibility first
+  const isCompatible = checkWebViewCompatibility()
+  
   // Try to communicate with the native app
   try {
     // Android WebView communication
@@ -108,6 +140,8 @@ export const initAppDetection = () => {
     console.log('App Detection:', {
       isInApp: isInApp(),
       platform: getPlatform(),
+      chromeVersion: getChromeVersion(),
+      isCompatible: isCompatible,
       userAgent: navigator.userAgent
     })
   }

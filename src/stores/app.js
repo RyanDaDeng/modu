@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { generateToken } from '@/api/crypto'
 import { toggleCollection, getCollections } from '@/api/collection'
 import { getUser } from '@/api/auth'
-import { isInApp, initAppDetection, getPlatform } from '@/utils/appDetection'
+import { isInApp, initAppDetection, getPlatform, getChromeVersion, checkWebViewCompatibility } from '@/utils/appDetection'
 
 export const useAppStore = defineStore('app', {
   state: () => ({
@@ -19,7 +19,9 @@ export const useAppStore = defineStore('app', {
     authToken: null, // Sanctum不需要token
     navCategories: [], // Navigation categories from API
     isWebView: false, // Whether user is in WebView/App
-    platform: 'web' // Platform: 'web', 'android', 'ios'
+    platform: 'web', // Platform: 'web', 'android', 'ios'
+    chromeVersion: 0, // Chrome/WebView version
+    isWebViewCompatible: true // Whether WebView version is supported
   }),
 
   getters: {
@@ -45,17 +47,21 @@ export const useAppStore = defineStore('app', {
     },
     
     detectAppEnvironment() {
-      // Initialize app detection
+      // Initialize app detection (includes compatibility check)
       initAppDetection()
       
       // Set WebView state
       this.isWebView = isInApp()
       this.platform = getPlatform()
+      this.chromeVersion = getChromeVersion()
+      this.isWebViewCompatible = checkWebViewCompatibility()
       
       // Log for debugging
       console.log('App Environment:', {
         isWebView: this.isWebView,
-        platform: this.platform
+        platform: this.platform,
+        chromeVersion: this.chromeVersion,
+        isCompatible: this.isWebViewCompatible
       })
     },
     
