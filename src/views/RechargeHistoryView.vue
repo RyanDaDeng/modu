@@ -13,8 +13,6 @@
         </div>
       </div>
       
-      <!-- Order List -->
-      <div class="max-w-4xl">
       <!-- Loading State -->
       <div v-if="loading && !orders.length" class="flex justify-center py-20">
         <LoadingSpinner />
@@ -33,9 +31,51 @@
           立即充值
         </router-link>
       </div>
+
+      <!-- Desktop Table View -->
+      <div v-else-if="orders.length" class="hidden md:block bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700/50 overflow-hidden">
+        <table class="w-full">
+          <thead class="bg-gray-700/50 border-b border-gray-700">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">订单号</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">产品名称</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">金额</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">支付方式</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">状态</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">创建时间</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-700">
+            <tr v-for="order in orders" :key="order.id" class="hover:bg-gray-700/30">
+              <td class="px-4 py-3 text-sm text-gray-300 font-mono">{{ order.order_reference }}</td>
+              <td class="px-4 py-3 text-sm text-white">{{ order.product_name }}</td>
+              <td class="px-4 py-3 text-sm font-medium text-pink-400">¥{{ order.product_price }}</td>
+              <td class="px-4 py-3 text-sm text-gray-300">{{ order.payment_method }}</td>
+              <td class="px-4 py-3">
+                <span 
+                  :class="[
+                    'px-2 py-1 text-xs rounded font-medium',
+                    order.status_code === 'success' 
+                      ? 'bg-green-900/50 text-green-400 border border-green-800' 
+                      : order.status_code === 'pending'
+                      ? 'bg-yellow-900/50 text-yellow-400 border border-yellow-800'
+                      : 'bg-red-900/50 text-red-400 border border-red-800'
+                  ]"
+                >
+                  {{ order.status }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-sm text-gray-400">
+                <div>{{ order.created_at }}</div>
+                <div v-if="order.completed_at" class="text-xs text-gray-500">完成: {{ order.completed_at }}</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
         
-      <!-- Orders List -->
-      <div v-else class="space-y-4">
+      <!-- Mobile Card View -->
+      <div v-if="orders.length" class="md:hidden space-y-4">
         <div 
           v-for="order in orders" 
           :key="order.id"
@@ -73,19 +113,19 @@
         </div>
       </div>
       
-      <!-- Pagination -->
-      <div v-if="pagination && pagination.last_page > 1" class="mt-6 flex justify-center">
+      <!-- Desktop Pagination -->
+      <div v-if="pagination && pagination.last_page > 1" class="hidden md:flex mt-6 justify-center">
         <div class="flex gap-2">
           <button
             @click="changePage(pagination.current_page - 1)"
             :disabled="pagination.current_page === 1"
-            class="px-3 py-1 bg-gray-800/50 backdrop-blur-sm text-gray-400 rounded border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/50 hover:border-white/20 transition-all cursor-pointer"
+            class="px-4 py-2 bg-gray-800/50 backdrop-blur-sm text-gray-300 rounded border border-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/50 hover:border-gray-600 transition-all cursor-pointer"
           >
             上一页
           </button>
           
-          <div class="flex items-center gap-2">
-            <span class="text-gray-400 text-sm">
+          <div class="flex items-center gap-2 px-4">
+            <span class="text-gray-300">
               第 {{ pagination.current_page }} / {{ pagination.last_page }} 页
             </span>
           </div>
@@ -93,16 +133,16 @@
           <button
             @click="changePage(pagination.current_page + 1)"
             :disabled="pagination.current_page === pagination.last_page"
-            class="px-3 py-1 bg-gray-800/50 backdrop-blur-sm text-gray-400 rounded border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/50 hover:border-white/20 transition-all cursor-pointer"
+            class="px-4 py-2 bg-gray-800/50 backdrop-blur-sm text-gray-300 rounded border border-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/50 hover:border-gray-600 transition-all cursor-pointer"
           >
             下一页
           </button>
         </div>
       </div>
 
-      <!-- Load More for Mobile -->
+      <!-- Mobile Load More -->
       <div v-if="pagination && pagination.current_page < pagination.last_page && !loadingMore" 
-        class="mt-6 text-center sm:hidden">
+        class="mt-6 text-center md:hidden">
         <button
           @click="loadMore"
           class="px-6 py-2 bg-gray-800/50 backdrop-blur-sm text-gray-300 rounded-lg border border-white/10 hover:bg-gray-700/50 hover:border-white/20 transition-all cursor-pointer"
@@ -111,10 +151,9 @@
         </button>
       </div>
 
-        <!-- Loading More Indicator -->
-        <div v-if="loadingMore" class="mt-6 flex justify-center">
-          <LoadingSpinner size="small" />
-        </div>
+      <!-- Loading More Indicator -->
+      <div v-if="loadingMore" class="mt-6 flex justify-center">
+        <LoadingSpinner size="small" />
       </div>
     </div>
   </AppLayout>

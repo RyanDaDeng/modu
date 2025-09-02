@@ -28,22 +28,14 @@ export default defineConfig({
     }
   },
   build: {
-    // Remove console.log, console.warn, console.error, and debugger statements in production
+    // Use terser for minification
+    minify: 'terser',
     terserOptions: {
       compress: {
         drop_console: true,     // Remove all console.* statements
         drop_debugger: true,    // Remove debugger statements
-        pure_funcs: ['console.log', 'console.warn', 'console.error', 'console.debug', 'console.trace']
       }
-    },
-    // Alternatively, if you want to keep console.error and console.warn:
-    // terserOptions: {
-    //   compress: {
-    //     drop_console: false,
-    //     drop_debugger: true,
-    //     pure_funcs: ['console.log', 'console.debug', 'console.trace']
-    //   }
-    // }
+    }
   },
   // Define global constants
   define: {

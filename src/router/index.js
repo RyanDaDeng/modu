@@ -105,6 +105,12 @@ const router = createRouter({
       path: '/app-download',
       name: 'app-download',
       component: () => import('../views/AppDownloadView.vue')
+    },
+    {
+      path: '/admin/payment-analysis',
+      name: 'admin-payment',
+      component: () => import('../views/AdminPaymentView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
     }
   ],
   scrollBehavior(to, from, savedPosition) {
@@ -135,7 +141,12 @@ router.beforeEach(async (to, from, next) => {
     
     // 检查是否已登录
     if (authStore.isLoggedIn) {
-      next()
+      // 如果需要管理员权限
+      if (to.meta.requiresAdmin && !authStore.user?.is_admin) {
+        next({ path: '/' })
+      } else {
+        next()
+      }
     } else {
       // 未登录，重定向到登录页
       next({
