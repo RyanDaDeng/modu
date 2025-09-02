@@ -38,59 +38,31 @@
             <h1 class="text-3xl sm:text-4xl font-bold mb-3 bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
               魔都 APP
             </h1>
-            <p class="text-gray-400">安装到主屏幕，享受原生应用体验</p>
-          </div>
-
-          <!-- Main APP Card with Glassmorphism -->
-          <div class="relative bg-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6 sm:p-8 mb-6 shadow-2xl overflow-hidden">
-            <!-- Gradient overlay for depth -->
-            <div class="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-pink-500/10 pointer-events-none"></div>
+            <p class="text-gray-400 mb-4">安装到主屏幕，享受原生应用体验</p>
             
-            <div class="relative z-10">
-            <!-- Platform badges -->
-            <div class="flex justify-center gap-3 mb-6">
-              <div class="px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-full">
-                <span class="text-green-300 font-medium">✓ Android</span>
+            <!-- Platform icons -->
+            <div class="flex justify-center gap-4">
+              <!-- Android icon -->
+              <div class="flex items-center gap-2 px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-full">
+                <img 
+                  src="/img_5.png" 
+                  alt="Android" 
+                  class="w-5 h-5 object-contain"
+                  @error="handleImageError"
+                />
+                <span class="text-green-300 font-medium">Android</span>
               </div>
-              <div class="px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-full">
-                <span class="text-blue-300 font-medium">✓ iOS</span>
-              </div>
-            </div>
-
-            <!-- Direct Link Recommendation -->
-            <div class="text-center">
-              <p class="text-gray-300 text-sm mb-3">💡 使用【浏览器】点开以下链接</p>
-              <a 
-                :href="siteUrl" 
-                target="_blank"
-                class="inline-flex items-center gap-1 mb-4 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 rounded-full hover:text-blue-300 transition-all cursor-pointer"
-              >
-                <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-                <span class="text-blue-400 text-sm font-medium">APP安装链接</span>
-              </a>
               
-              <!-- QR Code with Warning -->
-              <div class="relative">
-                <p class="text-gray-500 text-xs mb-2">或扫码访问（需在浏览器中打开）</p>
-                <div class="relative inline-block">
-                  <!-- Glass background for QR -->
-                  <div class="absolute inset-0 bg-white/10 backdrop-blur-md rounded-xl"></div>
-                  <div class="relative bg-white/95 p-2 rounded-xl">
-                    <qrcode-vue 
-                      :value="siteUrl" 
-                      :size="100"
-                      level="M"
-                      render-as="svg"
-                    />
-                  </div>
-                </div>
-                <p class="text-yellow-500 text-xs mt-2">
-                  ⚠️ 微信/支付宝扫码后请选择"在浏览器打开"
-                </p>
+              <!-- iOS icon -->
+              <div class="flex items-center gap-2 px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-full">
+                <img 
+                  src="/img_11.png" 
+                  alt="iOS" 
+                  class="w-5 h-5 object-contain"
+                  @error="handleImageError"
+                />
+                <span class="text-blue-300 font-medium">iOS</span>
               </div>
-            </div>
             </div>
           </div>
 
@@ -126,7 +98,7 @@
             <div class="grid sm:grid-cols-2 gap-3">
               <div class="flex items-start gap-3 p-3 bg-gray-800/50 rounded-lg">
                 <span class="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-sm font-bold">1</span>
-                <p class="text-gray-300 text-sm">使用支持的浏览器打开顶部链接</p>
+                <p class="text-gray-300 text-sm">使用支持的浏览器打开本站</p>
               </div>
               
               <div class="flex items-start gap-3 p-3 bg-gray-800/50 rounded-lg">
@@ -165,7 +137,7 @@
               <div class="flex items-start gap-3 p-3 bg-gray-800/50 rounded-lg">
                 <span class="flex-shrink-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">1</span>
                 <div class="flex-1 flex items-center gap-2">
-                  <p class="text-gray-300 text-sm">使用 Safari 浏览器打开顶部链接</p>
+                  <p class="text-gray-300 text-sm">使用 Safari 浏览器打开本站</p>
                   <img 
                     src="/safari.jpg" 
                     alt="Safari" 
@@ -209,15 +181,8 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
 import AppLayout from '@/components/AppLayout.vue'
-import QrcodeVue from 'qrcode.vue'
 import { handleImageError } from '@/utils/handleImageError'
-
-// External URL for QR code
-const siteUrl = computed(() => {
-  return 'https://modu18.vip?app=true'
-})
 </script>
 
 <style scoped>
