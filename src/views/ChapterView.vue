@@ -346,7 +346,7 @@
     </div>
 
     <!-- Reading Mode (Fullscreen) -->
-    <div v-if="isReading" ref="readingContainer" class="fixed inset-0 z-50 bg-black overflow-y-auto" @scroll="handleReadingScroll">
+    <div v-if="isReading" ref="readingContainer" :class="['fixed inset-0 z-50 bg-black overflow-y-auto', hideScrollbar && 'hide-scrollbar']" @scroll="handleReadingScroll">
       <!-- Reading Header -->
       <div 
         class="fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800 transition-transform duration-300 pt-safe"
@@ -909,6 +909,36 @@
                 </p>
               </div>
               
+              <!-- Hide Scrollbar Option -->
+              <div class="mb-3 sm:mb-4">
+                <div class="flex items-center justify-between p-2 sm:p-3 bg-gray-800/50 backdrop-blur-sm rounded-lg border border-white/10">
+                  <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="p-1.5 sm:p-2 bg-purple-500/20 rounded-lg">
+                      <svg class="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z" />
+                      </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-white font-medium text-xs sm:text-sm">隐藏滚动条</p>
+                      <p class="text-gray-400 text-[10px] sm:text-xs">阅读时隐藏页面滚动条</p>
+                    </div>
+                  </div>
+                  <button
+                    @click="toggleHideScrollbar"
+                    :class="[
+                      'relative inline-flex h-5 sm:h-6 w-9 sm:w-11 items-center rounded-full transition-colors cursor-pointer',
+                      hideScrollbar ? 'bg-purple-600' : 'bg-gray-600'
+                    ]"
+                  >
+                    <span
+                      :class="[
+                        'inline-block h-3 sm:h-4 w-3 sm:w-4 transform rounded-full bg-white transition-transform',
+                        hideScrollbar ? 'translate-x-5 sm:translate-x-6' : 'translate-x-1'
+                      ]"
+                    />
+                  </button>
+                </div>
+              </div>
 
               <!-- Close Button -->
               <button
@@ -1031,6 +1061,9 @@ const stepSize = ref(parseInt(localStorage.getItem('stepSize')) || 425) // pixel
 const autoScrollInterval = ref(null)
 const showAutoScrollSettings = ref(false)
 const loadingAllImages = ref(false)
+
+// Scrollbar visibility (default to true - hidden)
+const hideScrollbar = ref(localStorage.getItem('hideScrollbar') !== 'false')
 
 
 // Reading history
@@ -1955,6 +1988,11 @@ const togglePauseAutoScroll = () => {
   }
 }
 
+// Toggle scrollbar visibility
+const toggleHideScrollbar = () => {
+  hideScrollbar.value = !hideScrollbar.value
+  localStorage.setItem('hideScrollbar', hideScrollbar.value)
+}
 
 // Pause auto-scroll without disabling it
 const pauseAutoScroll = () => {
@@ -2305,25 +2343,17 @@ onUnmounted(() => {
   animation: spin-slow 3s linear infinite;
 }
 
-/* Transparent scrollbar for reading mode */
-.fixed.inset-0.z-50.bg-black.overflow-y-auto {
+/* Hide scrollbar when enabled */
+.hide-scrollbar {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
 }
 
-.fixed.inset-0.z-50.bg-black.overflow-y-auto::-webkit-scrollbar {
+.hide-scrollbar::-webkit-scrollbar {
   width: 0;
   height: 0;
-  background: transparent;
-}
-
-.fixed.inset-0.z-50.bg-black.overflow-y-auto::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.fixed.inset-0.z-50.bg-black.overflow-y-auto::-webkit-scrollbar-thumb {
-  background: transparent;
-  border: none;
+  display: none;
 }
 
 </style>
