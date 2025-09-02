@@ -26,7 +26,7 @@
         <!-- Logo and Title -->
         <div class="text-center mb-8 animate-fade-in-down">
           <div class="flex justify-center mb-4">
-            <SiteLogo :size="'large'" />
+            <SiteLogo :size="'normal'" />
           </div>
           <p class="text-gray-300 text-sm">记住永久地址：modu18.vip</p>
         </div>
@@ -74,6 +74,7 @@
                   <input
                     v-model="loginForm.email"
                     type="email"
+                    autocomplete="email"
                     required
                     class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-pink-400 focus:bg-white/10 transition-all duration-300 pr-10"
                     placeholder="your@email.com"
@@ -93,6 +94,7 @@
                   <input
                     v-model="loginForm.password"
                     :type="showPassword ? 'text' : 'password'"
+                    autocomplete="current-password"
                     required
                     class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-pink-400 focus:bg-white/10 transition-all duration-300 pr-10"
                     placeholder="••••••••"
@@ -165,6 +167,7 @@
                     <input
                       v-model="registerForm.name"
                       type="text"
+                      autocomplete="username"
                       required
                       class="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-400 focus:bg-white/10 transition-all duration-300 text-sm"
                       placeholder="昵称"
@@ -181,6 +184,7 @@
                     <input
                       v-model="registerForm.email"
                       type="email"
+                      autocomplete="email"
                       required
                       class="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-400 focus:bg-white/10 transition-all duration-300 text-sm"
                       placeholder="email@example.com"
@@ -200,6 +204,7 @@
                     <input
                       v-model="registerForm.password"
                       :type="showPassword ? 'text' : 'password'"
+                      autocomplete="new-password"
                       required
                       minlength="8"
                       class="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-400 focus:bg-white/10 transition-all duration-300 text-sm"
@@ -217,6 +222,7 @@
                     <input
                       v-model="registerForm.password_confirmation"
                       :type="showPassword ? 'text' : 'password'"
+                      autocomplete="new-password"
                       required
                       minlength="8"
                       class="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-400 focus:bg-white/10 transition-all duration-300 text-sm"

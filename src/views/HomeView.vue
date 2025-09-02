@@ -451,7 +451,7 @@
       <ReadingHistory />
 
       <!-- Divider before Latest Updates -->
-      <div class="flex justify-center my-4">
+      <div class="flex justify-center">
         <img
           src="/divider_1.png"
           alt=""

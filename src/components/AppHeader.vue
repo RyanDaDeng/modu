@@ -70,18 +70,6 @@
 
             <!-- Right Section: User Actions -->
             <div class="flex items-center gap-2 sm:gap-4">
-              <!-- Permanent Link Button -->
-              <button
-                @click="showPermanentLinkModal = true"
-                class="flex items-center gap-1 px-2.5 py-1 bg-gray-700/40 backdrop-blur-sm border border-gray-500/40 hover:bg-gray-600/50 hover:border-pink-500/30 text-gray-300 hover:text-pink-300 rounded-lg transition-all cursor-pointer"
-                title="永久链接"
-              >
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                </svg>
-                <span class="text-xs font-medium">永链</span>
-              </button>
-              
               <!-- APP Install Button - Mobile and Desktop (Only show if not in WebView) -->
               <router-link
                 v-if="appStore.shouldShowAppDownload"
@@ -144,7 +132,7 @@
                       <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                       </svg>
-                      开通VIP
+                      充值
                     </div>
                   </div>
                 </router-link>
@@ -198,7 +186,7 @@
                   
                   <!-- Mobile VIP button -->
                   <div class="relative px-2 py-1 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur-sm border border-yellow-400/40 text-yellow-300 text-xs font-medium rounded-full transition-all cursor-pointer">
-                    开通VIP
+                    充值
                   </div>
                 </router-link>
               </div>
@@ -270,7 +258,7 @@
                               <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                               </svg>
-                              <span class="text-yellow-400 font-medium">开通VIP</span>
+                              <span class="text-yellow-400 font-medium">充值</span>
                             </div>
                             <svg class="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -383,9 +371,15 @@
               <router-link
                 v-else
                 to="/login"
-                class="px-4 py-1.5 bg-pink-500 hover:bg-pink-600 text-white text-sm font-medium rounded-full transition-all"
+                class="relative group"
               >
-                登录
+                <!-- Animated gradient glow effect -->
+                <div class="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-full blur-sm opacity-50 group-hover:opacity-80 animate-pulse"></div>
+                
+                <!-- Main button with glassmorphism -->
+                <div class="relative px-4 py-1.5 bg-gradient-to-r from-pink-500/20 to-purple-500/20 backdrop-blur-sm border border-pink-400/50 text-pink-200 text-sm font-medium rounded-full transition-all group-hover:scale-105 group-hover:border-pink-300 group-hover:text-white cursor-pointer">
+                  登录
+                </div>
               </router-link>
             </div>
           </div>
@@ -396,6 +390,15 @@
       <div class="absolute bottom-0 left-0 right-0">
         <div class="container mx-auto px-4">
           <div class="flex items-center gap-4 sm:gap-6 h-12 overflow-x-auto scrollbar-hide">
+            <!-- Permanent Link Button -->
+            <button
+              @click="showPermanentLinkModal = true"
+              class="flex-shrink-0 px-3 py-1 text-white/80 hover:text-white text-sm font-medium hover:bg-white/10 rounded-lg transition-all whitespace-nowrap cursor-pointer"
+              title="永久链接"
+            >
+              永久链接
+            </button>
+            
             <router-link
               v-for="(item, index) in categoryItems"
               :key="`cat-${index}-${item.name}`"

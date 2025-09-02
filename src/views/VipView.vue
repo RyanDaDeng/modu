@@ -6,7 +6,7 @@
       <!-- Title Section -->
       <div class="text-center mb-8">
         <h2 class="text-2xl sm:text-3xl font-bold text-pink-500 mb-3" style="text-shadow: 2px 2px 0 rgba(31, 41, 55, 0.8);">
-          开通VIP会员
+          充值会员
         </h2>
         <p class="text-gray-400 text-sm sm:text-base">解锁全站所有漫画</p>
       </div>
