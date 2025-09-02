@@ -46,10 +46,10 @@
             <!-- Platform badges -->
             <div class="flex justify-center gap-3 mb-6">
               <div class="px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-full">
-                <span class="text-green-300 font-medium">✓ Android</span>
+                <span class="text-green-300 font-medium">✓ Android APK</span>
               </div>
-              <div class="px-4 py-2 bg-gray-700/50 border border-gray-600/30 rounded-full">
-                <span class="text-gray-500">✗ iOS</span>
+              <div class="px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-full">
+                <span class="text-blue-300 font-medium">✓ iOS PWA</span>
               </div>
             </div>
 
@@ -121,13 +121,13 @@
             </div>
           </div>
 
-          <!-- Installation Guide -->
-          <div class="bg-gray-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
+          <!-- Installation Guide - Android -->
+          <div class="bg-gray-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 mb-6">
             <h3 class="text-white font-semibold text-lg mb-4 flex items-center gap-2">
               <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              安装指南
+              Android 安装指南
             </h3>
             
             <div class="grid sm:grid-cols-2 gap-3">
@@ -159,6 +159,53 @@
                 <li>• 建议使用 Chrome 浏览器下载</li>
                 <li>• 安装前需卸载旧版本</li>
                 <li>• 首次启动需要网络验证</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- iOS PWA Installation Guide -->
+          <div class="bg-gray-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
+            <h3 class="text-white font-semibold text-lg mb-4 flex items-center gap-2">
+              <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              iOS 安装指南 (PWA)
+            </h3>
+            
+            <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-4">
+              <p class="text-blue-400 text-sm mb-2">🍎 iOS用户可以将网站添加到主屏幕，体验原生App般的使用感受</p>
+            </div>
+            
+            <div class="grid sm:grid-cols-2 gap-3">
+              <div class="flex items-start gap-3 p-3 bg-gray-800/50 rounded-lg">
+                <span class="flex-shrink-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">1</span>
+                <p class="text-gray-300 text-sm">使用 Safari 浏览器打开本网站</p>
+              </div>
+              
+              <div class="flex items-start gap-3 p-3 bg-gray-800/50 rounded-lg">
+                <span class="flex-shrink-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">2</span>
+                <p class="text-gray-300 text-sm">点击底部分享按钮 <span class="text-blue-400">⬆️</span></p>
+              </div>
+              
+              <div class="flex items-start gap-3 p-3 bg-gray-800/50 rounded-lg">
+                <span class="flex-shrink-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">3</span>
+                <p class="text-gray-300 text-sm">选择「添加到主屏幕」</p>
+              </div>
+              
+              <div class="flex items-start gap-3 p-3 bg-gray-800/50 rounded-lg">
+                <span class="flex-shrink-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">4</span>
+                <p class="text-gray-300 text-sm">点击「添加」完成安装</p>
+              </div>
+            </div>
+            
+            <!-- iOS Features -->
+            <div class="mt-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+              <p class="text-blue-400 font-medium mb-2">✨ PWA 功能</p>
+              <ul class="text-gray-400 text-sm space-y-1">
+                <li>• 全屏体验，无浏览器地址栏</li>
+                <li>• 离线缓存，快速加载</li>
+                <li>• 自动更新，始终最新版本</li>
+                <li>• 无需通过 App Store</li>
               </ul>
             </div>
           </div>
