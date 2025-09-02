@@ -346,7 +346,7 @@
     </div>
 
     <!-- Reading Mode (Fullscreen) -->
-    <div v-if="isReading" ref="readingContainer" class="fixed inset-0 z-50 bg-black overflow-y-auto" @scroll="handleReadingScroll">
+    <div v-if="isReading" ref="readingContainer" :class="['fixed inset-0 z-50 bg-black overflow-y-auto', hideScrollbar && 'hide-scrollbar']" @scroll="handleReadingScroll">
       <!-- Reading Header -->
       <div 
         class="fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800 transition-transform duration-300 pt-safe"
@@ -392,7 +392,7 @@
                 <span class="hidden sm:inline">书签</span>
               </button>
               
-              <!-- Auto-scroll settings button -->
+              <!-- Reading settings button -->
               <button
                 @click="showAutoScrollSettings = true"
                 :class="[
@@ -401,7 +401,7 @@
                     ? 'bg-green-600 hover:bg-green-700 text-white' 
                     : 'bg-gray-600 hover:bg-gray-700 text-gray-300'
                 ]"
-                title="自动滚动设置"
+                title="阅读设置"
               >
                 <svg :class="['w-4 h-4', autoScrollEnabled && 'animate-spin-slow']" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -713,14 +713,14 @@
       <!-- Auto-scroll Settings Modal -->
       <teleport to="body">
         <transition name="fade">
-          <div v-if="showAutoScrollSettings" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-6" @click.self="showAutoScrollSettings = false">
+          <div v-if="showAutoScrollSettings" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" @click.self="showAutoScrollSettings = false">
             <!-- Glassmorphism Modal with Gradient Border -->
-            <div class="relative w-full max-w-lg sm:max-w-xl">
+            <div class="relative w-full max-w-md sm:max-w-lg">
               <!-- Gradient border glow -->
               <div class="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-2xl blur-sm opacity-50"></div>
               
               <!-- Main modal content -->
-              <div class="relative bg-gray-900/90 backdrop-blur-xl rounded-2xl w-full p-4 sm:p-8 border border-white/10">
+              <div class="relative bg-gray-900/90 backdrop-blur-xl rounded-2xl w-full p-4 sm:p-6 border border-white/10 max-h-[90vh] overflow-y-auto">
                 <!-- Header -->
                 <div class="flex items-center justify-between mb-4 sm:mb-6">
                   <h3 class="text-lg sm:text-2xl font-bold text-white flex items-center gap-2">
@@ -730,7 +730,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
                     </div>
-                    自动滚动设置
+                    阅读设置
                   </h3>
                   <button
                     @click="showAutoScrollSettings = false"
@@ -842,29 +842,45 @@
                 </p>
               </div>
               
-              <!-- Toggle Switch -->
-              <div class="mb-3 sm:mb-6">
-                <button
-                  @click="toggleAutoScroll"
-                  :class="[
-                    'w-full py-2 sm:py-3 px-3 sm:px-4 rounded-md sm:rounded-lg text-xs sm:text-sm font-medium transition-all',
-                    autoScrollEnabled 
-                      ? 'bg-green-600 hover:bg-green-700 text-white'
-                      : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
-                  ]"
-                >
-                  <span v-if="!autoScrollEnabled">开启自动滚动</span>
-                  <span v-else>关闭自动滚动</span>
-                </button>
+              <!-- Auto-scroll Toggle Switch -->
+              <div class="mb-3 sm:mb-4">
+                <div class="flex items-center justify-between p-2 sm:p-3 bg-gray-800/50 backdrop-blur-sm rounded-lg border border-white/10">
+                  <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="p-1.5 sm:p-2 bg-green-500/20 rounded-lg">
+                      <svg class="w-4 h-4 sm:w-5 sm:h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-white font-medium text-xs sm:text-sm">自动滚动</p>
+                      <p class="text-gray-400 text-[10px] sm:text-xs">开启后页面将自动向下滚动</p>
+                    </div>
+                  </div>
+                  <button
+                    @click="toggleAutoScroll"
+                    :class="[
+                      'relative inline-flex h-5 sm:h-6 w-9 sm:w-11 flex-shrink-0 items-center rounded-full transition-colors cursor-pointer',
+                      autoScrollEnabled ? 'bg-green-600' : 'bg-gray-600'
+                    ]"
+                  >
+                    <span
+                      :class="[
+                        'inline-block h-3 sm:h-4 w-3 sm:w-4 transform rounded-full bg-white transition-transform',
+                        autoScrollEnabled ? 'translate-x-5 sm:translate-x-6' : 'translate-x-1'
+                      ]"
+                    />
+                  </button>
+                </div>
               </div>
               
               <!-- Load All Images Button -->
-              <div class="mb-4 sm:mb-6">
+              <div class="mb-3 sm:mb-4">
                 <button
                   @click="loadAllImages"
                   :disabled="loadingAllImages || allImagesLoaded"
                   :class="[
-                    'w-full py-2.5 sm:py-3 px-4 sm:px-5 rounded-lg text-sm sm:text-base font-medium transition-all',
+                    'w-full py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all',
                     loadingAllImages
                       ? 'bg-gray-800/30 text-gray-500 cursor-not-allowed'
                       : allImagesLoaded
@@ -872,14 +888,14 @@
                         : 'bg-gray-800/50 backdrop-blur-sm border border-white/10 hover:bg-gray-700/50 hover:border-white/20 text-gray-300 cursor-pointer'
                   ]"
                 >
-                  <span v-if="allImagesLoaded" class="flex items-center justify-center gap-2">
-                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <span v-if="allImagesLoaded" class="flex items-center justify-center gap-1.5">
+                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
                       <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                     </svg>
                     <span>已加载全部 {{ images.length }} 张图片</span>
                   </span>
-                  <span v-else-if="loadingAllImages" class="flex items-center justify-center gap-2">
-                    <svg class="animate-spin h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24">
+                  <span v-else-if="loadingAllImages" class="flex items-center justify-center gap-1.5">
+                    <svg class="animate-spin h-3.5 w-3.5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24">
                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
@@ -887,12 +903,43 @@
                   </span>
                   <span v-else>加载全部图片</span>
                 </button>
-                <p class="text-xs sm:text-sm text-gray-500 mt-2">
+                <p class="text-[10px] sm:text-xs text-gray-500 mt-1.5">
                   <span v-if="allImagesLoaded">所有图片已加载完成</span>
                   <span v-else>立即加载所有图片，不再等待滚动触发</span>
                 </p>
               </div>
               
+              <!-- Hide Scrollbar Option -->
+              <div class="mb-3 sm:mb-4">
+                <div class="flex items-center justify-between p-2 sm:p-3 bg-gray-800/50 backdrop-blur-sm rounded-lg border border-white/10">
+                  <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="p-1.5 sm:p-2 bg-purple-500/20 rounded-lg">
+                      <svg class="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z" />
+                      </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-white font-medium text-xs sm:text-sm">隐藏滚动条</p>
+                      <p class="text-gray-400 text-[10px] sm:text-xs">阅读时隐藏页面滚动条</p>
+                    </div>
+                  </div>
+                  <button
+                    @click="toggleHideScrollbar"
+                    :class="[
+                      'relative inline-flex h-5 sm:h-6 w-9 sm:w-11 items-center rounded-full transition-colors cursor-pointer',
+                      hideScrollbar ? 'bg-purple-600' : 'bg-gray-600'
+                    ]"
+                  >
+                    <span
+                      :class="[
+                        'inline-block h-3 sm:h-4 w-3 sm:w-4 transform rounded-full bg-white transition-transform',
+                        hideScrollbar ? 'translate-x-5 sm:translate-x-6' : 'translate-x-1'
+                      ]"
+                    />
+                  </button>
+                </div>
+              </div>
+
               <!-- Close Button -->
               <button
                 @click="showAutoScrollSettings = false"
@@ -1009,11 +1056,14 @@ const autoScrollEnabled = ref(localStorage.getItem('autoScrollEnabled') === 'tru
 const autoScrollPaused = ref(true) // Always start paused when loading a chapter
 const autoScrollSpeed = ref(parseInt(localStorage.getItem('autoScrollSpeed')) || 50) // pixels per second (for smooth mode)
 const autoScrollMode = ref(localStorage.getItem('autoScrollMode') || 'smooth') // 'smooth' or 'stepped'
-const stepInterval = ref(parseFloat(localStorage.getItem('stepInterval')) || 2) // seconds between steps
-const stepSize = ref(parseInt(localStorage.getItem('stepSize')) || 150) // pixels per step
+const stepInterval = ref(parseFloat(localStorage.getItem('stepInterval')) || 3) // seconds between steps (default 3s)
+const stepSize = ref(parseInt(localStorage.getItem('stepSize')) || 425) // pixels per step (default 425px)
 const autoScrollInterval = ref(null)
 const showAutoScrollSettings = ref(false)
 const loadingAllImages = ref(false)
+
+// Scrollbar visibility
+const hideScrollbar = ref(localStorage.getItem('hideScrollbar') !== 'false') // Default to true
 
 // Reading history
 const readingHistory = ref({}) // { comicId: chapterIndex }
@@ -1937,6 +1987,12 @@ const togglePauseAutoScroll = () => {
   }
 }
 
+// Toggle scrollbar visibility
+const toggleHideScrollbar = () => {
+  hideScrollbar.value = !hideScrollbar.value
+  localStorage.setItem('hideScrollbar', hideScrollbar.value)
+}
+
 // Pause auto-scroll without disabling it
 const pauseAutoScroll = () => {
   if (autoScrollInterval.value) {
@@ -2284,5 +2340,15 @@ onUnmounted(() => {
 
 .animate-spin-slow {
   animation: spin-slow 3s linear infinite;
+}
+
+/* Hide scrollbar styles */
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 </style>

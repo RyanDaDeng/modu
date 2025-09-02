@@ -28,9 +28,9 @@
             v-if="modelValue" 
             class="absolute bottom-0 left-0 right-0 bg-gray-900 rounded-t-2xl"
             :style="{ maxHeight: maxHeight }"
-            @touchstart="handleTouchStart"
-            @touchmove="handleTouchMove"
-            @touchend="handleTouchEnd"
+            @touchstart.passive="handleTouchStart"
+            @touchmove.passive="handleTouchMove"
+            @touchend.passive="handleTouchEnd"
           >
             <!-- Handle bar -->
             <div class="flex justify-center pt-3 pb-2">

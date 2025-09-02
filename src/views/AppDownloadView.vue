@@ -1,6 +1,6 @@
 <template>
   <AppLayout
-    title="App下载"
+    title="APP 安装"
     :show-back="true"
     :show-bottom-nav="true"
     :show-top-nav="false"
@@ -36,92 +36,65 @@
           <!-- App Title -->
           <div class="text-center mb-8">
             <h1 class="text-3xl sm:text-4xl font-bold mb-3 bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
-              魔都 App
+              魔都 APP
             </h1>
-            <p class="text-gray-400">更流畅的阅读体验</p>
+            <p class="text-gray-400">安装到主屏幕，享受原生应用体验</p>
           </div>
 
-          <!-- Main Download Card -->
-          <div class="bg-gray-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 sm:p-8 mb-6">
+          <!-- Main APP Card with Glassmorphism -->
+          <div class="relative bg-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6 sm:p-8 mb-6 shadow-2xl overflow-hidden">
+            <!-- Gradient overlay for depth -->
+            <div class="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-pink-500/10 pointer-events-none"></div>
+            
+            <div class="relative z-10">
             <!-- Platform badges -->
             <div class="flex justify-center gap-3 mb-6">
               <div class="px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-full">
-                <span class="text-green-300 font-medium">✓ Android APK</span>
+                <span class="text-green-300 font-medium">✓ Android</span>
               </div>
               <div class="px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-full">
-                <span class="text-blue-300 font-medium">✓ iOS PWA</span>
+                <span class="text-blue-300 font-medium">✓ iOS</span>
               </div>
             </div>
 
-            <!-- QR Code and Download Button -->
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-8">
-              <!-- QR Code -->
-              <div class="text-center">
-                <div class="bg-white p-3 rounded-xl inline-block mb-3">
-                  <qrcode-vue 
-                    :value="downloadUrl" 
-                    :size="120"
-                    level="M"
-                    render-as="svg"
-                  />
+            <!-- Direct Link Recommendation -->
+            <div class="text-center">
+              <p class="text-gray-300 text-sm mb-3">💡 使用【浏览器】点开以下链接</p>
+              <a 
+                :href="siteUrl" 
+                target="_blank"
+                class="inline-flex items-center gap-1 mb-4 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 rounded-full hover:text-blue-300 transition-all cursor-pointer"
+              >
+                <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                <span class="text-blue-400 text-sm font-medium">APP安装链接</span>
+              </a>
+              
+              <!-- QR Code with Warning -->
+              <div class="relative">
+                <p class="text-gray-500 text-xs mb-2">或扫码访问（需在浏览器中打开）</p>
+                <div class="relative inline-block">
+                  <!-- Glass background for QR -->
+                  <div class="absolute inset-0 bg-white/10 backdrop-blur-md rounded-xl"></div>
+                  <div class="relative bg-white/95 p-2 rounded-xl">
+                    <qrcode-vue 
+                      :value="siteUrl" 
+                      :size="100"
+                      level="M"
+                      render-as="svg"
+                    />
+                  </div>
                 </div>
-                <p class="text-gray-400 text-sm">扫码下载</p>
+                <p class="text-yellow-500 text-xs mt-2">
+                  ⚠️ 微信/支付宝扫码后请选择"在浏览器打开"
+                </p>
               </div>
-
-              <!-- Divider -->
-              <div class="hidden sm:block w-px h-32 bg-gray-700"></div>
-              <div class="sm:hidden w-32 h-px bg-gray-700"></div>
-
-              <!-- Direct Download -->
-              <div class="text-center">
-                <a 
-                  :href="downloadUrl"
-                  download
-                  class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-medium rounded-full transition-all transform hover:scale-105 shadow-lg mb-3"
-                >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                  安卓APK下载
-                </a>
-                <p class="text-gray-400 text-sm">文件大小: 5MB</p>
-              </div>
+            </div>
             </div>
           </div>
 
-          <!-- Warnings Section -->
-          <div class="space-y-3 mb-6">
-            <!-- WebView Warning -->
-            <div class="bg-red-900/30 backdrop-blur-sm border border-red-500/30 rounded-xl p-4">
-              <div class="flex items-start gap-3">
-                <svg class="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <div>
-                  <h4 class="text-red-400 font-semibold mb-1">无法加载页面？</h4>
-                  <p class="text-gray-300 text-sm">
-                    设备浏览器内核过旧，请更新 Android System WebView 或 Chrome 浏览器
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Content Warning -->
-            <div class="bg-yellow-900/30 backdrop-blur-sm border border-yellow-500/30 rounded-xl p-4">
-              <div class="flex items-start gap-3">
-                <svg class="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <div>
-                  <p class="text-gray-300 text-sm">
-                    因含成人内容，可能会被系统拦截
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Installation Guide - Android -->
+          <!-- Android Installation Guide -->
           <div class="bg-gray-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 mb-6">
             <h3 class="text-white font-semibold text-lg mb-4 flex items-center gap-2">
               <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -130,36 +103,46 @@
               Android 安装指南
             </h3>
             
-            <div class="grid sm:grid-cols-2 gap-3">
-              <div class="flex items-start gap-3 p-3 bg-gray-800/50 rounded-lg">
-                <span class="flex-shrink-0 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center text-white text-sm font-bold">1</span>
-                <p class="text-gray-300 text-sm">设定 → 安全性 → 开启「未知来源」</p>
+            <!-- Browser Support Notice -->
+            <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-3 mb-4">
+              <p class="text-green-400 text-sm mb-2">🤖 支持安装的浏览器</p>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                <div class="flex items-center gap-1 text-green-300">
+                  <span class="text-green-500">✓</span> Chrome
+                </div>
+                <div class="flex items-center gap-1 text-green-300">
+                  <span class="text-green-500">✓</span> Edge
+                </div>
+                <div class="flex items-center gap-1 text-green-300">
+                  <span class="text-green-500">✓</span> Samsung Browser
+                </div>
+                <div class="flex items-center gap-1 text-green-300">
+                  <span class="text-green-500">✓</span> Opera
+                </div>
               </div>
-              
-              <div class="flex items-start gap-3 p-3 bg-gray-800/50 rounded-lg">
-                <span class="flex-shrink-0 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center text-white text-sm font-bold">2</span>
-                <p class="text-gray-300 text-sm">关闭「禁止安装恶意应用」</p>
-              </div>
-              
-              <div class="flex items-start gap-3 p-3 bg-gray-800/50 rounded-lg">
-                <span class="flex-shrink-0 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center text-white text-sm font-bold">3</span>
-                <p class="text-gray-300 text-sm">下载 APK 并同意安装</p>
-              </div>
-              
-              <div class="flex items-start gap-3 p-3 bg-gray-800/50 rounded-lg">
-                <span class="flex-shrink-0 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center text-white text-sm font-bold">4</span>
-                <p class="text-gray-300 text-sm">无视安全提示，继续安装</p>
-              </div>
+              <p class="text-yellow-400 text-xs mt-2">⚠️ 其他浏览器可能不支持安装功能</p>
             </div>
             
-            <!-- Tips -->
-            <div class="mt-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-              <p class="text-blue-400 font-medium mb-2">💡 提示</p>
-              <ul class="text-gray-400 text-sm space-y-1">
-                <li>• 建议使用 Chrome 浏览器下载</li>
-                <li>• 安装前需卸载旧版本</li>
-                <li>• 首次启动需要网络验证</li>
-              </ul>
+            <div class="grid sm:grid-cols-2 gap-3">
+              <div class="flex items-start gap-3 p-3 bg-gray-800/50 rounded-lg">
+                <span class="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-sm font-bold">1</span>
+                <p class="text-gray-300 text-sm">使用支持的浏览器打开顶部链接</p>
+              </div>
+              
+              <div class="flex items-start gap-3 p-3 bg-gray-800/50 rounded-lg">
+                <span class="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-sm font-bold">2</span>
+                <p class="text-gray-300 text-sm">点击右上角菜单 <span class="text-green-400">⋮</span></p>
+              </div>
+              
+              <div class="flex items-start gap-3 p-3 bg-gray-800/50 rounded-lg">
+                <span class="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-sm font-bold">3</span>
+                <p class="text-gray-300 text-sm">选择「添加到主屏幕」</p>
+              </div>
+              
+              <div class="flex items-start gap-3 p-3 bg-gray-800/50 rounded-lg">
+                <span class="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-sm font-bold">4</span>
+                <p class="text-gray-300 text-sm">点击「安装」完成</p>
+              </div>
             </div>
           </div>
 
@@ -169,44 +152,54 @@
               <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              iOS 安装指南 (PWA)
+              iOS 安装指南
             </h3>
             
             <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-4">
               <p class="text-blue-400 text-sm mb-2">🍎 iOS用户可以将网站添加到主屏幕，体验原生App般的使用感受</p>
             </div>
             
+            <!-- Step by step with images -->
             <div class="grid sm:grid-cols-2 gap-3">
+              <!-- Step 1 with Safari icon -->
               <div class="flex items-start gap-3 p-3 bg-gray-800/50 rounded-lg">
                 <span class="flex-shrink-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">1</span>
-                <p class="text-gray-300 text-sm">使用 Safari 浏览器打开本网站</p>
+                <div class="flex-1 flex items-center gap-2">
+                  <p class="text-gray-300 text-sm">使用 Safari 浏览器打开顶部链接</p>
+                  <img 
+                    src="/safari.jpg" 
+                    alt="Safari" 
+                    class="w-6 h-6 rounded object-contain"
+                    @error="handleImageError"
+                  />
+                </div>
               </div>
               
+              <!-- Step 2 with Share icon -->
               <div class="flex items-start gap-3 p-3 bg-gray-800/50 rounded-lg">
                 <span class="flex-shrink-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">2</span>
-                <p class="text-gray-300 text-sm">点击底部分享按钮 <span class="text-blue-400">⬆️</span></p>
+                <div class="flex-1 flex items-center gap-2">
+                  <p class="text-gray-300 text-sm">点击底部分享按钮</p>
+                  <img 
+                    src="/addToScreen.jpg" 
+                    alt="Share" 
+                    class="w-6 h-6 rounded object-contain"
+                    @error="handleImageError"
+                  />
+                </div>
               </div>
               
+              <!-- Step 3 -->
               <div class="flex items-start gap-3 p-3 bg-gray-800/50 rounded-lg">
                 <span class="flex-shrink-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">3</span>
                 <p class="text-gray-300 text-sm">选择「添加到主屏幕」</p>
               </div>
               
+              <!-- Step 4 -->
               <div class="flex items-start gap-3 p-3 bg-gray-800/50 rounded-lg">
                 <span class="flex-shrink-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">4</span>
                 <p class="text-gray-300 text-sm">点击「添加」完成安装</p>
               </div>
-            </div>
-            
-            <!-- iOS Features -->
-            <div class="mt-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-              <p class="text-blue-400 font-medium mb-2">✨ PWA 功能</p>
-              <ul class="text-gray-400 text-sm space-y-1">
-                <li>• 全屏体验，无浏览器地址栏</li>
-                <li>• 离线缓存，快速加载</li>
-                <li>• 自动更新，始终最新版本</li>
-                <li>• 无需通过 App Store</li>
-              </ul>
             </div>
           </div>
         </div>
@@ -221,10 +214,9 @@ import AppLayout from '@/components/AppLayout.vue'
 import QrcodeVue from 'qrcode.vue'
 import { handleImageError } from '@/utils/handleImageError'
 
-// Generate download URL based on current location
-const downloadUrl = computed(() => {
-  const baseUrl = window.location.origin
-  return `${baseUrl}/modu-v1-release.apk`
+// External URL for QR code
+const siteUrl = computed(() => {
+  return 'https://modu18.vip?app=true'
 })
 </script>
 

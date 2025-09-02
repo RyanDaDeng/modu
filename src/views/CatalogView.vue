@@ -243,7 +243,6 @@
       <BottomDrawer 
         v-model="showFilterModal"
         title="选择筛选条件"
-        class="sm:hidden"
         max-height="90vh"
       >
         <!-- Category Selection -->
@@ -331,7 +330,7 @@ export default {
 </script>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getCategoriesFilter, getCategories } from '@/api/request'
 import AppLayout from '@/components/AppLayout.vue'
@@ -429,10 +428,19 @@ const parseQueryParams = () => {
         }
       }
     } else {
-      // Just main category
-      const mainCategory = categories.value.find(cat => cat.slug === query.c)
+      // Just main category - try matching by slug, id (string or number)
+      const mainCategory = categories.value.find(cat => {
+        // Check if query.c matches slug
+        if (cat.slug && cat.slug === query.c) return true
+        // Check if query.c matches id (as string)
+        if (cat.id && String(cat.id) === query.c) return true
+        // Check if query.c is a number and matches id
+        if (!isNaN(query.c) && cat.id === parseInt(query.c)) return true
+        return false
+      })
       if (mainCategory) {
         selectedCategory.value = mainCategory
+        selectedSubCategory.value = null
       }
     }
   }
@@ -452,9 +460,11 @@ const updateURL = () => {
   
   // Add category
   if (selectedCategory.value) {
-    let categoryParam = selectedCategory.value.slug
+    // Use slug if available, otherwise use id
+    let categoryParam = selectedCategory.value.slug || selectedCategory.value.id
     if (selectedSubCategory.value) {
-      categoryParam = `${categoryParam}_${selectedSubCategory.value.slug}`
+      const subSlug = selectedSubCategory.value.slug || selectedSubCategory.value.CID
+      categoryParam = `${categoryParam}_${subSlug}`
     }
     if (categoryParam) {
       query.c = categoryParam
@@ -647,22 +657,51 @@ const handlePageChange = (page) => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-// Don't use watch - it causes too many problems with keep-alive
-// Navigation within the page is handled by button clicks which call applyFilter directly
-
-onMounted(() => {
-  // Only load categories if they haven't been loaded yet
-  if (categories.value.length === 0) {
-    // Parse initial query params
+// Watch for route changes
+watch(() => route.query, () => {
+  // Only react to route changes if categories are loaded
+  if (categories.value.length > 0) {
     parseQueryParams()
     
-    // Initialize page if not set
-    if (currentPage.value === 0) {
-      currentPage.value = 1
-      displayPage.value = 1
+    // If no category selected from query, select first category by default
+    if (!selectedCategory.value && categories.value.length > 0) {
+      selectedCategory.value = categories.value[0]
     }
     
+    // Load comics with new settings
+    if (selectedCategory.value) {
+      applyFilter(false) // Don't reset page on query change
+    }
+  }
+}, { deep: true })
+
+onMounted(() => {
+  // Parse initial query params
+  parseQueryParams()
+  
+  // Initialize page if not set
+  if (currentPage.value === 0) {
+    currentPage.value = 1
+    displayPage.value = 1
+  }
+  
+  // Only load categories if they haven't been loaded yet
+  if (categories.value.length === 0) {
     loadCategories()
+  } else {
+    // Categories already loaded, parse query params and load comics
+    parseQueryParams()
+    
+    // If no category selected from query, select first category by default
+    if (!selectedCategory.value && categories.value.length > 0) {
+      selectedCategory.value = categories.value[0]
+    }
+    
+    // Load comics with current settings
+    if (selectedCategory.value) {
+      applyFilter(false) // Don't reset page on initial load
+    }
+    pageLoading.value = false
   }
 })
 </script>

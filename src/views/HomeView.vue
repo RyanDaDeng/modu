@@ -17,9 +17,46 @@
     <div class="relative">
       <!-- Welcome Dialog -->
       <WelcomeDialog @close="handleWelcomeClose" />
-      
+
       <!-- Image Server Selection Modal -->
       <ImageServerModal v-model="showImageServerModal" />
+      <!-- Mobile Search Bar -->
+      <MobileSearchBar
+        v-model="searchQuery"
+        @click="handleSearchClick"
+        class="mobile-search-bar"
+      >
+        <template #announcement>
+          <!-- Mobile New User Guide Banner - Below Search -->
+        <div v-show="!announcementHidden" class="sm:hidden mt-3 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-lg p-[1px]">
+          <div class="bg-gray-900/90 backdrop-blur-sm rounded-lg p-3">
+            <div class="flex items-start space-x-2">
+              <!-- Content -->
+              <div class="flex-1">
+                <h2 class="text-sm font-bold text-white mb-1.5 flex items-center gap-1">
+                  <span>💡 新手指引</span>
+                  <span class="px-1.5 py-0.5 text-[10px] bg-blue-500/30 backdrop-blur-sm border border-blue-400/50 text-blue-300 rounded-full">小贴士</span>
+                </h2>
+
+                <div class="text-gray-300 text-xs space-y-1.5">
+                  <p class="leading-relaxed">
+                    图片加载慢？点击右上角齿轮图标切换服务器！
+                  </p>
+                </div>
+              </div>
+
+              <!-- Close button -->
+              <button
+                  @click="hideAnnouncement"
+                  class="flex-shrink-0 text-gray-300 hover:text-white text-sm font-medium transition-colors cursor-pointer px-2 py-1 hover:bg-white/10 rounded"
+              >
+                关闭
+              </button>
+            </div>
+          </div>
+        </div>
+        </template>
+      </MobileSearchBar>
       <div class="container mx-auto px-4 -mb-12 py-6">
         <!-- New User Guide Banner - Desktop Only -->
         <div v-show="!announcementHidden" class="hidden sm:block mb-4 sm:mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-lg sm:rounded-xl p-[2px]">
@@ -75,44 +112,6 @@
         </div>
 
       </div>
-      <!-- Mobile Search Bar -->
-      <MobileSearchBar 
-        v-model="searchQuery"
-        @click="handleSearchClick"
-        class="mobile-search-bar"
-      >
-        <template #announcement>
-          <!-- Mobile New User Guide Banner - Below Search -->
-        <div v-show="!announcementHidden" class="sm:hidden mt-3 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-lg p-[1px]">
-          <div class="bg-gray-900/90 backdrop-blur-sm rounded-lg p-3">
-            <div class="flex items-start space-x-2">
-              <!-- Content -->
-              <div class="flex-1">
-                <h2 class="text-sm font-bold text-white mb-1.5 flex items-center gap-1">
-                  <span>💡 新手指引</span>
-                  <span class="px-1.5 py-0.5 text-[10px] bg-blue-500/30 backdrop-blur-sm border border-blue-400/50 text-blue-300 rounded-full">小贴士</span>
-                </h2>
-
-                <div class="text-gray-300 text-xs space-y-1.5">
-                  <p class="leading-relaxed">
-                    图片加载慢？点击右上角齿轮图标切换服务器！
-                  </p>
-                </div>
-              </div>
-
-              <!-- Close button -->
-              <button
-                  @click="hideAnnouncement"
-                  class="flex-shrink-0 text-gray-300 hover:text-white text-sm font-medium transition-colors cursor-pointer px-2 py-1 hover:bg-white/10 rounded"
-              >
-                关闭
-              </button>
-            </div>
-          </div>
-        </div>
-        </template>
-      </MobileSearchBar>
-
       <!-- Hero Slider Section - Featured Comics -->
       <div class="relative">
       <!-- Mobile Section Title -->
@@ -124,19 +123,19 @@
           精选推荐
         </h2>
       </div>
-      
+
       <!-- Hero Section with Split Layout -->
       <div class="container mx-auto px-4 py-4 sm:py-6">
         <!-- Mobile: Full width slider + Quick Access -->
         <div class="sm:hidden">
           <HeroSlider :items="heroComics" :auto-play="true" :interval="5000" />
-          
+
           <!-- Quick Access & Tag Cloud Section for Mobile -->
           <div class="bg-gray-900/60 backdrop-blur-sm border border-white/10 rounded-xl p-2 mt-3">
             <!-- Quick Rankings -->
             <div class="grid grid-cols-4 gap-1.5 mb-2">
-              <button 
-                v-for="ranking in quickRankings" 
+              <button
+                v-for="ranking in quickRankings"
                 :key="ranking.name"
                 @click="$router.push(ranking.path)"
                 class="group relative overflow-hidden rounded-lg bg-gray-800/50 backdrop-blur-sm border border-white/10 p-2 hover:bg-gray-700/50 hover:border-white/20 transition-all duration-200 cursor-pointer"
@@ -147,12 +146,12 @@
                 </div>
               </button>
             </div>
-            
+
             <!-- Word Cloud -->
             <div class="border-t border-white/10 pt-2">
               <div class="word-cloud-container">
-                <span 
-                  v-for="(tag, index) in tagCloudData" 
+                <span
+                  v-for="(tag, index) in tagCloudData"
                   :key="tag.text"
                   @click="$router.push(`/search?wd=${encodeURIComponent(tag.text)}`)"
                   class="word-cloud-tag text-[11px]"
@@ -168,19 +167,19 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Tablet: Stack Layout for medium screens -->
         <div class="hidden sm:block lg:hidden">
           <div class="flex flex-col gap-3">
             <!-- Slider Full Width -->
             <HeroSlider :items="heroComics" :auto-play="true" :interval="5000" />
-            
+
             <!-- Quick Access & Tag Cloud Section Below Slider -->
             <div class="bg-gray-900/60 backdrop-blur-sm border border-white/10 rounded-xl p-3">
               <!-- Quick Rankings -->
               <div class="grid grid-cols-4 gap-2 mb-3">
-                <button 
-                  v-for="ranking in quickRankings" 
+                <button
+                  v-for="ranking in quickRankings"
                   :key="ranking.name"
                   @click="$router.push(ranking.path)"
                   class="group relative overflow-hidden rounded-lg bg-gray-800/50 backdrop-blur-sm border border-white/10 p-3 hover:bg-gray-700/50 hover:border-white/20 transition-all duration-200 cursor-pointer"
@@ -191,12 +190,12 @@
                   </div>
                 </button>
               </div>
-              
+
               <!-- Word Cloud -->
               <div class="border-t border-white/10 pt-3">
                 <div class="word-cloud-container">
-                  <span 
-                    v-for="(tag, index) in tagCloudData" 
+                  <span
+                    v-for="(tag, index) in tagCloudData"
                     :key="tag.text"
                     @click="$router.push(`/search?wd=${encodeURIComponent(tag.text)}`)"
                     class="word-cloud-tag"
@@ -211,7 +210,7 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- Featured Comics Section Below for Tablet -->
             <div class="bg-gray-900/60 backdrop-blur-sm border border-white/10 rounded-xl p-3">
               <div class="grid grid-cols-4 gap-3">
@@ -227,14 +226,14 @@
                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     @error="handleImageError"
                   />
-                  
+
                   <!-- Badge -->
                   <div class="absolute top-2 left-2 z-10">
                     <span class="px-2 py-1 bg-gradient-to-r from-pink-600 to-purple-600 text-white text-xs font-bold rounded-full shadow-lg">
                       热门推荐
                     </span>
                   </div>
-                  
+
                   <!-- Overlay with info -->
                   <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black via-black/80 to-transparent">
                     <p class="text-white text-sm font-bold truncate mb-1">{{ heroComics[0]?.name }}</p>
@@ -258,7 +257,7 @@
                     </div>
                   </div>
                 </router-link>
-                
+
                 <!-- Other Featured Comics -->
                 <router-link
                   v-for="(comic, idx) in heroComics.slice(1, 9)"
@@ -272,14 +271,14 @@
                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     @error="handleImageError"
                   />
-                  
+
                   <!-- Mini badge -->
                   <div v-if="idx < 3" class="absolute top-1 right-1 z-10">
                     <span class="px-1.5 py-0.5 bg-red-600/70 backdrop-blur-sm border border-red-400/60 text-white text-[9px] font-bold rounded">
                       {{ idx + 1 }}
                     </span>
                   </div>
-                  
+
                   <!-- Overlay with stats -->
                   <div class="absolute bottom-0 left-0 right-0 p-1.5 bg-gradient-to-t from-black via-black/80 to-transparent">
                     <p class="text-white text-[10px] font-medium truncate mb-1">{{ comic.name }}</p>
@@ -304,20 +303,20 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Desktop: Split Layout (large screens and above) -->
         <div class="hidden lg:flex gap-3 items-stretch">
           <!-- Left: Slider (2/5 width) -->
           <div class="w-2/5 flex flex-col gap-3">
             <!-- Main Slider -->
             <HeroSlider :items="heroComics" :auto-play="true" :interval="5000" />
-            
+
             <!-- Quick Access & Tag Cloud Section Below Slider -->
             <div class="bg-gray-900/60 backdrop-blur-sm border border-white/10 rounded-xl p-3">
               <!-- Quick Rankings -->
               <div class="grid grid-cols-4 gap-2 mb-3">
-                <button 
-                  v-for="ranking in quickRankings" 
+                <button
+                  v-for="ranking in quickRankings"
                   :key="ranking.name"
                   @click="$router.push(ranking.path)"
                   class="group relative overflow-hidden rounded-lg bg-gray-800/50 backdrop-blur-sm border border-white/10 p-3 hover:bg-gray-700/50 hover:border-white/20 transition-all duration-200 cursor-pointer"
@@ -328,12 +327,12 @@
                   </div>
                 </button>
               </div>
-              
+
               <!-- Word Cloud -->
               <div class="border-t border-white/10 pt-3">
                 <div class="word-cloud-container">
-                  <span 
-                    v-for="(tag, index) in tagCloudData" 
+                  <span
+                    v-for="(tag, index) in tagCloudData"
                     :key="tag.text"
                     @click="$router.push(`/search?wd=${encodeURIComponent(tag.text)}`)"
                     class="word-cloud-tag"
@@ -349,7 +348,7 @@
               </div>
             </div>
           </div>
-          
+
           <!-- Right: Featured Comics -->
           <div class="w-3/5">
             <div class="bg-gray-900/60 backdrop-blur-sm border border-white/10 rounded-xl h-full p-3 flex gap-3">
@@ -396,7 +395,7 @@
                   </div>
                 </router-link>
               </div>
-              
+
               <!-- Right: Grid of 6 smaller comics -->
               <div class="flex-1 grid grid-cols-3 grid-rows-2 gap-2">
                 <!-- Featured Comic Cards -->
@@ -412,14 +411,14 @@
                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     @error="handleImageError"
                   />
-                  
+
                   <!-- Mini badge -->
                   <div v-if="idx < 3" class="absolute top-1 right-1 z-10">
                     <span class="px-1.5 py-0.5 bg-red-600/70 backdrop-blur-sm border border-red-400/60 text-white text-[9px] font-bold rounded">
                       {{ idx + 1 }}
                     </span>
                   </div>
-                  
+
                   <!-- Overlay with stats -->
                   <div class="absolute bottom-0 left-0 right-0 p-1.5 bg-gradient-to-t from-black via-black/80 to-transparent">
                     <p class="text-white text-[10px] font-medium truncate mb-1">{{ comic.name }}</p>
@@ -446,17 +445,17 @@
         </div>
       </div>
       </div>
-      
+
       <div class="container mx-auto px-4 py-6">
       <!-- Reading History Section -->
       <ReadingHistory />
 
       <!-- Divider before Latest Updates -->
       <div class="flex justify-center my-4">
-        <img 
-          src="/divider_1.png" 
-          alt="" 
-          class="h-6 w-auto opacity-30" 
+        <img
+          src="/divider_1.png"
+          alt=""
+          class="h-6 w-auto opacity-30"
           style="filter: drop-shadow(0 0 1px rgba(236, 72, 153, 0.3)) sepia(1) saturate(2) hue-rotate(280deg) brightness(0.8);"
         />
       </div>
@@ -487,7 +486,7 @@
             </button>
           </div>
         </div>
-        
+
         <div class="px-1">
           <!-- Mobile: Horizontal Slider -->
           <div class="md:hidden relative">
@@ -543,7 +542,7 @@
               </router-link>
             </HorizontalSlider>
           </div>
-          
+
           <!-- Desktop: Grid with Load More -->
           <div class="hidden md:block">
             <GridWithLoadMore
@@ -572,10 +571,10 @@
         <div v-for="(promotion, index) in promotions" :key="promotion.title" class="mb-8">
           <!-- Divider before each section -->
           <div v-if="index === 0 || promotion.title" class="flex justify-center my-4">
-            <img 
-              src="/divider_1.png" 
-              alt="" 
-              class="h-6 w-auto opacity-30" 
+            <img
+              src="/divider_1.png"
+              alt=""
+              class="h-6 w-auto opacity-30"
               style="filter: drop-shadow(0 0 1px rgba(236, 72, 153, 0.3)) sepia(1) saturate(2) hue-rotate(280deg) brightness(0.8);"
             />
           </div>
@@ -583,7 +582,7 @@
             <h2 class="text-xl font-bold text-white">{{ promotion.title }}</h2>
             <span class="text-sm text-gray-400 md:hidden">滑动查看更多 →</span>
           </div>
-          
+
           <!-- Mobile: Horizontal Slider Component -->
           <div class="px-1 md:hidden">
             <HorizontalSlider>
@@ -595,7 +594,7 @@
               >
                 <!-- Gradient border effect on hover -->
                 <div class="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-lg opacity-0 group-hover:opacity-50 blur-sm transition-opacity"></div>
-                
+
                 <!-- Main card with glassmorphism -->
                 <div class="relative bg-gray-900/60 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden group-hover:border-pink-500/30 transition-all">
                 <div class="relative aspect-[3/4] bg-gray-800/50">
@@ -625,7 +624,7 @@
               </router-link>
             </HorizontalSlider>
           </div>
-          
+
           <!-- Desktop: Grid with Load More -->
           <div class="px-1 hidden md:block">
             <GridWithLoadMore
@@ -657,10 +656,10 @@
       </div>
       </div>
     </div>
-    
+
     <!-- Fullscreen Search Modal -->
     <FullscreenSearch v-model="showFullscreenSearch" />
-    
+
     <!-- Login Prompt Modal -->
     <ModalDialog
       v-model="showLoginPrompt"
