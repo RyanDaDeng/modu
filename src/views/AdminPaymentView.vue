@@ -107,7 +107,7 @@
                 <td class="px-4 py-3 text-sm text-gray-300">{{ order.mch_order_no }}</td>
                 <td class="px-4 py-3 text-sm text-gray-300">{{ order.user_id }}</td>
                 <td class="px-4 py-3 text-sm text-gray-300">{{ order.product_name }}</td>
-                <td class="px-4 py-3 text-sm font-medium text-pink-400">¥{{ order.receive_amount }}</td>
+                <td class="px-4 py-3 text-sm font-medium text-pink-400">¥{{ formatAmount(order.receive_amount) }}</td>
                 <td class="px-4 py-3 text-sm">
                   <span v-if="order.payment_method === 'wechat'" class="text-green-400">微信</span>
                   <span v-else-if="order.payment_method === 'alipay'" class="text-blue-400">支付宝</span>
@@ -264,7 +264,7 @@
             </div>
             <div>
               <div class="text-sm text-gray-400">金额</div>
-              <div class="font-medium text-pink-400">¥{{ selectedOrder.receive_amount }}</div>
+              <div class="font-medium text-pink-400">¥{{ formatAmount(selectedOrder.receive_amount) }}</div>
             </div>
             <div>
               <div class="text-sm text-gray-400">支付方式</div>
@@ -392,7 +392,8 @@ const viewOrder = async (orderId) => {
 }
 
 const formatAmount = (amount) => {
-  return Number(amount || 0).toFixed(2)
+  // Convert from cents to yuan (divide by 100)
+  return (Number(amount || 0) / 100).toFixed(2)
 }
 
 const formatDate = (dateString) => {

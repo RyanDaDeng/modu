@@ -1,0 +1,1 @@
+import{a6 as r}from"./index-BkfaYN6j.js";function n(){const n=r();return{success:(r,o)=>n.success(r,o),error:(r,o)=>n.error(r,o),warning:(r,o)=>n.warning(r,o),info:(r,o)=>n.info(r,o),notify:r=>n.add(r),clear:()=>n.clear()}}export{n as u};
