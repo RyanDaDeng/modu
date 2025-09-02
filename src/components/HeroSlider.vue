@@ -5,9 +5,9 @@
       class="relative overflow-hidden rounded-2xl bg-gray-900/60 backdrop-blur-sm border border-white/10 h-full"
       @mouseenter="handleMouseEnter"
       @mouseleave="handleMouseLeave"
-      @touchstart="handleTouchStart"
-      @touchmove="handleTouchMove"
-      @touchend="handleTouchEnd"
+      @touchstart.passive="handleTouchStart"
+      @touchmove.passive="handleTouchMove"
+      @touchend.passive="handleTouchEnd"
     >
       <!-- Slides -->
       <div 

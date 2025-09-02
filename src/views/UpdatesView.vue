@@ -118,7 +118,6 @@
       <BottomDrawer 
         v-model="showFilterModal"
         title="选择筛选条件"
-        class="sm:hidden"
       >
         <!-- Type Selection -->
         <div class="px-4 pb-4">

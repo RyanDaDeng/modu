@@ -2,7 +2,7 @@
   <div class="min-h-screen" :style="backgroundStyle">
     <!-- AppHeader - Show on desktop always, show on mobile when showTopNav is true -->
     <AppHeader v-if="!hideAppHeader" :class="showTopNav ? '' : 'hidden lg:block'" />
-    
+
     <!-- Mobile Header with back button - Show on mobile when showTopNav is false -->
     <div v-if="!showTopNav && !noHeader" class="lg:hidden sticky top-0 left-0 right-0 z-20">
       <!-- Glassmorphism background -->
@@ -16,11 +16,11 @@
           <!-- Back Button -->
           <button
             v-if="shouldShowBack"
-            @click="handleBack"
-            class="group flex items-center space-x-1 text-gray-300 hover:text-pink-400 transition-all duration-300 flex-shrink-0 cursor-pointer relative"
+            @click.prevent="handleBack"
+            class="group flex items-center space-x-1 text-gray-300 hover:text-pink-400 transition-all duration-300 flex-shrink-0 cursor-pointer relative z-10"
           >
             <!-- Glow effect on hover -->
-            <div class="absolute -inset-2 bg-pink-500/0 group-hover:bg-pink-500/10 rounded-lg transition-all duration-300"></div>
+            <div class="absolute -inset-2 bg-pink-500/0 group-hover:bg-pink-500/10 rounded-lg transition-all duration-300 pointer-events-none"></div>
             <svg class="w-5 h-5 relative transition-transform group-active:scale-95" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
@@ -255,6 +255,7 @@ const backgroundStyle = computed(() => {
   return {}
 })
 
+// Handle back button click
 const handleBack = () => {
   if (props.backTo) {
     router.push(props.backTo)

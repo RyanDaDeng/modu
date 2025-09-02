@@ -39,7 +39,7 @@
             </div>
 
             <!-- Center Section: Search Bar -->
-            <div class="flex-1 max-w-xl mx-4 hidden sm:block">
+            <div class="flex-1 max-w-xl mx-4 hidden lg:block">
               <div class="relative group">
                 <!-- Gradient border glow on focus -->
                 <div class="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-full blur opacity-0 group-hover:opacity-30 transition-opacity"></div>
@@ -70,17 +70,29 @@
 
             <!-- Right Section: User Actions -->
             <div class="flex items-center gap-2 sm:gap-4">
-              <!-- App Download Button - Mobile and Desktop (Only show if not in WebView) -->
+              <!-- Permanent Link Button -->
+              <button
+                @click="showPermanentLinkModal = true"
+                class="flex items-center gap-1 px-2.5 py-1 bg-gray-700/40 backdrop-blur-sm border border-gray-500/40 hover:bg-gray-600/50 hover:border-pink-500/30 text-gray-300 hover:text-pink-300 rounded-lg transition-all cursor-pointer"
+                title="永久链接"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+                <span class="text-xs font-medium">永链</span>
+              </button>
+              
+              <!-- APP Install Button - Mobile and Desktop (Only show if not in WebView) -->
               <router-link
                 v-if="appStore.shouldShowAppDownload"
                 to="/app-download"
                 class="flex items-center gap-1 px-2.5 py-1 bg-gray-700/40 backdrop-blur-sm border border-gray-500/40 hover:bg-gray-600/50 hover:border-pink-500/30 text-gray-300 hover:text-pink-300 rounded-lg transition-all cursor-pointer"
-                title="下载 App"
+                title="安装 APP"
               >
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
-                <span class="text-xs font-medium">App</span>
+                <span class="text-xs font-medium">APP</span>
               </router-link>
               
               <!-- Quick Links - Desktop -->
@@ -91,8 +103,7 @@
                   title="图片服务器设置"
                 >
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </button>
                 
@@ -148,8 +159,7 @@
                   title="图片服务器设置"
                 >
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </button>
                 
@@ -211,13 +221,7 @@
                       </svg>
                     </div>
                   </div>
-                  <div class="flex items-center gap-1">
-                    <span class="text-white text-sm hidden sm:block">{{ authStore.user?.name }}</span>
-                    <!-- VIP Text Badge for desktop -->
-                    <span v-if="isUserVip" class="hidden sm:inline-flex items-center px-1.5 py-0.5 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold rounded-full">
-                      VIP
-                    </span>
-                  </div>
+                  <span class="text-white text-sm hidden sm:block">{{ authStore.user?.name }}</span>
                   <svg class="w-4 h-4 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                   </svg>
@@ -271,6 +275,18 @@
                             <svg class="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
+                          </div>
+                        </router-link>
+                        <router-link
+                          to="/vip"
+                          @click="handleDropdownClick"
+                          class="block px-4 py-2 text-gray-200 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+                        >
+                          <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            我要充值
                           </div>
                         </router-link>
                         <router-link
@@ -332,7 +348,7 @@
                             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                             </svg>
-                            App 下载
+                            APP 安装
                           </div>
                         </router-link>
                         <router-link
@@ -414,6 +430,102 @@
       @cancel="handleRegister"
     />
 
+    <!-- Permanent Link Modal -->
+    <div v-if="showPermanentLinkModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <!-- Backdrop -->
+      <div 
+        @click="showPermanentLinkModal = false"
+        class="absolute inset-0 bg-black/50 backdrop-blur-sm"
+      ></div>
+      
+      <!-- Modal Content -->
+      <div class="relative max-w-md w-full">
+        <!-- Gradient border effect -->
+        <div class="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-2xl blur opacity-50"></div>
+        
+        <!-- Main modal with glassmorphism -->
+        <div class="relative bg-gray-900/95 backdrop-blur-xl border border-white/20 rounded-2xl p-6 shadow-2xl">
+          <!-- Close button -->
+          <button
+            @click="showPermanentLinkModal = false"
+            class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors cursor-pointer"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          
+          <!-- Title -->
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
+              <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-white">永久链接</h2>
+              <p class="text-sm text-gray-400 mt-0.5">请保存以下地址</p>
+            </div>
+          </div>
+          
+          <!-- Links -->
+          <div class="space-y-4">
+            <!-- Main Address 1 -->
+            <div class="bg-gray-800/50 backdrop-blur-sm border border-white/10 rounded-lg p-4">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm text-gray-400">主地址一</span>
+                <button
+                  @click="copyToClipboard('https://modu18.vip')"
+                  class="text-xs px-2 py-1 bg-pink-500/20 hover:bg-pink-500/30 border border-pink-500/50 text-pink-300 rounded transition-all cursor-pointer"
+                >
+                  复制
+                </button>
+              </div>
+              <a 
+                href="https://modu18.vip" 
+                target="_blank"
+                class="text-blue-400 hover:text-blue-300 font-mono text-sm break-all transition-colors"
+              >
+                https://modu18.vip
+              </a>
+            </div>
+            
+            <!-- Main Address 2 -->
+            <div class="bg-gray-800/50 backdrop-blur-sm border border-white/10 rounded-lg p-4">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm text-gray-400">主地址二</span>
+                <button
+                  @click="copyToClipboard('https://18modu.vip')"
+                  class="text-xs px-2 py-1 bg-pink-500/20 hover:bg-pink-500/30 border border-pink-500/50 text-pink-300 rounded transition-all cursor-pointer"
+                >
+                  复制
+                </button>
+              </div>
+              <a 
+                href="https://18modu.vip" 
+                target="_blank"
+                class="text-blue-400 hover:text-blue-300 font-mono text-sm break-all transition-colors"
+              >
+                https://18modu.vip
+              </a>
+            </div>
+          </div>
+          
+          <!-- Notice -->
+          <div class="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+            <div class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p class="text-sm text-yellow-200">
+                可能需要科学上网访问
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </header>
 </template>
 
@@ -422,6 +534,7 @@ import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
+import { useNotificationStore } from '@/stores/notification'
 import SiteLogo from '@/components/SiteLogo.vue'
 import ServerSettings from '@/components/ServerSettings.vue'
 import FullscreenSearch from '@/components/FullscreenSearch.vue'
@@ -431,6 +544,7 @@ import ModalDialog from '@/components/ModalDialog.vue'
 const router = useRouter()
 const authStore = useAuthStore()
 const appStore = useAppStore()
+const notificationStore = useNotificationStore()
 
 // State
 const searchQuery = ref('')
@@ -439,6 +553,7 @@ const showServerSettings = ref(false)
 const showFullscreenSearch = ref(false)
 const showImageServerModal = ref(false)
 const showLoginPrompt = ref(false)
+const showPermanentLinkModal = ref(false)
 
 // Navigation Items
 const mainNavItems = [
@@ -452,17 +567,21 @@ const mainNavItems = [
 const categoryItems = computed(() => {
   const storeCategories = appStore.navCategories
   
-  // Always include 热门推荐 as first item
-  const items = [{ name: '热门推荐', path: '/' }]
+  // Always include 热门标签 as first item
+  const items = [{ name: '热门标签', path: '/search' }]
   
   // If we have categories from API, use them
   if (storeCategories && storeCategories.length > 0) {
     // Take first 6 categories and format them
-    const apiCategories = storeCategories.slice(0, 6).map((cat, index) => ({
-      name: cat.name || cat.title,
-      // First category (index 0) doesn't need c= parameter as it's the default
-      path: index === 0 ? '/catalog' : `/catalog?c=${cat.slug || cat.id}`
-    }))
+    const apiCategories = storeCategories.slice(0, 6).map((cat, index) => {
+      // Use the slug if available, otherwise use id
+      const categoryParam = cat.slug || cat.id || index
+      return {
+        name: cat.name || cat.title,
+        // First category (index 0) doesn't need c= parameter as it's the default
+        path: index === 0 ? '/catalog' : `/catalog?c=${categoryParam}`
+      }
+    })
     items.push(...apiCategories)
   }
   
@@ -539,6 +658,39 @@ const navigateFromDropdown = (path) => {
 // Handle dropdown click - close menu
 const handleDropdownClick = () => {
   showUserMenu.value = false
+}
+
+// Copy to clipboard function
+const copyToClipboard = (text) => {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      notificationStore.success('链接已复制到剪贴板')
+    }).catch(() => {
+      fallbackCopyToClipboard(text)
+    })
+  } else {
+    fallbackCopyToClipboard(text)
+  }
+}
+
+// Fallback copy method for older browsers
+const fallbackCopyToClipboard = (text) => {
+  const textArea = document.createElement('textarea')
+  textArea.value = text
+  textArea.style.position = 'fixed'
+  textArea.style.left = '-999999px'
+  document.body.appendChild(textArea)
+  textArea.focus()
+  textArea.select()
+  
+  try {
+    document.execCommand('copy')
+    notificationStore.success('链接已复制到剪贴板')
+  } catch (err) {
+    notificationStore.error('复制失败，请手动复制')
+  }
+  
+  document.body.removeChild(textArea)
 }
 </script>
 

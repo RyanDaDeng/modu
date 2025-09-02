@@ -3,7 +3,7 @@
     <button
       v-if="showButton"
       @click="scrollToTop"
-      class="fixed bottom-20 sm:bottom-6 right-4 z-40 group cursor-pointer"
+      class="fixed bottom-24 sm:bottom-30 right-4 md:right-60 lg:right-80 z-40 group cursor-pointer"
       aria-label="返回顶部"
     >
       <!-- Glassmorphism background with gradient border -->

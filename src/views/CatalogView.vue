@@ -447,7 +447,7 @@ const parseQueryParams = () => {
 }
 
 // Update URL with current filters
-const updateURL = () => {
+const updateURL = (usePush = false) => {
   const query = {}
   
   // Always include page in URL
@@ -471,8 +471,16 @@ const updateURL = () => {
     }
   }
   
-  // Always use push to maintain proper history
-  router.push({ query })
+  // Set flag to prevent watch handler from reacting to our own updates
+  isUpdatingUrl.value = true
+  
+  // Use replace to avoid creating multiple history entries when filtering
+  // Only use push for initial navigation or explicit page changes
+  if (usePush) {
+    router.push({ query })
+  } else {
+    router.replace({ query })
+  }
 }
 
 // Load categories
@@ -657,8 +665,17 @@ const handlePageChange = (page) => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
+// Flag to prevent recursive updates
+const isUpdatingUrl = ref(false)
+
 // Watch for route changes
 watch(() => route.query, () => {
+  // Skip if we're the ones updating the URL
+  if (isUpdatingUrl.value) {
+    isUpdatingUrl.value = false
+    return
+  }
+  
   // Only react to route changes if categories are loaded
   if (categories.value.length > 0) {
     parseQueryParams()
@@ -670,7 +687,15 @@ watch(() => route.query, () => {
     
     // Load comics with new settings
     if (selectedCategory.value) {
-      applyFilter(false) // Don't reset page on query change
+      // Don't call applyFilter here as it will update URL again
+      // Just load comics directly
+      comics.value = []
+      hasMore.value = true
+      hasSearched.value = true
+      totalItems.value = 0
+      itemsPerPage.value = 0
+      totalPages.value = 1
+      loadComics(true)
     }
   }
 }, { deep: true })
