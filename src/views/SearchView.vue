@@ -380,9 +380,11 @@ const saveScrollPosition = () => {
 
 watch(() => route.query.wd, (newQuery) => {
   console.log('Search query changed:', newQuery, 'Current:', searchQuery.value)
-  // Only update if there's an actual change and newQuery is not undefined
-  if (newQuery !== undefined && newQuery !== searchQuery.value) {
-    searchQuery.value = newQuery || ''
+  // Update searchQuery based on route query (undefined means no query param)
+  const queryValue = newQuery || ''
+  
+  if (queryValue !== searchQuery.value) {
+    searchQuery.value = queryValue
     if (searchQuery.value && authStore.isLoggedIn) {
       // Only search if user is logged in
       // Try to restore previous state first

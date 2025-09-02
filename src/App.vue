@@ -26,7 +26,7 @@
       <main class="flex-grow">
         <router-view v-slot="{ Component, route }">
           <keep-alive :include="cachedViews">
-            <component :is="Component" :key="route.path" />
+            <component :is="Component" :key="cachedViews.includes(Component?.name) ? Component?.name : route.path" />
           </keep-alive>
         </router-view>
       </main>

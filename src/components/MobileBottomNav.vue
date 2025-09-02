@@ -1,18 +1,5 @@
 <template>
   <div class="lg:hidden fixed bottom-0 left-0 right-0 z-40">
-    <!-- Page Loading Indicator -->
-    <transition
-      enter-active-class="transition-opacity duration-200"
-      enter-from-class="opacity-0"
-      enter-to-class="opacity-100"
-      leave-active-class="transition-opacity duration-200"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
-    >
-      <div v-if="isNavigating" class="absolute inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500"></div>
-      </div>
-    </transition>
     <!-- Glassmorphism background with gradient border -->
     <div class="absolute inset-0 bg-gray-900/80 backdrop-blur-xl border-t border-white/10"></div>
     
@@ -24,7 +11,6 @@
       <!-- Home -->
       <router-link
         to="/"
-        @click="handleNavClick('/')"
         class="group flex flex-col items-center justify-center py-3 transition-all duration-300 relative"
         :class="{ 'text-pink-400': $route.path === '/', 'text-gray-400': $route.path !== '/' }"
       >
@@ -49,7 +35,6 @@
       <!-- Catalog -->
       <router-link
         to="/catalog"
-        @click="handleNavClick('/catalog')"
         class="group flex flex-col items-center justify-center py-3 transition-all duration-300 relative"
         :class="{ 'text-purple-400': $route.path === '/catalog', 'text-gray-400': $route.path !== '/catalog' }"
       >
@@ -73,7 +58,6 @@
       <!-- Search -->
       <router-link
         to="/search"
-        @click="handleNavClick('/search')"
         class="group flex flex-col items-center justify-center py-3 transition-all duration-300 relative"
         :class="{ 'text-cyan-400': $route.path === '/search', 'text-gray-400': $route.path !== '/search' }"
       >
@@ -97,7 +81,6 @@
       <!-- Updates -->
       <router-link
         to="/updates"
-        @click="handleNavClick('/updates')"
         class="group flex flex-col items-center justify-center py-3 transition-all duration-300 relative"
         :class="{ 'text-blue-400': $route.path === '/updates', 'text-gray-400': $route.path !== '/updates' }"
       >
@@ -121,7 +104,6 @@
       <!-- Latest -->
       <router-link
         to="/latest"
-        @click="handleNavClick('/latest')"
         class="group flex flex-col items-center justify-center py-3 transition-all duration-300 relative"
         :class="{ 'text-green-400': $route.path === '/latest', 'text-gray-400': $route.path !== '/latest' }"
       >
@@ -145,7 +127,6 @@
       <!-- Profile/My -->
       <router-link
         to="/profile"
-        @click="handleNavClick('/profile')"
         class="group flex flex-col items-center justify-center py-3 transition-all duration-300 relative"
         :class="{ 'text-yellow-400': $route.path === '/profile', 'text-gray-400': $route.path !== '/profile' }"
       >
@@ -170,27 +151,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const router = useRouter()
-const isNavigating = ref(false)
-
-const handleNavClick = (targetPath) => {
-  // Only show loading if navigating to a different page
-  if (route.path !== targetPath) {
-    isNavigating.value = true
-    
-    // Clear loading state after navigation completes or after timeout
-    setTimeout(() => {
-      isNavigating.value = false
-    }, 800) // Fallback timeout
-  }
-}
-
-// Listen for route changes to clear loading state
-router.afterEach(() => {
-  isNavigating.value = false
-})
 </script>

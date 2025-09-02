@@ -64,6 +64,19 @@ const updateScrollButtons = () => {
   }
 }
 
+// Method to reset scroll position to the beginning
+const resetScroll = () => {
+  if (scrollContainer.value) {
+    scrollContainer.value.scrollTo({ left: 0, behavior: 'smooth' })
+    updateScrollButtons()
+  }
+}
+
+// Expose the reset method for parent components
+defineExpose({
+  resetScroll
+})
+
 let resizeObserver = null
 
 onMounted(() => {

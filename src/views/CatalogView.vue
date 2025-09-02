@@ -330,7 +330,7 @@ export default {
 </script>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, onBeforeUnmount, onActivated, onDeactivated, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getCategoriesFilter, getCategories } from '@/api/request'
 import AppLayout from '@/components/AppLayout.vue'
@@ -342,6 +342,9 @@ import { formatNumber } from '@/utils/format'
 
 const router = useRouter()
 const route = useRoute()
+
+// Key for storing state in sessionStorage
+const CATALOG_STATE_KEY = 'catalogPageState'
 
 // Categories data
 const categories = ref([])
@@ -480,6 +483,70 @@ const updateURL = (usePush = false) => {
     router.push({ query })
   } else {
     router.replace({ query })
+  }
+}
+
+// Save state to sessionStorage
+const saveState = () => {
+  const state = {
+    categories: categories.value,
+    themeBlocks: themeBlocks.value,
+    selectedCategory: selectedCategory.value,
+    selectedSubCategory: selectedSubCategory.value,
+    selectedSort: selectedSort.value,
+    comics: comics.value,
+    currentPage: currentPage.value,
+    displayPage: displayPage.value,
+    hasMore: hasMore.value,
+    totalItems: totalItems.value,
+    totalPages: totalPages.value,
+    itemsPerPage: itemsPerPage.value,
+    hasSearched: hasSearched.value,
+    timestamp: Date.now()
+  }
+  sessionStorage.setItem(CATALOG_STATE_KEY, JSON.stringify(state))
+}
+
+// Restore state from sessionStorage
+const restoreState = () => {
+  try {
+    const savedState = sessionStorage.getItem(CATALOG_STATE_KEY)
+    if (!savedState) return false
+    
+    const state = JSON.parse(savedState)
+    
+    // Check if state is not too old (5 minutes)
+    if (Date.now() - state.timestamp > 5 * 60 * 1000) {
+      sessionStorage.removeItem(CATALOG_STATE_KEY)
+      return false
+    }
+    
+    // Restore all state
+    categories.value = state.categories || []
+    themeBlocks.value = state.themeBlocks || []
+    selectedCategory.value = state.selectedCategory
+    selectedSubCategory.value = state.selectedSubCategory
+    selectedSort.value = state.selectedSort || 'mv'
+    comics.value = state.comics || []
+    currentPage.value = state.currentPage || 1
+    displayPage.value = state.displayPage || 1
+    hasMore.value = state.hasMore ?? true
+    totalItems.value = state.totalItems || 0
+    totalPages.value = state.totalPages || 1
+    itemsPerPage.value = state.itemsPerPage || 0
+    hasSearched.value = state.hasSearched ?? false
+    
+    // Make sure loading states are false when restoring
+    loading.value = false
+    loadingMore.value = false
+    loadingCategories.value = false
+    pageLoading.value = false
+    
+    return true
+  } catch (error) {
+    console.error('Failed to restore state:', error)
+    sessionStorage.removeItem(CATALOG_STATE_KEY)
+    return false
   }
 }
 
@@ -667,14 +734,45 @@ const handlePageChange = (page) => {
 
 // Flag to prevent recursive updates
 const isUpdatingUrl = ref(false)
+// Flag to prevent watch from firing on mount
+const isMounted = ref(false)
 
-// Watch for route changes
-watch(() => route.query, () => {
+// Watch for route changes  
+watch(() => route.query, (newQuery, oldQuery) => {
+  console.log('Route query watch triggered', { 
+    isMounted: isMounted.value, 
+    routeName: route.name,
+    isUpdatingUrl: isUpdatingUrl.value,
+    newQuery,
+    oldQuery 
+  })
+  
+  // Skip if not mounted yet
+  if (!isMounted.value) {
+    console.log('Skipping - not mounted')
+    return
+  }
+  
+  // Only process if we're on the catalog page
+  if (route.name !== 'catalog') {
+    console.log('Skipping - not on catalog page')
+    return
+  }
+  
   // Skip if we're the ones updating the URL
   if (isUpdatingUrl.value) {
+    console.log('Skipping - we are updating URL')
     isUpdatingUrl.value = false
     return
   }
+  
+  // Skip if coming back to the same page (activated from keep-alive)
+  if (!isFirstActivation.value && JSON.stringify(newQuery) === JSON.stringify(oldQuery)) {
+    console.log('Skipping - same query, just activated from keep-alive')
+    return
+  }
+  
+  console.log('Processing route change in watch')
   
   // Only react to route changes if categories are loaded
   if (categories.value.length > 0) {
@@ -695,39 +793,65 @@ watch(() => route.query, () => {
       totalItems.value = 0
       itemsPerPage.value = 0
       totalPages.value = 1
+      console.log('Watch is calling loadComics')
       loadComics(true)
     }
   }
 }, { deep: true })
 
+// Flag to track if this is the first activation
+const isFirstActivation = ref(true)
+
 onMounted(() => {
-  // Parse initial query params
-  parseQueryParams()
+  console.log('CatalogView mounted (first time)')
+  // Initial mount - load data
+  const stateRestored = restoreState()
   
-  // Initialize page if not set
-  if (currentPage.value === 0) {
-    currentPage.value = 1
-    displayPage.value = 1
-  }
-  
-  // Only load categories if they haven't been loaded yet
-  if (categories.value.length === 0) {
-    loadCategories()
-  } else {
-    // Categories already loaded, parse query params and load comics
+  if (!stateRestored) {
+    // Parse initial query params
     parseQueryParams()
     
-    // If no category selected from query, select first category by default
-    if (!selectedCategory.value && categories.value.length > 0) {
-      selectedCategory.value = categories.value[0]
+    // Initialize page if not set
+    if (currentPage.value === 0) {
+      currentPage.value = 1
+      displayPage.value = 1
     }
     
-    // Load comics with current settings
-    if (selectedCategory.value) {
-      applyFilter(false) // Don't reset page on initial load
-    }
+    // Load categories
+    loadCategories()
+  } else {
     pageLoading.value = false
   }
+  
+  // Set mounted flag after initial load
+  setTimeout(() => {
+    isMounted.value = true
+  }, 100)
+})
+
+// Called when keep-alive component is activated (navigating back to this page)
+onActivated(() => {
+  console.log('CatalogView activated, isFirstActivation:', isFirstActivation.value)
+  if (!isFirstActivation.value) {
+    // Not the first activation, we're coming back to this page
+    // State is already in memory, no need to reload
+    pageLoading.value = false
+    loadingCategories.value = false  // Make sure loading state is false
+    console.log('Reusing existing state, no API call')
+  }
+  isFirstActivation.value = false
+})
+
+// Called when keep-alive component is deactivated (navigating away)
+onDeactivated(() => {
+  console.log('CatalogView deactivated, saving state')
+  saveState()
+})
+
+// Still keep onBeforeUnmount for cases where the component is actually destroyed
+onBeforeUnmount(() => {
+  console.log('CatalogView unmounting')
+  saveState()
 })
 </script>
 

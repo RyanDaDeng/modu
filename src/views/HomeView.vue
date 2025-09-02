@@ -493,7 +493,7 @@
             <div v-if="loadingWeekly" class="absolute inset-0 bg-gray-900/50 backdrop-blur-sm rounded-lg z-10 flex items-center justify-center min-h-[200px]">
               <LoadingSpinner />
             </div>
-            <HorizontalSlider>
+            <HorizontalSlider ref="weeklySlider">
               <router-link
                 v-for="comic in weeklyUpdates"
                 :key="comic.id"
@@ -680,7 +680,7 @@ export default {
 </script>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { useAuthStore } from '@/stores/auth'
@@ -752,6 +752,7 @@ const updateTabs = [
   { label: '日漫', value: 'manga' }
 ]
 const selectedUpdateType = ref('all')
+const weeklySlider = ref(null)
 
 
 
@@ -953,6 +954,12 @@ const selectUpdateType = async (type) => {
     const data = await getWeeklyUpdates(type)
     if (data?.list) {
       weeklyUpdates.value = data.list.slice(0, 20)
+      // Reset slider to the beginning on mobile after data loads
+      if (weeklySlider.value && window.innerWidth < 768) {
+        // Use nextTick to ensure DOM has updated with new content
+        await nextTick()
+        weeklySlider.value.resetScroll()
+      }
     }
   } catch (err) {
     console.error('Failed to load weekly updates:', err)
