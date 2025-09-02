@@ -92,6 +92,12 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/affiliate',
+      name: 'affiliate',
+      component: () => import('../views/AffiliateView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/terms',
       name: 'terms',
       component: () => import('../views/TermsView.vue')

@@ -68,6 +68,17 @@ const cachedViews = [
 
 onMounted(async () => {
   try {
+    // Check for referral ID in URL
+    const urlParams = new URLSearchParams(window.location.search)
+    const fromId = urlParams.get('fromid')
+    if (fromId) {
+      // Store referral ID in localStorage
+      localStorage.setItem('referral_from_id', fromId)
+      // Remove fromid from URL to clean it up
+      const cleanUrl = window.location.pathname + window.location.hash
+      window.history.replaceState({}, document.title, cleanUrl)
+    }
+    
     // 初始化应用
     appStore.initializeApp()
     

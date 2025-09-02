@@ -94,11 +94,28 @@ const generateRequestSignature = () => {
 // 注册 - 带安全验证
 export const register = async (data) => {
   const { timestamp, signature } = generateRequestSignature()
-  const response = await api.post('/api/auth/register', {
+  
+  // Get referral ID from localStorage if exists
+  const referralFromId = localStorage.getItem('referral_from_id')
+  
+  const requestData = {
     ...data,
     _timestamp: timestamp,
     _signature: signature
-  })
+  }
+  
+  // Add inviter_id if referral ID exists
+  if (referralFromId) {
+    requestData.inviter_id = referralFromId
+  }
+  
+  const response = await api.post('/api/auth/register', requestData)
+  
+  // Clear referral ID after successful registration
+  if (response.success) {
+    localStorage.removeItem('referral_from_id')
+  }
+  
   return response
 }
 
