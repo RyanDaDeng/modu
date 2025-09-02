@@ -2305,4 +2305,25 @@ onUnmounted(() => {
   animation: spin-slow 3s linear infinite;
 }
 
+/* Transparent scrollbar for reading mode */
+.fixed.inset-0.z-50.bg-black.overflow-y-auto {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.fixed.inset-0.z-50.bg-black.overflow-y-auto::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  background: transparent;
+}
+
+.fixed.inset-0.z-50.bg-black.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.fixed.inset-0.z-50.bg-black.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: transparent;
+  border: none;
+}
+
 </style>
