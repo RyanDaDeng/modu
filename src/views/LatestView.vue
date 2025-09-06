@@ -11,7 +11,7 @@
         <LoadingSpinner />
       </div>
 
-      <div v-if="!loading" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-6 gap-3">
+      <div v-if="!loading" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-6 gap-3">
         <ComicCard
           v-for="comic in comics"
           :key="`${comic.id}-${comic.page}`"

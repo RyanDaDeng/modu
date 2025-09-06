@@ -10,11 +10,11 @@
     >
       <div
         v-if="modelValue"
-        class="fixed inset-0 z-[100] flex items-start justify-center pt-[5vh] sm:pt-[10vh] bg-black/80 backdrop-blur-sm"
+        class="fixed inset-0 z-[100] flex items-start justify-center pt-safe bg-black/80 backdrop-blur-sm"
         @click.self="close"
       >
         <div 
-          class="w-full max-w-2xl mx-2 sm:mx-4"
+          class="w-full max-w-2xl mx-2 sm:mx-4 mt-[5vh] sm:mt-[10vh]"
           @click.stop
         >
           <!-- Search Input -->
@@ -44,6 +44,31 @@
               <svg class="w-5 sm:w-6 h-5 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
+            </button>
+          </div>
+
+          <!-- ID Direct Navigation Suggestion -->
+          <div v-if="isNumericQuery" class="mt-3 sm:mt-4 bg-gradient-to-r from-blue-600/20 to-purple-600/20 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-2xl border border-blue-500/30 overflow-hidden">
+            <button
+              @click="goToComicById"
+              class="w-full p-3 sm:p-4 hover:bg-white/5 transition-colors cursor-pointer"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  <div class="p-2 bg-blue-500/20 rounded-lg">
+                    <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                    </svg>
+                  </div>
+                  <div class="text-left">
+                    <p class="text-sm sm:text-base text-white font-medium">直接跳转到 ID: {{ searchQuery }}</p>
+                    <p class="text-xs text-gray-400">如果您要查找特定漫画ID，点击这里直接跳转</p>
+                  </div>
+                </div>
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
             </button>
           </div>
 
@@ -118,7 +143,7 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick, onMounted } from 'vue'
+import { ref, computed, watch, nextTick, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { getHotTags } from '@/api/request'
@@ -141,6 +166,12 @@ const searchInput = ref(null)
 const hotTags = ref([])
 const showClearConfirm = ref(false)
 
+// Computed property to check if query is purely numeric
+const isNumericQuery = computed(() => {
+  const trimmed = searchQuery.value.trim()
+  return trimmed.length > 0 && /^\d+$/.test(trimmed)
+})
+
 const close = () => {
   searchQuery.value = ''
   emit('update:modelValue', false)
@@ -162,6 +193,15 @@ const handleSearch = () => {
         query: { wd: query }
       })
     }
+    close()
+  }
+}
+
+// Navigate directly to comic by ID
+const goToComicById = () => {
+  const id = searchQuery.value.trim()
+  if (id && /^\d+$/.test(id)) {
+    router.push(`/chapter/${id}`)
     close()
   }
 }

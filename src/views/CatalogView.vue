@@ -590,6 +590,8 @@ const loadComics = async (reset = false) => {
     loading.value = true
   } else {
     loadingMore.value = true
+    // Increment page BEFORE fetching for load more
+    currentPage.value++
   }
 
   try {
@@ -633,10 +635,7 @@ const loadComics = async (reset = false) => {
       // Update display page for pagination component
       displayPage.value = currentPage.value
       
-      // Only increment currentPage if not using reset (for load more functionality)
-      if (!reset) {
-        currentPage.value++
-      }
+      // Check if there are more pages
       hasMore.value = data.content.length >= 80
     } else {
       hasMore.value = false

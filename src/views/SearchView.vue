@@ -97,6 +97,33 @@
       </div>
 
       <div v-else>
+        <!-- ID Direct Navigation Suggestion for numeric queries - Always show at top -->
+        <div v-if="isNumericQuery" class="mb-6">
+          <div class="bg-gradient-to-r from-blue-600/20 to-purple-600/20 backdrop-blur-sm rounded-xl shadow-2xl border border-blue-500/30 overflow-hidden">
+            <button
+              @click="goToComicById"
+              class="w-full p-4 hover:bg-white/5 transition-colors cursor-pointer"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  <div class="p-2 bg-blue-500/20 rounded-lg">
+                    <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                    </svg>
+                  </div>
+                  <div class="text-left">
+                    <p class="text-base text-white font-medium">直接跳转到 ID: {{ searchQuery }}</p>
+                    <p class="text-sm text-gray-400">点击尝试直接访问此漫画ID</p>
+                  </div>
+                </div>
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </button>
+          </div>
+        </div>
+
         <div v-if="loading && !comics.length" class="flex justify-center py-12">
           <LoadingSpinner />
         </div>
@@ -143,7 +170,7 @@ export default {
 </script>
 
 <script setup>
-import { ref, watch, onMounted, onUnmounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { useAuthStore } from '@/stores/auth'
@@ -170,6 +197,20 @@ const categoryBlocks = ref([])
 const loadingCategories = ref(false)
 
 let observer = null
+
+// Computed property to check if query is purely numeric
+const isNumericQuery = computed(() => {
+  const trimmed = searchQuery.value.trim()
+  return trimmed.length > 0 && /^\d+$/.test(trimmed)
+})
+
+// Navigate directly to comic by ID
+const goToComicById = () => {
+  const id = searchQuery.value.trim()
+  if (id && /^\d+$/.test(id)) {
+    router.push(`/chapter/${id}`)
+  }
+}
 
 // Handle search click
 const handleSearchClick = () => {
