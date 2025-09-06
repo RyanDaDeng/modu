@@ -346,7 +346,7 @@
     </div>
 
     <!-- Reading Mode (Fullscreen) -->
-    <div v-if="isReading" ref="readingContainer" class="fixed inset-0 z-50 bg-black overflow-y-auto hide-scrollbar pinch-zoom-container" @scroll="handleReadingScroll">
+    <div v-if="isReading" ref="readingContainer" class="fixed inset-0 z-50 bg-black overflow-y-auto hide-scrollbar" @scroll="handleReadingScroll">
       <!-- Reading Header -->
       <div 
         class="fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800 transition-transform duration-300 pt-safe"
@@ -550,7 +550,6 @@
               v-show="image.loaded"
               :ref="el => canvasRefs[index] = el"
               class="w-full h-auto block"
-              style="touch-action: pinch-zoom;"
             />
             
             <!-- Regular image -->
@@ -559,7 +558,6 @@
               :src="image.src"
               :alt="`Page ${index + 1}`"
               class="w-full h-auto block"
-              style="touch-action: pinch-zoom;"
               @load="onImageLoad(index)"
               @error="onImageError(index)"
             />
@@ -2316,31 +2314,6 @@ onUnmounted(() => {
   width: 0;
   height: 0;
   display: none;
-}
-
-/* Enable pinch-to-zoom on mobile for comic images */
-.pinch-zoom-container {
-  touch-action: pan-y pinch-zoom;
-}
-
-/* For individual images, allow pinch zoom */
-.comic-image-container img,
-.comic-image-container canvas {
-  max-width: 100%;
-  height: auto;
-}
-
-/* On mobile devices, allow zooming */
-@media (max-width: 768px) {
-  .comic-image-container {
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  .comic-image-container img,
-  .comic-image-container canvas {
-    touch-action: auto;
-  }
 }
 
 </style>
