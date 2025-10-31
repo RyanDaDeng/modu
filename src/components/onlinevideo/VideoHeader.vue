@@ -70,9 +70,9 @@
 
               <!-- Quick Links - Desktop -->
               <div class="hidden md:flex items-center gap-2">
-                <!-- Video Collection - Show when user is logged in and is Video VIP -->
+                <!-- Video Collection - Show when user is logged in -->
                 <router-link
-                  v-if="authStore.isLoggedIn && isVideoVip"
+                  v-if="authStore.isLoggedIn"
                   to="/video-collection"
                   class="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all"
                   title="视频收藏"
@@ -82,7 +82,7 @@
                   </svg>
                 </router-link>
 
-                <!-- VIP Button -->
+                <!-- VIP Button - Show when not logged in or not VIP -->
                 <router-link
                   v-if="!authStore.isLoggedIn || !isVideoVip"
                   to="/vip?tab=video"
