@@ -122,8 +122,8 @@ const displayedCategories = computed(() => {
 // 排序选项
 const sortFilters = [
   { value: 'latest', label: '最新' },
-  { value: 'popular', label: '最热' },
-  { value: 'views', label: '观看最多' }
+  { value: 'hot', label: '最热' },
+  { value: 'favorites', label: '最多收藏' }
 ]
 
 // 来源选项

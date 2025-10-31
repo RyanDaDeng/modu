@@ -220,8 +220,8 @@ const currentCategoryName = computed(() => {
 const currentSortName = computed(() => {
   const sortMap = {
     'latest': '最新',
-    'popular': '最热',
-    'views': '观看最多'
+    'hot': '最热',
+    'favorites': '最多收藏'
   }
   return sortMap[filters.value.sortFilter] || filters.value.sortFilter
 })
