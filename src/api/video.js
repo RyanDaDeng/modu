@@ -54,7 +54,13 @@ export const getVideoSettings = async (source = null) => {
  * @param {string|number} id - 视频ID
  */
 export const getVideoDetail = async (id) => {
-  const response = await api.get(`/api/online-video/${id}/detail`)
+  // 检查用户是否已登录
+  const token = localStorage.getItem('auth_token')
+  // 根据登录状态选择不同的API端点
+  const endpoint = token
+    ? `/api/online-video/${id}/detail`  // 已登录：使用需要认证的接口
+    : `/api/public/online-video/${id}/detail`  // 未登录：使用公开接口
+  const response = await api.get(endpoint)
   return response.data
 }
 
