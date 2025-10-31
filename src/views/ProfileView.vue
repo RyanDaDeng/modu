@@ -47,23 +47,45 @@
                 {{ authStore.user?.email }}
               </p>
               
-              <!-- VIP Status Badge -->
-              <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-sm" 
-                :class="isUserVip() 
-                  ? 'bg-gradient-to-r from-yellow-500/20 to-orange-500/20 text-yellow-300 border border-yellow-500/30' 
-                  : 'bg-gray-800/50 text-gray-400 border border-gray-700/50'">
-                <svg v-if="isUserVip()" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-                <svg v-else class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-                </svg>
-                <span class="font-medium">
-                  {{ isUserVip() ? 'VIP会员' : '普通用户' }}
-                </span>
-                <span v-if="isUserVip() && authStore.user?.vip_expired_at" class="text-xs opacity-70 border-l border-yellow-500/30 pl-2">
-                  {{ formatDate(authStore.user.vip_expired_at) }}
-                </span>
+              <!-- VIP Status Badges -->
+              <div class="flex flex-col sm:flex-row gap-2">
+                <!-- 漫画VIP -->
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-sm"
+                  :class="isComicVip()
+                    ? 'bg-gradient-to-r from-yellow-500/20 to-orange-500/20 text-yellow-300 border border-yellow-500/30'
+                    : 'bg-gray-800/50 text-gray-400 border border-gray-700/50'">
+                  <svg v-if="isComicVip()" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <svg v-else class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.669 0-3.218.51-4.5 1.385V4.804z" />
+                  </svg>
+                  <span class="font-medium text-sm">
+                    {{ isComicVip() ? '漫画VIP' : '无漫画通行证' }}
+                  </span>
+                  <span v-if="isComicVip() && authStore.user?.vip_expired_at" class="text-xs opacity-70 border-l border-yellow-500/30 pl-2">
+                    {{ formatDate(authStore.user.vip_expired_at) }}
+                  </span>
+                </div>
+
+                <!-- 视频VIP -->
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-sm"
+                  :class="isVideoVip()
+                    ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-300 border border-purple-500/30'
+                    : 'bg-gray-800/50 text-gray-400 border border-gray-700/50'">
+                  <svg v-if="isVideoVip()" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
+                  </svg>
+                  <svg v-else class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                  </svg>
+                  <span class="font-medium text-sm">
+                    {{ isVideoVip() ? '视频VIP' : '无视频通行证' }}
+                  </span>
+                  <span v-if="isVideoVip() && authStore.user?.video_expired_at" class="text-xs opacity-70 border-l border-purple-500/30 pl-2">
+                    {{ formatDate(authStore.user.video_expired_at) }}
+                  </span>
+                </div>
               </div>
             </div>
             
@@ -467,10 +489,21 @@ const userInitial = computed(() => {
   return authStore.user?.name?.charAt(0).toUpperCase() || 'U'
 })
 
-// Helper function to check if user is VIP
-const isUserVip = () => {
+// Helper function to check if user has Comic VIP
+const isComicVip = () => {
   if (!authStore.user?.vip_expired_at) return false
   return new Date(authStore.user.vip_expired_at) > new Date()
+}
+
+// Helper function to check if user has Video VIP
+const isVideoVip = () => {
+  if (!authStore.user?.video_expired_at) return false
+  return new Date(authStore.user.video_expired_at) > new Date()
+}
+
+// Legacy function for backward compatibility
+const isUserVip = () => {
+  return isComicVip() || isVideoVip()
 }
 
 // Methods
