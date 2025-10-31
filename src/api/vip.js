@@ -30,8 +30,15 @@ api.interceptors.request.use(
 )
 
 
-// Get VIP plans
+// Get All VIP plans (including both comic and video plans)
 export const getVipPlans = async () => {
+  const response = await api.get('/api/vip/plans')
+  return response.data
+}
+
+// Deprecated: Use getVipPlans() instead which now returns all plans
+export const getVideoVipPlans = async () => {
+  console.warn('getVideoVipPlans is deprecated. Use getVipPlans() instead.')
   const response = await api.get('/api/vip/plans')
   return response.data
 }

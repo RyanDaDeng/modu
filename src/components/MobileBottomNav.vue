@@ -10,24 +10,24 @@
     <div class="relative grid grid-cols-6 h-20 pb-safe">
       <!-- Home -->
       <router-link
-        to="/"
+        to="/comic"
         class="group flex flex-col items-center justify-center py-3 transition-all duration-300 relative"
-        :class="{ 'text-pink-400': $route.path === '/', 'text-gray-400': $route.path !== '/' }"
+        :class="{ 'text-pink-400': $route.path === '/comic', 'text-gray-400': $route.path !== '/comic' }"
       >
         <!-- Active indicator -->
-        <div v-if="$route.path === '/'" 
+        <div v-if="$route.path === '/comic'"
              class="absolute inset-0 bg-gradient-to-t from-pink-500/20 to-transparent"></div>
-        
+
         <!-- Icon container with glow effect -->
         <div class="relative">
-          <svg class="w-7 h-7 transition-transform group-active:scale-95" 
-               :class="{ 'filter drop-shadow-[0_0_8px_rgba(236,72,153,0.5)]': $route.path === '/' }"
+          <svg class="w-7 h-7 transition-transform group-active:scale-95"
+               :class="{ 'filter drop-shadow-[0_0_8px_rgba(236,72,153,0.5)]': $route.path === '/comic' }"
                fill="currentColor" viewBox="0 0 20 20">
             <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
           </svg>
         </div>
         <span class="text-xs mt-1.5 font-medium"
-              :class="{ 'text-pink-400': $route.path === '/', 'text-gray-500': $route.path !== '/' }">
+              :class="{ 'text-pink-400': $route.path === '/comic', 'text-gray-500': $route.path !== '/comic' }">
           首页
         </span>
       </router-link>
@@ -85,9 +85,9 @@
         :class="{ 'text-blue-400': $route.path === '/updates', 'text-gray-400': $route.path !== '/updates' }"
       >
         <!-- Active indicator -->
-        <div v-if="$route.path === '/updates'" 
+        <div v-if="$route.path === '/updates'"
              class="absolute inset-0 bg-gradient-to-t from-blue-500/20 to-transparent"></div>
-        
+
         <div class="relative">
           <svg class="w-7 h-7 transition-transform group-active:scale-95"
                :class="{ 'filter drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]': $route.path === '/updates' }"
@@ -100,7 +100,7 @@
           更新
         </span>
       </router-link>
-      
+
       <!-- Latest -->
       <router-link
         to="/latest"
@@ -125,33 +125,55 @@
       </router-link>
       
       <!-- Profile/My -->
-      <router-link
-        to="/profile"
-        class="group flex flex-col items-center justify-center py-3 transition-all duration-300 relative"
-        :class="{ 'text-yellow-400': $route.path === '/profile', 'text-gray-400': $route.path !== '/profile' }"
+      <button
+        @click="handleMyClick"
+        class="group flex flex-col items-center justify-center py-3 transition-all duration-300 relative cursor-pointer"
+        :class="{ 'text-yellow-400': isUserMenuActive, 'text-gray-400': !isUserMenuActive }"
       >
         <!-- Active indicator -->
-        <div v-if="$route.path === '/profile'" 
+        <div v-if="isUserMenuActive"
              class="absolute inset-0 bg-gradient-to-t from-yellow-500/20 to-transparent"></div>
-        
+
         <div class="relative">
           <svg class="w-7 h-7 transition-transform group-active:scale-95"
-               :class="{ 'filter drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]': $route.path === '/profile' }"
+               :class="{ 'filter drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]': isUserMenuActive }"
                fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
           </svg>
         </div>
         <span class="text-xs mt-1.5 font-medium"
-              :class="{ 'text-yellow-400': $route.path === '/profile', 'text-gray-500': $route.path !== '/profile' }">
+              :class="{ 'text-yellow-400': isUserMenuActive, 'text-gray-500': !isUserMenuActive }">
           我的
         </span>
-      </router-link>
+      </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { useRoute } from 'vue-router'
+import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useUserMenu } from '@/composables/useUserMenu'
+import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
+const router = useRouter()
+const authStore = useAuthStore()
+const { isUserMenuOpen, toggle } = useUserMenu()
+
+const isUserMenuActive = computed(() => isUserMenuOpen.value)
+
+const handleMyClick = () => {
+  if (!authStore.isLoggedIn) {
+    router.push('/login')
+  } else {
+    toggle()
+  }
+}
 </script>
+
+<style scoped>
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+</style>

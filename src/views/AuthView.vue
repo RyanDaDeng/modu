@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen relative overflow-hidden pb-16 lg:pb-0">
+  <div class="min-h-screen relative overflow-hidden">
     <!-- Background Image -->
     <div class="fixed inset-0">
       <img 
@@ -315,9 +315,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Mobile Bottom Navigation -->
-    <MobileBottomNav />
   </div>
 </template>
 
@@ -327,7 +324,6 @@ import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useNotificationStore } from '@/stores/notification'
 import SiteLogo from '@/components/SiteLogo.vue'
-import MobileBottomNav from '@/components/MobileBottomNav.vue'
 
 const router = useRouter()
 const route = useRoute()

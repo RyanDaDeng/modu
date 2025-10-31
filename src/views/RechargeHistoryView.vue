@@ -1,5 +1,5 @@
 <template>
-  <AppLayout title="充值记录">
+  <GeneralLayout title="充值记录">
     <div class="container mx-auto px-4 py-6">
       <!-- Header with count -->
       <div class="mb-6">
@@ -156,7 +156,7 @@
         <LoadingSpinner size="small" />
       </div>
     </div>
-  </AppLayout>
+  </GeneralLayout>
 </template>
 
 <script setup>
@@ -164,7 +164,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { getRechargeHistory } from '@/api/vip'
-import AppLayout from '@/components/AppLayout.vue'
+import GeneralLayout from '@/components/GeneralLayout.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const router = useRouter()

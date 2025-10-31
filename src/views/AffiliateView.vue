@@ -1,5 +1,5 @@
 <template>
-  <AppLayout title="推广中心" :show-back="true">
+  <GeneralLayout title="推广中心">
     <div class="container mx-auto px-4 py-6 pb-20 md:pb-6">
       <!-- Not Affiliate Notice -->
       <div v-if="!loading && !isAffiliate" class="bg-gradient-to-r from-pink-500/20 to-purple-600/20 backdrop-blur-sm rounded-lg border border-pink-500/30 p-8 mb-6 text-center">
@@ -190,14 +190,14 @@
       </div>
       </div>
     </div>
-  </AppLayout>
+  </GeneralLayout>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import AppLayout from '@/components/AppLayout.vue'
+import GeneralLayout from '@/components/GeneralLayout.vue'
 import { request } from '@/api/request'
 
 const router = useRouter()

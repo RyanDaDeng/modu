@@ -294,7 +294,7 @@ const authStore = useAuthStore()
 // Check admin access
 onMounted(() => {
   if (!authStore.user?.is_admin) {
-    router.push('/')
+    router.push('/comic')
   } else {
     fetchData(1)
   }

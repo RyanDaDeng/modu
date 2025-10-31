@@ -5,7 +5,11 @@
       "WebSearch",
       "Bash(sed:*)",
       "Bash(php artisan make:migration:*)",
-      "Bash(php artisan tinker:*)"
+      "Bash(php artisan tinker:*)",
+      "Read(//mnt/d/workspace/**)",
+      "Bash(php artisan migrate:*)",
+      "Bash(find:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []

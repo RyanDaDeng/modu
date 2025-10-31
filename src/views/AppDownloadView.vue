@@ -1,9 +1,8 @@
 <template>
-  <AppLayout
+  <GeneralLayout
     title="APP 安装"
-    :show-back="true"
+    :show-top-nav="true"
     :show-bottom-nav="true"
-    :show-top-nav="false"
   >
     <div class="min-h-screen relative overflow-hidden">
       <!-- Background Screenshots - Desktop Only -->
@@ -177,11 +176,11 @@
         </div>
       </div>
     </div>
-  </AppLayout>
+  </GeneralLayout>
 </template>
 
 <script setup>
-import AppLayout from '@/components/AppLayout.vue'
+import GeneralLayout from '@/components/GeneralLayout.vue'
 import { handleImageError } from '@/utils/handleImageError'
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-  <AppLayout title="个人中心" :hide-breadcrumbs="true">
+  <GeneralLayout title="个人中心" :hide-breadcrumbs="true">
     <!-- Header with background image -->
     <div class="relative">
       <!-- Background Image -->
@@ -99,13 +99,28 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
               </div>
-              <div class="text-white font-medium">我的收藏</div>
+              <div class="text-white font-medium">漫画收藏</div>
             </div>
             <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
           </router-link>
-          
+
+          <!-- Video Collection -->
+          <router-link to="/video-collection" class="flex items-center justify-between p-4 hover:bg-gray-750 transition-colors cursor-pointer">
+            <div class="flex items-center gap-3">
+              <div class="p-2 bg-purple-500/20 rounded-lg">
+                <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                </svg>
+              </div>
+              <div class="text-white font-medium">视频收藏</div>
+            </div>
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </router-link>
+
           <!-- Reading History -->
           <router-link to="/reading-history" class="flex items-center justify-between p-4 hover:bg-gray-750 transition-colors cursor-pointer">
             <div class="flex items-center gap-3">
@@ -114,7 +129,7 @@
                   <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.669 0-3.218.51-4.5 1.385V4.804z" />
                 </svg>
               </div>
-              <div class="text-white font-medium">阅读历史</div>
+              <div class="text-white font-medium">观漫历史</div>
             </div>
             <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -129,7 +144,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                 </svg>
               </div>
-              <div class="text-white font-medium">我的书签</div>
+              <div class="text-white font-medium">漫画书签</div>
             </div>
             <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -408,7 +423,7 @@
       confirm-button-class="bg-red-600 hover:bg-red-700 text-white"
       @confirm="handleLogout"
     />
-  </AppLayout>
+  </GeneralLayout>
 </template>
 
 <script setup>
@@ -420,7 +435,7 @@ import { updateProfile, changePassword } from '@/api/auth'
 import { useNotification } from '@/composables/useNotification'
 import ModalDialog from '@/components/ModalDialog.vue'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
-import AppLayout from '@/components/AppLayout.vue'
+import GeneralLayout from '@/components/GeneralLayout.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -556,7 +571,7 @@ const handleChangePassword = async () => {
 
 const handleLogout = async () => {
   await authStore.logout()
-  router.push('/')
+  router.push('/comic')
 }
 
 onMounted(() => {

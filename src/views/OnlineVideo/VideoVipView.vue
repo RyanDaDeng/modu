@@ -1,78 +1,33 @@
 <template>
-  <GeneralLayout title="通行证充值">
-
+  <VideoLayout title="视频VIP会员">
     <!-- Main Content -->
     <div class="container mx-auto px-4 py-6">
       <!-- Title Section -->
       <div class="text-center mb-8">
         <h2 class="text-2xl sm:text-3xl font-bold text-pink-500 mb-3" style="text-shadow: 2px 2px 0 rgba(31, 41, 55, 0.8);">
-          充值通行证
+          视频通行证充值
         </h2>
-        <p class="text-gray-400 text-sm sm:text-base">{{ currentTab === 'comic' ? '解锁全站所有漫画' : '畅享全站海量视频内容' }}</p>
+        <p class="text-gray-400 text-sm sm:text-base">畅享全站海量视频内容</p>
       </div>
 
-      <!-- VIP Status Cards -->
+      <!-- Current VIP Status -->
       <div v-if="authStore.isLoggedIn" class="max-w-2xl mx-auto mb-8">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <!-- Comic VIP Status -->
-          <div class="bg-gradient-to-r from-gray-900/60 to-gray-800/60 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-            <div class="flex items-center justify-between">
-              <div>
-                <h3 class="text-white font-semibold text-sm mb-1">漫画通行证</h3>
-                <p v-if="isComicVip" class="text-green-400 text-xs">
-                  有效期至 {{ formatDate(authStore.user?.vip_expired_at) }}
-                </p>
-                <p v-else class="text-gray-400 text-xs">未开通</p>
-              </div>
-              <div :class="isComicVip ? 'bg-green-500/20 border-green-500/50 text-green-400' : 'bg-gray-700/50 border-gray-600 text-gray-400'" class="px-3 py-1 border rounded-lg text-xs">
-                {{ isComicVip ? '已开通' : '未开通' }}
-              </div>
+        <div class="bg-gradient-to-r from-gray-900/60 to-gray-800/60 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-white font-semibold mb-1">当前状态</h3>
+              <p v-if="isVideoVip" class="text-green-400">
+                视频通行证有效期至：{{ formatDate(authStore.user?.video_expired_at) }}
+              </p>
+              <p v-else class="text-gray-400">未开通视频通行证</p>
+            </div>
+            <div v-if="isVideoVip" class="px-4 py-2 bg-green-500/20 border border-green-500/50 text-green-400 rounded-lg">
+              已开通
+            </div>
+            <div v-else class="px-4 py-2 bg-gray-700/50 border border-gray-600 text-gray-400 rounded-lg">
+              未开通
             </div>
           </div>
-
-          <!-- Video VIP Status -->
-          <div class="bg-gradient-to-r from-gray-900/60 to-gray-800/60 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-            <div class="flex items-center justify-between">
-              <div>
-                <h3 class="text-white font-semibold text-sm mb-1">视频通行证</h3>
-                <p v-if="isVideoVip" class="text-green-400 text-xs">
-                  有效期至 {{ formatDate(authStore.user?.video_expired_at) }}
-                </p>
-                <p v-else class="text-gray-400 text-xs">未开通</p>
-              </div>
-              <div :class="isVideoVip ? 'bg-green-500/20 border-green-500/50 text-green-400' : 'bg-gray-700/50 border-gray-600 text-gray-400'" class="px-3 py-1 border rounded-lg text-xs">
-                {{ isVideoVip ? '已开通' : '未开通' }}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tab Switcher -->
-      <div class="max-w-md mx-auto mb-6 sm:max-w-3xl">
-        <div class="flex bg-gray-900/60 backdrop-blur-sm rounded-lg p-1 border border-white/10">
-          <button
-            @click="currentTab = 'comic'"
-            :class="[
-              'flex-1 py-2 px-4 rounded-lg font-medium transition-all',
-              currentTab === 'comic'
-                ? 'bg-gradient-to-r from-pink-600 to-purple-600 text-white'
-                : 'text-gray-400 hover:text-white'
-            ]"
-          >
-            漫画通行证
-          </button>
-          <button
-            @click="currentTab = 'video'"
-            :class="[
-              'flex-1 py-2 px-4 rounded-lg font-medium transition-all',
-              currentTab === 'video'
-                ? 'bg-gradient-to-r from-pink-600 to-purple-600 text-white'
-                : 'text-gray-400 hover:text-white'
-            ]"
-          >
-            视频通行证
-          </button>
         </div>
       </div>
 
@@ -84,12 +39,12 @@
       <!-- Pricing Cards -->
       <div v-else class="max-w-md mx-auto space-y-4 sm:max-w-3xl sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:items-stretch">
         <div
-          v-for="plan in filteredPlans"
+          v-for="plan in plans"
           :key="plan.key"
           :class="[
             'relative bg-gray-900/60 backdrop-blur-sm rounded-xl p-4 sm:p-6 border transition-all flex flex-col',
-            plan.popular 
-              ? 'border-pink-500/50 shadow-lg shadow-pink-500/20' 
+            plan.popular
+              ? 'border-pink-500/50 shadow-lg shadow-pink-500/20'
               : 'border-white/10 hover:border-pink-500/30'
           ]"
         >
@@ -100,22 +55,22 @@
             </span>
           </div>
 
-          <!-- Plan Content - flex-grow to push button to bottom -->
+          <!-- Plan Content -->
           <div class="flex flex-col flex-grow text-center">
             <!-- Plan Name -->
-            <h3 class="text-xl font-bold text-white mb-2">{{ currentTab === 'comic' ? '漫画' : '视频' }}{{ plan.name }}</h3>
-            
+            <h3 class="text-xl font-bold text-white mb-2">{{ plan.name }}</h3>
+
             <!-- Duration -->
             <p class="text-gray-400 text-sm mb-4">{{ plan.duration }}{{ plan.duration_unit }}</p>
-            
-            <!-- Price Section - fixed height -->
+
+            <!-- Price Section -->
             <div class="mb-4">
               <div class="flex items-baseline justify-center gap-1">
                 <span class="text-pink-500 text-sm">¥</span>
                 <span class="text-pink-500 text-3xl font-bold">{{ plan.price }}</span>
               </div>
-              
-              <!-- Original Price & Save - fixed height container -->
+
+              <!-- Original Price & Save -->
               <div class="h-10 mt-2">
                 <template v-if="plan.original_price">
                   <div class="text-gray-500 text-sm line-through">¥{{ plan.original_price }}</div>
@@ -125,8 +80,8 @@
                 </template>
               </div>
             </div>
-            
-            <!-- Feature - flex-grow to push divider down -->
+
+            <!-- Features -->
             <div class="flex-grow flex items-center justify-center border-t border-white/10 py-4">
               <div v-for="feature in plan.features" :key="feature" class="flex items-center justify-center gap-2 text-gray-300 text-sm">
                 <svg class="w-4 h-4 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -135,8 +90,8 @@
                 <span>{{ feature }}</span>
               </div>
             </div>
-            
-            <!-- Payment Buttons - always at bottom -->
+
+            <!-- Payment Buttons -->
             <div class="space-y-2">
               <button
                 @click.stop="handlePurchase(plan, 'alipay')"
@@ -193,16 +148,40 @@
         <div class="bg-gray-900/60 backdrop-blur-sm border border-white/10 rounded-lg divide-y divide-white/10">
           <details class="group">
             <summary class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-800/50 transition-colors">
-              <span class="text-gray-300 text-sm">通行证到期后会怎样？</span>
+              <span class="text-gray-300 text-sm">视频通行证可以观看所有视频吗？</span>
               <svg class="w-5 h-5 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </summary>
             <div class="px-4 pt-2 pb-4 text-gray-400 text-sm">
-              到期后将恢复为普通用户，您的收藏记录会保留。
+              是的，开通视频通行证后可以无限制观看全站所有视频内容。
             </div>
           </details>
-          
+
+          <details class="group">
+            <summary class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-800/50 transition-colors">
+              <span class="text-gray-300 text-sm">视频通行证和漫画VIP是分开的吗？</span>
+              <svg class="w-5 h-5 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="px-4 pt-2 pb-4 text-gray-400 text-sm">
+              是的，视频通行证和漫画VIP是独立的会员服务，需要分别购买。
+            </div>
+          </details>
+
+          <details class="group">
+            <summary class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-800/50 transition-colors">
+              <span class="text-gray-300 text-sm">视频通行证到期后会怎样？</span>
+              <svg class="w-5 h-5 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="px-4 pt-2 pb-4 text-gray-400 text-sm">
+              到期后将无法观看视频内容，但可以随时续费恢复权益。
+            </div>
+          </details>
+
           <details class="group">
             <summary class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-800/50 transition-colors">
               <span class="text-gray-300 text-sm">支持哪些支付方式？</span>
@@ -214,19 +193,7 @@
               目前支持支付宝和微信支付。
             </div>
           </details>
-          
-          <details class="group">
-            <summary class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-800/50 transition-colors">
-              <span class="text-gray-300 text-sm">在哪里查看支付状态？</span>
-              <svg class="w-5 h-5 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </summary>
-            <div class="px-4 pt-2 pb-4 text-gray-400 text-sm">
-              您可以在"个人中心" → "充值记录"页面查看所有支付订单的状态。
-            </div>
-          </details>
-          
+
           <details class="group">
             <summary class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-800/50 transition-colors">
               <span class="text-gray-300 text-sm">支付后多久到账？</span>
@@ -235,12 +202,11 @@
               </svg>
             </summary>
             <div class="px-4 pt-2 pb-4 text-gray-400 text-sm">
-              支付成功后，VIP权益会在十几秒到几分钟内自动到账。如果长时间未到账，请前往"个人中心" → "联系我们"反馈问题。
+              支付成功后，视频通行证权益会在几秒到几分钟内自动到账。如果长时间未到账，请联系客服反馈。
             </div>
           </details>
         </div>
       </div>
-
     </div>
 
     <!-- Login Modal -->
@@ -248,238 +214,202 @@
       v-model="showLoginModal"
       icon="lock"
       title="请先登录"
-      message="购买通行证需要先登录账号"
+      message="购买视频通行证需要先登录账号"
       confirm-text="立即登录"
       cancel-text="取消"
       @confirm="goToLogin"
-      @cancel="showLoginModal = false"
     />
 
-    <!-- Purchase Confirmation Modal -->
-    <ConfirmationDialog
-      v-model="showPurchaseModal"
-      type="info"
-      title="确认购买"
-      :message="`确认使用${selectedPaymentMethod === 'alipay' ? '支付宝' : '微信'}购买${selectedPlan?.name}（¥${selectedPlan?.price}）？`"
-      confirm-text="确认支付"
-      cancel-text="取消"
-      @confirm="confirmPurchase"
+    <!-- Payment Modal -->
+    <ModalDialog
+      v-model="showPaymentModal"
+      :icon="paymentModalIcon"
+      :title="paymentModalTitle"
+      :message="paymentModalMessage"
+      :confirm-text="paymentModalConfirmText"
+      @confirm="handlePaymentModalConfirm"
     />
-    
-    <!-- Payment Processing Modal -->
-    <div v-if="processingPayment" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <div class="bg-gray-900/90 backdrop-blur-xl rounded-xl p-6 border border-white/10 text-center max-w-sm mx-4">
-        <LoadingSpinner size="large" />
-        <p class="text-white mt-4 text-lg font-medium">{{ paymentMessage }}</p>
-        <p class="text-gray-400 mt-2 text-sm">请稍候，请勿关闭页面...</p>
-      </div>
-    </div>
-  </GeneralLayout>
+  </VideoLayout>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useNotification } from '@/composables/useNotification'
-import { getVipPlans, createVipOrder } from '@/api/vip'
-import { redeemCode } from '@/api/redemption'
+import VideoLayout from '@/components/onlinevideo/VideoLayout.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import ModalDialog from '@/components/ModalDialog.vue'
-import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
-import GeneralLayout from '@/components/GeneralLayout.vue'
+import { createVipOrder } from '@/api/vip'
+import { redeemCode } from '@/api/redemption'
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
-const notification = useNotification()
+const { showSuccess, showError } = useNotification()
 
-// State
-const currentTab = ref('comic') // 'comic' or 'video'
-const plans = ref([])
 const loading = ref(false)
-const showLoginModal = ref(false)
-const showPurchaseModal = ref(false)
-const selectedPlan = ref(null)
-const selectedPaymentMethod = ref(null)
-const processingPayment = ref(false)
-const paymentMessage = ref('正在创建订单...')
 const redemptionCode = ref('')
 const redeeming = ref(false)
+const showLoginModal = ref(false)
+const showPaymentModal = ref(false)
+const paymentModalIcon = ref('success')
+const paymentModalTitle = ref('')
+const paymentModalMessage = ref('')
+const paymentModalConfirmText = ref('确定')
+const currentOrderId = ref(null)
 
-// Computed: Filter plans based on current tab
-const filteredPlans = computed(() => {
-  return plans.value.filter(plan => {
-    // Determine plan type from 'type' field or fallback to 'key' suffix/prefix
-    let planType = plan.type
-    if (!planType) {
-      // Fallback: infer type from plan.key
-      // Supports: "monthly-video", "quarterly-video", "yearly-video" (ends with -video)
-      // Or: "video-1", "video-3", "video-7" (starts with video-)
-      if (plan.key && (plan.key.endsWith('-video') || plan.key.startsWith('video-'))) {
-        planType = 'video'
-      } else {
-        planType = 'comic' // default to comic for backward compatibility
-      }
-    }
+// 视频VIP套餐（月卡、季卡、年卡）
+const plans = ref([
+  {
+    key: 'video-1',
+    name: '月卡',
+    duration: 30,
+    duration_unit: '天',
+    price: 50,
+    original_price: null,
+    save_amount: null,
+    features: ['畅享全站视频'],
+    popular: false
+  },
+  {
+    key: 'video-3',
+    name: '季卡',
+    duration: 90,
+    duration_unit: '天',
+    price: 100,
+    original_price: 150,
+    save_amount: 50,
+    features: ['畅享全站视频'],
+    popular: false
+  },
+  {
+    key: 'video-7',
+    name: '年卡',
+    duration: 365,
+    duration_unit: '天',
+    price: 280,
+    original_price: 600,
+    save_amount: 320,
+    features: ['畅享全站视频'],
+    popular: true
+  }
+])
 
-    if (currentTab.value === 'comic') {
-      return planType === 'comic'
-    } else {
-      return planType === 'video'
-    }
-  })
-})
-
-// Computed: Check VIP status
-const isComicVip = computed(() => {
-  if (!authStore.user?.vip_expired_at) return false
-  const expiredDate = new Date(authStore.user.vip_expired_at)
-  return expiredDate > new Date()
-})
-
+// 是否是视频VIP
 const isVideoVip = computed(() => {
   if (!authStore.user?.video_expired_at) return false
   const expiredDate = new Date(authStore.user.video_expired_at)
   return expiredDate > new Date()
 })
 
-// Format date
+// 格式化日期
 const formatDate = (dateString) => {
   if (!dateString) return ''
   const date = new Date(dateString)
   return date.toLocaleDateString('zh-CN', {
     year: 'numeric',
     month: '2-digit',
-    day: '2-digit'
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
   })
 }
 
-// Load VIP plans
-const loadPlans = async () => {
-  loading.value = true
+// 跳转到登录页
+const goToLogin = () => {
+  router.push({
+    path: '/login',
+    query: { redirect: route.fullPath }
+  })
+}
+
+// 处理购买
+const handlePurchase = async (plan, paymentMethod) => {
+  // 检查登录状态
+  if (!authStore.isLoggedIn) {
+    showLoginModal.value = true
+    return
+  }
+
   try {
-    const response = await getVipPlans()
-    if (response.success) {
-      plans.value = response.data
-      console.log('Loaded VIP plans:', plans.value)
-      console.log('Filtered plans for current tab:', filteredPlans.value)
+    loading.value = true
+
+    // 创建订单
+    const response = await createVipOrder({
+      plan_key: plan.key,
+      payment_method: paymentMethod
+    })
+
+    if (response.data) {
+      currentOrderId.value = response.data.order_id
+
+      // 显示支付二维码或跳转链接
+      if (response.data.qr_code) {
+        paymentModalIcon.value = 'qrcode'
+        paymentModalTitle.value = '扫码支付'
+        paymentModalMessage.value = response.data.qr_code
+        paymentModalConfirmText.value = '我已支付'
+        showPaymentModal.value = true
+      } else if (response.data.pay_url) {
+        // 跳转到支付页面
+        window.location.href = response.data.pay_url
+      }
     }
   } catch (error) {
-    console.error('Failed to load VIP plans:', error)
+    console.error('创建订单失败:', error)
+    showError(error.response?.data?.message || '创建订单失败，请稍后重试')
   } finally {
     loading.value = false
   }
 }
 
-// Handle purchase click
-const handlePurchase = (plan, paymentMethod) => {
-  if (!authStore.isLoggedIn) {
-    showLoginModal.value = true
-    return
-  }
-  
-  selectedPlan.value = plan
-  selectedPaymentMethod.value = paymentMethod
-  showPurchaseModal.value = true
-}
-
-// Confirm purchase
-const confirmPurchase = async () => {
-  showPurchaseModal.value = false
-  processingPayment.value = true
-  paymentMessage.value = '正在创建订单...'
-  
-  try {
-    const response = await createVipOrder(selectedPlan.value.key, selectedPaymentMethod.value)
-    if (response.success && response.payment_url) {
-      // Show redirect message
-      paymentMessage.value = '正在转向支付页面...'
-      
-      // Small delay to show the message
-      setTimeout(() => {
-        window.location.href = response.payment_url
-      }, 500)
-    } else {
-      processingPayment.value = false
-      alert('订单创建失败，请稍后重试')
-    }
-  } catch (error) {
-    console.error('Failed to create order:', error)
-    processingPayment.value = false
-    alert('订单创建失败，请稍后重试')
-  }
-}
-
-// Go to login page
-const goToLogin = () => {
-  showLoginModal.value = false
-  router.push({
-    path: '/login',
-    query: { redirect: '/vip' }
-  })
-}
-
-// Handle redemption code
+// 处理兑换码
 const handleRedeem = async () => {
   const code = redemptionCode.value.trim()
-  
-  if (!code) {
-    notification.error('请输入兑换码')
-    return
-  }
-  
-  // Check if user is logged in
+  if (!code) return
+
+  // 检查登录状态
   if (!authStore.isLoggedIn) {
     showLoginModal.value = true
     return
   }
-  
-  redeeming.value = true
-  
+
   try {
+    redeeming.value = true
     const response = await redeemCode(code)
-    
-    if (response.success) {
-      notification.success(response.message || `成功兑换 ${response.value} 天 VIP`)
+
+    if (response.data) {
+      showSuccess('兑换成功！视频通行证已到账')
       redemptionCode.value = ''
-      
-      // Update user's VIP status
-      if (response.vip_expire) {
-        authStore.user.vip_expired_at = response.vip_expire
-      }
-      
-      // Optionally refresh user data
+      // 刷新用户信息
       await authStore.fetchUser()
-    } else {
-      notification.error(response.message || '兑换失败')
     }
   } catch (error) {
-    console.error('Redemption error:', error)
-    notification.error(error.message || '兑换失败，请稍后再试')
+    console.error('兑换失败:', error)
+    showError(error.response?.data?.message || '兑换码无效或已使用')
   } finally {
     redeeming.value = false
   }
 }
 
-// Watch for tab changes
-watch(currentTab, (newTab) => {
-  console.log('Tab changed to:', newTab)
-  console.log('Filtered plans:', filteredPlans.value)
-})
+// 处理支付确认
+const handlePaymentModalConfirm = () => {
+  showPaymentModal.value = false
+  // 刷新用户信息
+  authStore.fetchUser()
+  showSuccess('如果支付成功，权益将在几分钟内到账')
+}
 
 onMounted(() => {
-  loadPlans()
-
-  // Check if coming from video section, default to video tab
-  if (route.query.tab === 'video') {
-    currentTab.value = 'video'
+  // 如果URL中有plan参数，自动选中对应套餐
+  const planKey = route.query.plan
+  if (planKey) {
+    const plan = plans.value.find(p => p.key === planKey)
+    if (plan) {
+      // 可以高亮显示或自动打开该套餐
+      console.log('预选套餐:', plan.name)
+    }
   }
 })
 </script>
-
-<style scoped>
-details summary::-webkit-details-marker {
-  display: none;
-}
-</style>

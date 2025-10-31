@@ -1,5 +1,5 @@
 <template>
-  <div v-if="totalPages > 1" class="flex items-center justify-center gap-0.5 sm:gap-1">
+  <div v-if="totalPages >= 1" class="flex items-center justify-center gap-0.5 sm:gap-1">
     <!-- Previous Page -->
     <button
       @click="changePage(currentPage - 1)"

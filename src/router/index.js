@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { usePageStateStore } from '@/stores/pageState'
+import NavigationView from '../views/NavigationView.vue'
 import HomeView from '../views/HomeView.vue'
 
 const router = createRouter({
@@ -8,6 +9,11 @@ const router = createRouter({
   routes: [
     {
       path: '/',
+      name: 'navigation',
+      component: NavigationView
+    },
+    {
+      path: '/comic',
       name: 'home',
       component: HomeView
     },
@@ -117,6 +123,39 @@ const router = createRouter({
       name: 'admin-payment',
       component: () => import('../views/AdminPaymentView.vue'),
       meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    // Video routes - all with /video prefix
+    {
+      path: '/video',
+      name: 'video-home',
+      component: () => import('../views/OnlineVideo/VideoHomeView.vue')
+    },
+    {
+      path: '/video/search',
+      name: 'video-search',
+      component: () => import('../views/OnlineVideo/VideoSearchView.vue')
+    },
+    {
+      path: '/video/favorites',
+      name: 'video-favorites',
+      component: () => import('../views/OnlineVideo/VideoFavoritesView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/video/:id',
+      name: 'video-detail',
+      component: () => import('../views/OnlineVideo/VideoDetailView.vue')
+    },
+    {
+      path: '/video-collection',
+      name: 'video-collection',
+      component: () => import('../views/OnlineVideo/VideoCollectionView.vue'),
+      meta: { requiresAuth: true }
+    },
+    // Redirect old vip-video route to unified vip page with video tab
+    {
+      path: '/vip-video',
+      redirect: '/vip?tab=video'
     }
   ],
   scrollBehavior(to, from, savedPosition) {

@@ -212,7 +212,7 @@ const handleRegister = async () => {
     
     if (result.success) {
       // 注册成功，跳转到首页
-      router.push('/')
+      router.push('/comic')
     } else {
       errorMessage.value = result.message || '注册失败，请检查您的信息'
     }
