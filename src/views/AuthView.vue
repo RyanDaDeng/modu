@@ -26,7 +26,7 @@
         <!-- Logo and Title -->
         <div class="text-center mb-8 animate-fade-in-down">
           <div class="flex justify-center mb-4">
-            <SiteLogo :size="'normal'" />
+            <SiteLogo :size="'normal'" module='' />
           </div>
           <p class="text-gray-300 text-sm">记住永久地址：modu18.vip</p>
         </div>

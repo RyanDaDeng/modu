@@ -1,11 +1,22 @@
 <template>
   <div class="min-h-screen flex items-center justify-center relative overflow-hidden">
-    <!-- Background with gradient -->
-    <div
-      class="absolute inset-0 bg-cover bg-center"
-      style="background-image: url('/img_6.png')"
-    >
-      <div class="absolute inset-0 bg-black/80"></div>
+    <!-- Background Image -->
+    <div class="fixed inset-0">
+      <img
+        src="/img_1.png"
+        alt="Background"
+        class="w-full h-full object-cover"
+      />
+      <!-- Dark Overlay with gradient -->
+      <div class="absolute inset-0 bg-gradient-to-br from-black/70 via-purple-900/50 to-pink-900/50"></div>
+
+      <!-- Animated particles effect -->
+      <div class="absolute inset-0">
+        <div class="particle particle-1"></div>
+        <div class="particle particle-2"></div>
+        <div class="particle particle-3"></div>
+        <div class="particle particle-4"></div>
+      </div>
     </div>
 
     <!-- Content -->
@@ -120,5 +131,59 @@ const showPermanentLinkModal = ref(false)
 </script>
 
 <style scoped>
-/* Optional: Add any additional styling here */
+/* Animated particles */
+.particle {
+  position: absolute;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  opacity: 0.3;
+  animation: float 20s infinite ease-in-out;
+}
+
+.particle-1 {
+  width: 80px;
+  height: 80px;
+  top: 10%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.particle-2 {
+  width: 120px;
+  height: 120px;
+  top: 70%;
+  right: 10%;
+  animation-delay: 5s;
+}
+
+.particle-3 {
+  width: 60px;
+  height: 60px;
+  bottom: 10%;
+  left: 30%;
+  animation-delay: 10s;
+}
+
+.particle-4 {
+  width: 100px;
+  height: 100px;
+  top: 40%;
+  right: 30%;
+  animation-delay: 15s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.3;
+  }
+  33% {
+    transform: translateY(-100px) rotate(120deg);
+    opacity: 0.5;
+  }
+  66% {
+    transform: translateY(100px) rotate(240deg);
+    opacity: 0.2;
+  }
+}
 </style>
