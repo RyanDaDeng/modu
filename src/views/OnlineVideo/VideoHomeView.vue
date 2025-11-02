@@ -163,8 +163,14 @@
   </VideoLayout>
 </template>
 
+<script>
+export default {
+  name: 'VideoHomeView'
+}
+</script>
+
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onActivated, onDeactivated, onBeforeUnmount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getVideos, getVideoSettings } from '@/api/video'
 
@@ -174,6 +180,9 @@ import VideoLayout from '@/components/onlinevideo/VideoLayout.vue'
 import VideoFilter from '@/components/onlinevideo/VideoFilter.vue'
 import VideoGrid from '@/components/onlinevideo/VideoGrid.vue'
 import Pagination from '@/components/Pagination.vue'
+
+// Key for storing state in sessionStorage
+const VIDEO_HOME_STATE_KEY = 'videoHomePageState'
 
 // 状态
 const videos = ref([])
@@ -243,6 +252,73 @@ const getEmptyMessage = computed(() => {
   }
   return '暂无视频，试试换个筛选条件吧'
 })
+
+// Save state to sessionStorage
+const saveState = () => {
+  const state = {
+    videos: videos.value,
+    categories: categories.value,
+    cdnDomain: cdnDomain.value,
+    filters: filters.value,
+    pagination: pagination.value,
+    showFilters: showFilters.value,
+    scrollPosition: {
+      x: window.scrollX,
+      y: window.scrollY
+    },
+    timestamp: Date.now()
+  }
+  sessionStorage.setItem(VIDEO_HOME_STATE_KEY, JSON.stringify(state))
+}
+
+// Restore state from sessionStorage
+const restoreState = () => {
+  try {
+    const savedState = sessionStorage.getItem(VIDEO_HOME_STATE_KEY)
+    if (!savedState) return false
+
+    const state = JSON.parse(savedState)
+
+    // Check if state is not too old (5 minutes)
+    if (Date.now() - state.timestamp > 5 * 60 * 1000) {
+      sessionStorage.removeItem(VIDEO_HOME_STATE_KEY)
+      return false
+    }
+
+    // Restore all state
+    videos.value = state.videos || []
+    categories.value = state.categories || []
+    cdnDomain.value = state.cdnDomain || ''
+    filters.value = state.filters || {
+      type: null,
+      sortFilter: 'latest',
+      source: null,
+      searchText: null
+    }
+    pagination.value = state.pagination || {
+      currentPage: 1,
+      perPage: 32,
+      total: 0,
+      lastPage: 1
+    }
+    showFilters.value = state.showFilters ?? false
+
+    // Make sure loading states are false when restoring
+    loading.value = false
+    initialLoading.value = false
+
+    // Save scroll position for later restoration
+    if (state.scrollPosition) {
+      savedScrollPosition.value = state.scrollPosition
+    }
+
+    return true
+  } catch (error) {
+    console.error('Failed to restore video home state:', error)
+    sessionStorage.removeItem(VIDEO_HOME_STATE_KEY)
+    return false
+  }
+}
 
 // 获取视频列表
 const fetchVideos = async (page = 1) => {
@@ -364,28 +440,99 @@ const handleMobileSearch = () => {
 
 // 监听 URL query 变化
 watch(() => route.query.q, (newQuery) => {
-  filters.value.searchText = newQuery || null
-  fetchVideos(1)
+  // 只在组件激活状态下响应 URL 变化
+  if (isActivated.value && newQuery !== filters.value.searchText) {
+    filters.value.searchText = newQuery || null
+    fetchVideos(1)
+  }
 })
+
+// Flag to track if component is activated
+const isActivated = ref(false)
+const isFirstActivation = ref(true)
+const savedScrollPosition = ref({ x: 0, y: 0 })
 
 // 初始化
 onMounted(async () => {
-  try {
-    // 从 URL 读取搜索关键词
-    const searchQuery = route.query.q
-    if (searchQuery) {
-      filters.value.searchText = searchQuery
-    }
+  console.log('VideoHomeView mounted')
 
-    // 并行加载分类和视频列表
-    await Promise.all([
-      fetchCategories(),
-      fetchVideos(1)
-    ])
-  } catch (error) {
-    console.error('初始化失败:', error)
-  } finally {
+  // Try to restore state first
+  const stateRestored = restoreState()
+
+  if (!stateRestored) {
+    // No saved state, load fresh data
+    try {
+      // 从 URL 读取搜索关键词
+      const searchQuery = route.query.q
+      if (searchQuery) {
+        filters.value.searchText = searchQuery
+      }
+
+      // 并行加载分类和视频列表
+      await Promise.all([
+        fetchCategories(),
+        fetchVideos(1)
+      ])
+    } catch (error) {
+      console.error('初始化失败:', error)
+    } finally {
+      initialLoading.value = false
+    }
+  } else {
+    // State restored, no need to load
+    console.log('State restored from sessionStorage')
     initialLoading.value = false
   }
+
+  isActivated.value = true
+})
+
+// Called when keep-alive component is activated (navigating back to this page)
+onActivated(() => {
+  console.log('VideoHomeView activated, isFirstActivation:', isFirstActivation.value)
+  isActivated.value = true
+
+  if (!isFirstActivation.value) {
+    // Not the first activation, we're coming back to this page
+    // State is already in memory from keep-alive, no need to reload
+    console.log('Reusing existing state from keep-alive, no API call')
+
+    // Make sure loading states are false
+    loading.value = false
+    initialLoading.value = false
+
+    // Restore scroll position
+    if (savedScrollPosition.value.y > 0 || savedScrollPosition.value.x > 0) {
+      setTimeout(() => {
+        window.scrollTo({
+          top: savedScrollPosition.value.y,
+          left: savedScrollPosition.value.x,
+          behavior: 'instant'
+        })
+      }, 0)
+    }
+  }
+
+  isFirstActivation.value = false
+})
+
+// Called when keep-alive component is deactivated (navigating away)
+onDeactivated(() => {
+  console.log('VideoHomeView deactivated, saving state')
+  isActivated.value = false
+
+  // Save current scroll position
+  savedScrollPosition.value = {
+    x: window.scrollX,
+    y: window.scrollY
+  }
+
+  saveState()
+})
+
+// Still keep onBeforeUnmount for cases where the component is actually destroyed
+onBeforeUnmount(() => {
+  console.log('VideoHomeView unmounting')
+  saveState()
 })
 </script>

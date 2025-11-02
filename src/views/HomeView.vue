@@ -567,7 +567,7 @@
 
       <!-- Promotions Sections -->
       <div v-else-if="promotions.length">
-        <div v-for="(promotion, index) in promotions" :key="promotion.title" class="mb-8">
+        <div v-for="(promotion, index) in promotions" :key="promotion.title" :class="index == promotions.length-1 ? 'pb-8' :'mb-8'">
           <!-- Divider before each section -->
           <div v-if="index === 0 || promotion.title" class="flex justify-center my-4">
             <img

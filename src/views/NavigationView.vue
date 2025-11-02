@@ -13,14 +13,11 @@
       <!-- Logo and Title -->
       <div class="text-center mb-8 sm:mb-12">
         <div class="flex justify-center mb-4 sm:mb-6">
-          <SiteLogo :size="'large'" />
+          <SiteLogo :size="'large'" module=''  />
         </div>
         <h1 class="text-2xl sm:text-4xl lg:text-5xl font-bold text-white mb-2 sm:mb-4">
           欢迎来到魔都
         </h1>
-        <p class="text-gray-400 text-sm sm:text-lg">
-          请选择你想要访问的模块
-        </p>
       </div>
 
       <!-- Navigation Cards -->
@@ -104,100 +101,7 @@
       </div>
 
       <!-- Permanent Link Modal -->
-      <div
-        v-if="showPermanentLinkModal"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4"
-        @click="showPermanentLinkModal = false"
-      >
-        <!-- Backdrop with glassmorphism -->
-        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
-
-        <!-- Modal Content -->
-        <div
-          class="relative bg-gray-900/95 backdrop-blur-xl border border-white/20 rounded-2xl p-6 max-w-lg w-full shadow-2xl"
-          @click.stop
-        >
-          <!-- Close Button -->
-          <button
-            @click="showPermanentLinkModal = false"
-            class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors cursor-pointer"
-          >
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-
-          <!-- Modal Header -->
-          <div class="mb-6">
-            <div class="flex items-center gap-3">
-              <svg class="w-8 h-8 text-pink-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd" />
-              </svg>
-              <h2 class="text-xl font-bold text-white">永久链接</h2>
-            </div>
-          </div>
-
-          <!-- Permanent Links -->
-          <div class="space-y-3">
-            <!-- Link 1 -->
-            <div class="bg-gray-800/50 backdrop-blur-sm border border-white/10 rounded-lg p-4 hover:border-pink-500/30 transition-colors">
-              <div class="flex items-center justify-between">
-                <a
-                  href="https://modu18.vip"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="text-pink-400 hover:text-pink-300 font-medium text-sm sm:text-base flex items-center gap-2 transition-colors flex-1 min-w-0"
-                >
-                  <span class="truncate">https://modu18.vip</span>
-                  <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                </a>
-                <button
-                  @click="copyToClipboard('https://modu18.vip')"
-                  class="ml-3 px-3 py-1.5 bg-pink-500/20 hover:bg-pink-500/30 border border-pink-400/50 hover:border-pink-400/70 text-pink-300 hover:text-pink-200 text-xs sm:text-sm rounded-lg transition-all flex items-center gap-1 flex-shrink-0 cursor-pointer"
-                >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                  <span class="hidden sm:inline">复制</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Link 2 -->
-            <div class="bg-gray-800/50 backdrop-blur-sm border border-white/10 rounded-lg p-4 hover:border-pink-500/30 transition-colors">
-              <div class="flex items-center justify-between">
-                <a
-                  href="https://modu19.vip"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="text-pink-400 hover:text-pink-300 font-medium text-sm sm:text-base flex items-center gap-2 transition-colors flex-1 min-w-0"
-                >
-                  <span class="truncate">https://modu19.vip</span>
-                  <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                </a>
-                <button
-                  @click="copyToClipboard('https://modu19.vip')"
-                  class="ml-3 px-3 py-1.5 bg-pink-500/20 hover:bg-pink-500/30 border border-pink-400/50 hover:border-pink-400/70 text-pink-300 hover:text-pink-200 text-xs sm:text-sm rounded-lg transition-all flex items-center gap-1 flex-shrink-0 cursor-pointer"
-                >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                  <span class="hidden sm:inline">复制</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Note -->
-          <div class="mt-4 text-xs text-gray-400 text-center">
-            建议将以上地址保存到浏览器收藏夹
-          </div>
-        </div>
-      </div>
+      <PermanentLinksModal v-model="showPermanentLinkModal" />
 
       <!-- Footer Note -->
       <div class="text-center mt-6 sm:mt-8 text-gray-500 text-xs sm:text-sm px-4">
@@ -210,31 +114,9 @@
 <script setup>
 import { ref } from 'vue'
 import SiteLogo from '@/components/SiteLogo.vue'
+import PermanentLinksModal from '@/components/PermanentLinksModal.vue'
 
 const showPermanentLinkModal = ref(false)
-
-// Copy to clipboard function
-const copyToClipboard = async (text) => {
-  try {
-    await navigator.clipboard.writeText(text)
-    // You can add a notification here if needed
-    alert('链接已复制到剪贴板')
-  } catch (err) {
-    console.error('Failed to copy:', err)
-    // Fallback for older browsers
-    const textArea = document.createElement('textarea')
-    textArea.value = text
-    document.body.appendChild(textArea)
-    textArea.select()
-    try {
-      document.execCommand('copy')
-      alert('链接已复制到剪贴板')
-    } catch (err) {
-      console.error('Fallback: Failed to copy', err)
-    }
-    document.body.removeChild(textArea)
-  }
-}
 </script>
 
 <style scoped>

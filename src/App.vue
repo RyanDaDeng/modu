@@ -59,11 +59,12 @@ const isChapterView = computed(() => false) // Always show header and nav
 // Define which views should be cached
 const cachedViews = [
   'HomeView',
-  'CatalogView', 
+  'CatalogView',
   'UpdatesView',
   'LatestView',
   'CollectionView',
-  'SearchView'
+  'SearchView',
+  'VideoHomeView'
 ]
 
 onMounted(async () => {

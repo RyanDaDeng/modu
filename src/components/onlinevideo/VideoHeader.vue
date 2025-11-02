@@ -168,110 +168,7 @@
     </div>
 
     <!-- Permanent Link Modal -->
-    <div
-      v-if="showPermanentLinkModal"
-      class="fixed inset-0 z-50 flex items-center justify-center p-4"
-      @click="showPermanentLinkModal = false"
-    >
-      <!-- Backdrop with glassmorphism -->
-      <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
-
-      <!-- Modal Content -->
-      <div
-        class="relative bg-gray-900/95 backdrop-blur-xl border border-white/20 rounded-2xl p-6 max-w-lg w-full shadow-2xl"
-        @click.stop
-      >
-        <!-- Close Button -->
-        <button
-          @click="showPermanentLinkModal = false"
-          class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors cursor-pointer"
-        >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-
-        <!-- Modal Header with "魔都漫画" Branding -->
-        <div class="mb-6">
-          <div class="flex items-center gap-3 mb-2">
-            <svg class="w-8 h-8 text-pink-500" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd" />
-            </svg>
-            <h2 class="text-xl font-bold text-white">永久链接</h2>
-          </div>
-          <!-- "魔都漫画" Branding with highlighted gradient color -->
-          <div class="mt-3 text-center">
-            <span class="text-2xl font-bold bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent animate-gradient">
-              魔都漫画
-            </span>
-          </div>
-          <p class="text-gray-400 text-sm mt-2">收藏以下地址，以备不时之需</p>
-        </div>
-
-        <!-- Permanent Links -->
-        <div class="space-y-3">
-          <!-- Link 1 -->
-          <div class="bg-gray-800/50 backdrop-blur-sm border border-white/10 rounded-lg p-4 hover:border-pink-500/30 transition-colors">
-            <div class="flex items-center justify-between">
-              <a
-                href="https://modu18.vip"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-pink-400 hover:text-pink-300 font-medium text-sm sm:text-base flex items-center gap-2 transition-colors flex-1 min-w-0"
-              >
-                <span class="truncate">https://modu18.vip</span>
-                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-              </a>
-              <button
-                @click="copyToClipboard('https://modu18.vip')"
-                class="ml-3 px-3 py-1.5 bg-pink-500/20 hover:bg-pink-500/30 border border-pink-400/50 hover:border-pink-400/70 text-pink-300 hover:text-pink-200 text-xs sm:text-sm rounded-lg transition-all flex items-center gap-1 flex-shrink-0 cursor-pointer"
-              >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-                <span class="hidden sm:inline">复制</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Link 2 -->
-          <div class="bg-gray-800/50 backdrop-blur-sm border border-white/10 rounded-lg p-4 hover:border-pink-500/30 transition-colors">
-            <div class="flex items-center justify-between">
-              <a
-                href="https://18modu.vip"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-pink-400 hover:text-pink-300 font-medium text-sm sm:text-base flex items-center gap-2 transition-colors flex-1 min-w-0"
-              >
-                <span class="truncate">https://18modu.vip</span>
-                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-              </a>
-              <button
-                @click="copyToClipboard('https://18modu.vip')"
-                class="ml-3 px-3 py-1.5 bg-pink-500/20 hover:bg-pink-500/30 border border-pink-400/50 hover:border-pink-400/70 text-pink-300 hover:text-pink-200 text-xs sm:text-sm rounded-lg transition-all flex items-center gap-1 flex-shrink-0 cursor-pointer"
-              >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-                <span class="hidden sm:inline">复制</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Copy Success Message -->
-        <div
-          v-if="showCopySuccess"
-          class="mt-4 p-3 bg-green-500/20 border border-green-400/50 rounded-lg text-green-300 text-sm text-center"
-        >
-          ✓ 链接已复制到剪贴板
-        </div>
-      </div>
-    </div>
+    <PermanentLinksModal v-model="showPermanentLinkModal" />
   </header>
 </template>
 
@@ -282,6 +179,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
 import VideoSiteLogo from '@/components/VideoSiteLogo.vue'
 import UserDropdown from '@/components/UserDropdown.vue'
+import PermanentLinksModal from '@/components/PermanentLinksModal.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -289,7 +187,6 @@ const appStore = useAppStore()
 const searchQuery = ref('')
 const showUserMenu = ref(false)
 const showPermanentLinkModal = ref(false)
-const showCopySuccess = ref(false)
 
 // 是否是视频VIP
 const isVideoVip = computed(() => {
@@ -331,19 +228,6 @@ const handleLogout = async () => {
   await authStore.logout()
   closeUserMenu()
   router.push('/video')
-}
-
-// 复制到剪贴板
-const copyToClipboard = async (text) => {
-  try {
-    await navigator.clipboard.writeText(text)
-    showCopySuccess.value = true
-    setTimeout(() => {
-      showCopySuccess.value = false
-    }, 2000)
-  } catch (err) {
-    console.error('复制失败:', err)
-  }
 }
 
 // Click outside directive

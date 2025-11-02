@@ -29,14 +29,14 @@
       >♥</span>
 
       <!-- Mobile & Desktop: 漫画 -->
-      <span
+      <span v-if="module"
         :class="[
           'text-pink-500 font-extrabold tracking-wider',
           size === 'small' ? 'text-lg' : 'text-xl sm:text-2xl'
         ]"
         style="font-family: 'Pacifico', 'Dancing Script', 'Satisfy', 'Kaushan Script', 'Permanent Marker', fantasy; text-shadow: 2px 2px 0 rgba(31, 41, 55, 0.8), 3px 3px 0 rgba(219, 39, 119, 0.5); letter-spacing: 0.05em;"
       >
-        漫画
+        {{ module }}
       </span>
     </div>
   </div>
@@ -48,6 +48,10 @@ defineProps({
     type: String,
     default: 'normal',
     validator: (value) => ['small', 'normal'].includes(value)
+  },
+  module: {
+    type: String,
+    default: '漫画',
   }
 })
 </script>

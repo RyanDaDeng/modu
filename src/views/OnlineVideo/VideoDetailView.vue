@@ -125,12 +125,12 @@
                     </a>
                     <span class="text-gray-400">|</span>
                     <a
-                      href="https://modu19.vip"
+                      href="https://18modu.vip"
                       target="_blank"
                       rel="noopener noreferrer"
                       class="text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 transition-colors"
                     >
-                      https://modu19.vip
+                      https://18modu.vip
                     </a>
                   </div>
                 </div>
